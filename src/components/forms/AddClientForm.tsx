@@ -3,8 +3,11 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
 import { 
   Form, 
   FormControl, 
@@ -13,12 +16,20 @@ import {
   FormLabel, 
   FormMessage 
 } from "@/components/ui/form";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { DialogFooter } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  contractStart: z.string().min(1, { message: "Please select a contract start date." }),
+  contractStart: z.date({
+    required_error: "Please select a contract start date.",
+  }),
 });
 
 export type ClientFormValues = z.infer<typeof formSchema>;
@@ -34,7 +45,7 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
     defaultValues: {
       name: "",
       email: "",
-      contractStart: new Date().toISOString().split('T')[0],
+      contractStart: new Date(),
     },
   });
 
@@ -78,11 +89,36 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
           control={form.control}
           name="contractStart"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel>Contract Start Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full pl-3 text-left font-normal flex justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "PP")
+                      ) : (
+                        <span>Select date</span>
+                      )}
+                      <CalendarIcon className="h-4 w-4 opacity-70" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}

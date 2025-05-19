@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddClientForm, ClientFormValues } from "../forms/AddClientForm";
+import { toast } from "@/components/ui/use-toast";
 
 interface AddClientDialogProps {
   buttonClassName?: string;
@@ -23,6 +24,10 @@ export function AddClientDialog({ buttonClassName, className }: AddClientDialogP
   const handleSubmit = (values: ClientFormValues) => {
     console.log("New client:", values);
     // Here you would typically make an API call to create the client
+    toast({
+      title: "Client added successfully",
+      description: `${values.name} has been added with contract start date: ${values.contractStart.toLocaleDateString()}`,
+    });
     setOpen(false);
   };
 
