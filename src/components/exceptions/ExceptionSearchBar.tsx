@@ -21,12 +21,16 @@ const ExceptionSearchBar = ({ onSearch, onFilter }: ExceptionSearchBarProps) => 
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
         <Input 
           placeholder="Search exceptions..." 
-          className="pl-9 w-full sm:max-w-xs" 
+          className="pl-9 w-full sm:max-w-xs bg-[#1A1F2C] border-gray-700 text-white" 
           onChange={handleSearchChange}
         />
       </div>
       
-      <Button variant="outline" className="w-full sm:w-auto" onClick={onFilter}>
+      <Button 
+        variant="outline" 
+        className="w-full sm:w-auto border-gray-700 text-white hover:bg-gray-700" 
+        onClick={onFilter}
+      >
         <Filter size={16} className="mr-2" />
         Filter
       </Button>

@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
+import ClientCredentials from "./pages/ClientCredentials";
 import Workflows from "./pages/Workflows";
 import Exceptions from "./pages/Exceptions";
 import Billing from "./pages/Billing";
@@ -110,6 +111,7 @@ const AppRoutes = () => {
       <Route path="/subscriptions" element={<AdminRoute><Subscriptions /></AdminRoute>} />
       <Route path="/reporting" element={<AdminRoute><Reporting /></AdminRoute>} />
       <Route path="/messaging" element={<AdminRoute><Messaging /></AdminRoute>} />
+      <Route path="/client/credentials" element={<AdminRoute><ClientCredentials /></AdminRoute>} />
       
       {/* Client routes */}
       <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />

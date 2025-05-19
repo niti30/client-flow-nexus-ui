@@ -18,17 +18,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Exception } from "@/hooks/useExceptions";
 
 interface ExceptionsTableProps {
   exceptions: Exception[];
   loading: boolean;
+  onViewCredentials?: (clientId: string) => void;
 }
 
 type SortField = 'created_at' | 'client' | 'department' | 'workflow' | 'exception_type' | 'severity' | 'remedy' | 'status';
 type SortDirection = 'asc' | 'desc';
 
-const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
+const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsTableProps) => {
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [page, setPage] = useState(1);
@@ -37,15 +45,15 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
   const getSeverityBadgeColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'critical':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-800 text-white';
       case 'high':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-amber-800 text-white';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-700 text-white';
       case 'low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-800 text-white';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-700 text-white';
     }
   };
 
@@ -69,6 +77,11 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
     return sortDirection === 'asc' 
       ? <ArrowUp className="inline ml-1" size={14} /> 
       : <ArrowDown className="inline ml-1" size={14} />;
+  };
+
+  const handleStatusChange = (exceptionId: string, newStatus: string) => {
+    console.log(`Exception ${exceptionId} status changed to ${newStatus}`);
+    // In a real implementation, we would update the exception status in the database
   };
 
   const sortedExceptions = [...exceptions].sort((a, b) => {
@@ -179,56 +192,56 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
   };
 
   return (
-    <div className="bg-white rounded-md border overflow-hidden">
+    <div className="overflow-hidden">
       <div className="overflow-x-auto">
-        <Table>
+        <Table className="w-full">
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b border-gray-700">
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('created_at')}
               >
                 Datetime reported {getSortIcon('created_at')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('client')}
               >
                 Client name {getSortIcon('client')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('department')}
               >
                 Department {getSortIcon('department')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('workflow')}
               >
                 Workflow name {getSortIcon('workflow')}
               </TableHead>
-              <TableHead className="whitespace-nowrap">Notifications</TableHead>
+              <TableHead className="whitespace-nowrap text-gray-300 font-medium text-xs uppercase">Notifications</TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('exception_type')}
               >
                 Exception type {getSortIcon('exception_type')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('severity')}
               >
                 Severity {getSortIcon('severity')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('remedy')}
               >
                 Remedy {getSortIcon('remedy')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
                 onClick={() => handleSort('status')}
               >
                 Status {getSortIcon('status')}
@@ -238,23 +251,30 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center text-gray-300">
                   Loading exceptions...
                 </TableCell>
               </TableRow>
             ) : paginatedExceptions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center text-gray-300">
                   No exceptions found.
                 </TableCell>
               </TableRow>
             ) : (
               paginatedExceptions.map((exception) => (
-                <TableRow key={exception.id}>
-                  <TableCell>{exception.created_at ? formatDateTime(exception.created_at) : "—"}</TableCell>
-                  <TableCell>{exception.clients?.name || "—"}</TableCell>
-                  <TableCell>{exception.department || "—"}</TableCell>
-                  <TableCell>{exception.workflows?.name || "—"}</TableCell>
+                <TableRow key={exception.id} className="border-b border-gray-700">
+                  <TableCell className="text-gray-300 whitespace-nowrap">{exception.created_at ? formatDateTime(exception.created_at) : "—"}</TableCell>
+                  <TableCell className="text-gray-300">
+                    <button
+                      onClick={() => onViewCredentials && exception.clients && onViewCredentials(exception.id)}
+                      className="text-gray-300 hover:text-blue-400 transition-colors"
+                    >
+                      {exception.clients?.name || "—"}
+                    </button>
+                  </TableCell>
+                  <TableCell className="text-gray-300">{exception.department || "—"}</TableCell>
+                  <TableCell className="text-gray-300">{exception.workflows?.name || "—"}</TableCell>
                   <TableCell>
                     <div className="flex">
                       <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
@@ -263,25 +283,34 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
                       <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs -ml-2">
                         A
                       </div>
-                      <span className="text-xs ml-1 text-gray-500">{exception.notifications || "+2 more"}</span>
+                      <span className="text-xs ml-1 text-gray-300">{exception.notifications || "+2 more"}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{exception.exception_type || "—"}</TableCell>
+                  <TableCell className="text-gray-300">{exception.exception_type || "—"}</TableCell>
                   <TableCell>
                     <Badge className={getSeverityBadgeColor(exception.severity || "Critical")}>
                       {exception.severity || "Critical"}
                     </Badge>
                   </TableCell>
-                  <TableCell>{exception.remedy || "—"}</TableCell>
+                  <TableCell className="text-gray-300">{exception.remedy || "—"}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <span>{exception.status || "New"}</span>
-                      <select className="ml-2 p-1 rounded text-sm border border-gray-200">
-                        <option value="">⋮</option>
-                        <option value="inprogress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed</option>
-                      </select>
+                      <span className="text-gray-300 mr-2">{exception.status || "open"}</span>
+                      <Select 
+                        onValueChange={(value) => handleStatusChange(exception.id, value)}
+                        defaultValue={exception.status || "open"}
+                      >
+                        <SelectTrigger className="h-8 w-8 p-0 border-none bg-transparent">
+                          <span className="sr-only">Open menu</span>
+                          <div className="flex justify-center items-center">⋮</div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white min-w-[120px]">
+                          <SelectItem value="open">Open</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -290,7 +319,7 @@ const ExceptionsTable = ({ exceptions, loading }: ExceptionsTableProps) => {
           </TableBody>
         </Table>
       </div>
-      <div className="border-t py-2 px-4">
+      <div className="border-t border-gray-700 py-2 px-4">
         {renderPagination()}
       </div>
     </div>

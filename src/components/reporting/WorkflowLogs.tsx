@@ -22,32 +22,70 @@ interface WorkflowLogsProps {
   logs: WorkflowLog[];
   selectedWorkflow: string;
   onWorkflowChange: (workflow: string) => void;
+  onExportLogs: () => void;
 }
 
-const WorkflowLogs = ({ logs, selectedWorkflow, onWorkflowChange }: WorkflowLogsProps) => {
+const WorkflowLogs = ({ logs, selectedWorkflow, onWorkflowChange, onExportLogs }: WorkflowLogsProps) => {
+  const getStatusClass = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'bg-green-800 text-white';
+      case 'failed':
+        return 'bg-red-800 text-white';
+      case 'in_progress':
+        return 'bg-yellow-800 text-white';
+      default:
+        return 'bg-gray-700 text-white';
+    }
+  };
+
+  const handleSingleLogDownload = (log: WorkflowLog) => {
+    // Create text content
+    const content = `
+Timestamp: ${log.timestamp}
+Workflow: ${log.workflow}
+Status: ${log.status}
+Execution Details: ${log.executionDetails}
+    `.trim();
+    
+    // Create and download the file
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `log-${log.workflow.replace(/\s+/g, '-').toLowerCase()}-${new Date(log.timestamp).toISOString().slice(0, 10)}.txt`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Get unique workflow names for the filter dropdown
+  const workflowNames = ['All Workflows', ...Array.from(new Set(logs.map(log => log.workflow)))];
+
   return (
-    <div className="bg-white rounded-md border overflow-hidden">
-      <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b">
-        <h2 className="text-lg font-semibold">Workflow Execution Logs</h2>
+    <div className="bg-[#1A1F2C] rounded-md border border-gray-700 overflow-hidden">
+      <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-700">
+        <h2 className="text-lg font-semibold text-white">Workflow Execution Logs</h2>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="w-full sm:w-64">
             <Select
               value={selectedWorkflow}
               onValueChange={onWorkflowChange}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-[#1A1F2C] border-gray-700 text-white">
                 <SelectValue placeholder="Select Workflow" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Invoice Processing Workflow">Invoice Processing Workflow</SelectItem>
-                <SelectItem value="Data Import">Data Import</SelectItem>
-                <SelectItem value="Client Onboarding">Client Onboarding</SelectItem>
-                <SelectItem value="API Integration">API Integration</SelectItem>
-                <SelectItem value="Payment Processing">Payment Processing</SelectItem>
+              <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white">
+                {workflowNames.map(workflow => (
+                  <SelectItem key={workflow} value={workflow}>{workflow}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto border-gray-700 text-white hover:bg-gray-700" onClick={onExportLogs}>
             <Download size={16} className="mr-2" />
             Export Logs
           </Button>
@@ -57,37 +95,39 @@ const WorkflowLogs = ({ logs, selectedWorkflow, onWorkflowChange }: WorkflowLogs
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Timestamp</TableHead>
-              <TableHead>Workflow</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Execution Details</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className="border-b border-gray-700">
+              <TableHead className="text-gray-300 font-medium text-xs uppercase">Timestamp</TableHead>
+              <TableHead className="text-gray-300 font-medium text-xs uppercase">Workflow</TableHead>
+              <TableHead className="text-gray-300 font-medium text-xs uppercase">Status</TableHead>
+              <TableHead className="text-gray-300 font-medium text-xs uppercase">Execution Details</TableHead>
+              <TableHead className="text-gray-300 font-medium text-xs uppercase text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {logs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center text-gray-300">
                   No logs found.
                 </TableCell>
               </TableRow>
             ) : (
               logs.map((log, index) => (
-                <TableRow key={index}>
-                  <TableCell className="whitespace-nowrap">{log.timestamp}</TableCell>
-                  <TableCell>{log.workflow}</TableCell>
+                <TableRow key={index} className="border-b border-gray-700">
+                  <TableCell className="whitespace-nowrap text-gray-300">{log.timestamp}</TableCell>
+                  <TableCell className="text-gray-300">{log.workflow}</TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                      ${log.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                        log.status === 'failed' ? 'bg-red-100 text-red-800' : 
-                        'bg-yellow-100 text-yellow-800'}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass(log.status)}`}>
                       {log.status}
                     </span>
                   </TableCell>
-                  <TableCell className="max-w-md">{log.executionDetails}</TableCell>
+                  <TableCell className="max-w-md text-gray-300">{log.executionDetails}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-300 hover:text-white hover:bg-gray-700"
+                      onClick={() => handleSingleLogDownload(log)}
+                    >
                       <FileDown size={16} />
                     </Button>
                   </TableCell>

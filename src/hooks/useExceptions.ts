@@ -129,6 +129,82 @@ export const useExceptions = () => {
     }
   ];
 
+  // Added more mock data to match the design
+  const additionalMockExceptions = [
+    {
+      id: "8", 
+      description: "Document approval rejected: Missing signatures",
+      status: "open",
+      created_at: "2025-05-13T14:15:00Z",
+      resolved_at: null,
+      clients: { name: "LexCorp" },
+      workflows: { name: "Document Approval" },
+      department: "Legal",
+      exception_type: "Workflow logic",
+      severity: "Medium",
+      remedy: "Request signatures",
+      notifications: "+2 more"
+    },
+    {
+      id: "9",
+      description: "Workflow execution halted: Logic error in step #4",
+      status: "in_progress",
+      created_at: "2025-05-12T22:00:00Z",
+      resolved_at: null,
+      clients: { name: "Oscorp" },
+      workflows: { name: "Custom Process" },
+      department: "Engineering",
+      exception_type: "Workflow logic",
+      severity: "Critical",
+      remedy: "Debug logic",
+      notifications: "+3 more"
+    },
+    {
+      id: "10",
+      description: "Missing customer information: Contact details incomplete",
+      status: "open",
+      created_at: "2025-05-12T19:50:00Z",
+      resolved_at: null,
+      clients: { name: "Stark Industries" },
+      workflows: { name: "Client Onboarding" },
+      department: "Customer Success",
+      exception_type: "Data process",
+      severity: "Low",
+      remedy: "Manual data entry",
+      notifications: "+2 more"
+    },
+    {
+      id: "11",
+      description: "Payment processing failed: Invalid card information",
+      status: "in_progress",
+      created_at: "2025-05-11T16:40:00Z",
+      resolved_at: null,
+      clients: { name: "Wayne Enterprises" },
+      workflows: { name: "Payment Processing" },
+      department: "Finance",
+      exception_type: "Workflow logic",
+      severity: "High",
+      remedy: "Contact customer",
+      notifications: "+4 more"
+    },
+    {
+      id: "12",
+      description: "Data extraction error: Unrecognized document format",
+      status: "in_progress",
+      created_at: "2025-05-11T15:00:00Z",
+      resolved_at: null,
+      clients: { name: "Globex Inc" },
+      workflows: { name: "Data Import" },
+      department: "Operations",
+      exception_type: "Integration",
+      severity: "High",
+      remedy: "Format conversion",
+      notifications: "+3 more"
+    }
+  ];
+
+  const allMockExceptions = [...mockExceptions, ...additionalMockExceptions];
+
   const fetchExceptions = async () => {
     try {
       setLoading(true);
@@ -150,7 +226,7 @@ export const useExceptions = () => {
       
       // Filter exceptions if there's a search query
       const filteredExceptions = searchQuery
-        ? mockExceptions.filter(exception => 
+        ? allMockExceptions.filter(exception => 
             exception.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
             exception.clients?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             exception.workflows?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -158,7 +234,7 @@ export const useExceptions = () => {
             exception.exception_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             exception.severity?.toLowerCase().includes(searchQuery.toLowerCase())
           )
-        : mockExceptions;
+        : allMockExceptions;
       
       setExceptions(filteredExceptions);
     } catch (error) {
@@ -172,10 +248,40 @@ export const useExceptions = () => {
     fetchExceptions();
   }, [searchQuery]);
 
+  const updateExceptionStatus = async (exceptionId: string, newStatus: string) => {
+    try {
+      // In a real implementation, we would update the exception status in Supabase
+      // const { error } = await supabase
+      //   .from('exceptions')
+      //   .update({ status: newStatus })
+      //   .eq('id', exceptionId);
+      
+      // if (error) {
+      //   console.error('Error updating exception status:', error);
+      //   return false;
+      // }
+      
+      // Update the local state to reflect the change
+      setExceptions(prev => 
+        prev.map(exception => 
+          exception.id === exceptionId 
+            ? { ...exception, status: newStatus } 
+            : exception
+        )
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Unexpected error updating exception status:', error);
+      return false;
+    }
+  };
+
   return { 
     exceptions, 
     loading, 
     fetchExceptions, 
-    setSearchQuery 
+    setSearchQuery,
+    updateExceptionStatus
   };
 };
