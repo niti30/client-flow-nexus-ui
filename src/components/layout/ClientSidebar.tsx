@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -144,29 +143,6 @@ const ClientSidebar = () => {
             })}
           </ul>
         </nav>
-
-        <div className="p-3 border-t border-gray-700">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="w-full flex items-center p-3 rounded-xl text-gray-300 hover:bg-[#333333]">
-                <User className="h-5 w-5 mr-3" />
-                <span className="text-base mr-auto">My Account</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-[#333333] text-white border border-gray-700">
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="cursor-pointer">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings" className="cursor-pointer">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-400 focus:text-red-400">
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </aside>
 
       {/* Main content wrapper with proper margin */}

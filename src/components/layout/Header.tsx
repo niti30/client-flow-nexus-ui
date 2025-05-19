@@ -99,8 +99,16 @@ const Header = () => {
             <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors">
               {currentUser && (
                 <>
-                  <div className="h-8 w-8 rounded-full bg-[#1785c1] text-white flex items-center justify-center">
-                    {currentUser.name}
+                  <div className="h-8 w-8 rounded-full bg-[#1785c1] text-white flex items-center justify-center overflow-hidden">
+                    {user?.user_metadata?.avatar_url ? (
+                      <img 
+                        src={user.user_metadata.avatar_url} 
+                        alt="User avatar" 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span>{currentUser.name}</span>
+                    )}
                   </div>
                   <ChevronDown className="h-4 w-4 text-gray-600" />
                 </>
