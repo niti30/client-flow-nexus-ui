@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
@@ -18,9 +17,10 @@ import { ClientDocumentLinks } from "@/components/client-detail/ClientDocumentLi
 import { ClientPipelineProgress } from "@/components/client-detail/ClientPipelineProgress";
 import { ClientDetailWorkflows } from "@/components/client-detail/ClientDetailWorkflows";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 const Clients = () => {
-  const { userRole } = useAuth();
+  const {
+    userRole
+  } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState("overview");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -39,9 +39,7 @@ const Clients = () => {
   const handleClientAdded = () => {
     setRefreshTrigger(prev => prev + 1);
   };
-
-  return (
-    <div className="flex h-screen bg-[#f5f5f7]">
+  return <div className="flex h-screen bg-[#f5f5f7]">
       {/* Sidebar */}
       <Sidebar />
       
@@ -50,27 +48,17 @@ const Clients = () => {
         <Header />
         
         <main className="flex-1 overflow-y-auto p-6">
-          <Tabs defaultValue="overview" onValueChange={(value) => setActiveTab(value)}>
+          <Tabs defaultValue="overview" onValueChange={value => setActiveTab(value)}>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
               <h1 className="text-2xl font-semibold">Clients</h1>
               
-              {activeTab === "overview" && (
-                <div className="flex items-center gap-4 w-full md:w-auto">
+              {activeTab === "overview" && <div className="flex items-center gap-4 w-full md:w-auto">
                   <div className="relative w-full max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                    <Input 
-                      placeholder="Search clients..." 
-                      className="pl-9 w-full"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                    <Input placeholder="Search clients..." className="pl-9 w-full" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                   </div>
-                  <AddClientDialog 
-                    buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" 
-                    onClientAdded={handleClientAdded}
-                  />
-                </div>
-              )}
+                  <AddClientDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" onClientAdded={handleClientAdded} />
+                </div>}
             </div>
             
             <TabsList className="mb-6 border-b w-64">
@@ -97,11 +85,7 @@ const Clients = () => {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      <ClientUsersList 
-                        clientId="demo" 
-                        showDialog={showUserDialog} 
-                        onDialogClose={() => setShowUserDialog(false)} 
-                      />
+                      <ClientUsersList clientId="demo" showDialog={showUserDialog} onDialogClose={() => setShowUserDialog(false)} />
                     </CardContent>
                   </Card>
                 </div>
@@ -116,11 +100,7 @@ const Clients = () => {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      <ClientDocumentLinks 
-                        clientId="demo" 
-                        showDialog={showDocumentDialog} 
-                        onDialogClose={() => setShowDocumentDialog(false)} 
-                      />
+                      <ClientDocumentLinks clientId="demo" showDialog={showDocumentDialog} onDialogClose={() => setShowDocumentDialog(false)} />
                     </CardContent>
                   </Card>
                 </div>
@@ -138,25 +118,17 @@ const Clients = () => {
               
               {/* Table hidden by default - only show when requested through a toggle or similar */}
               <div className="hidden">
-                <ClientsTable 
-                  searchQuery={searchQuery} 
-                  refreshTrigger={refreshTrigger}
-                />
+                <ClientsTable searchQuery={searchQuery} refreshTrigger={refreshTrigger} />
               </div>
             </TabsContent>
             
             <TabsContent value="workflows">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-medium">Workflows</h2>
-                {/* Removed the AddWorkflowDialog from here to eliminate duplicate button */}
-              </div>
+              
               <ClientDetailWorkflows clientId="demo" />
             </TabsContent>
           </Tabs>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Clients;
