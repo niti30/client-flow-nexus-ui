@@ -24,9 +24,10 @@ import {
 import { DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
+// Updated schema to make email optional
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
+  email: z.string().email({ message: "Please enter a valid email address." }).optional().or(z.literal('')),
   contractStart: z.date({
     required_error: "Please select a contract start date.",
   }),
@@ -77,7 +78,7 @@ export function AddClientForm({ onSubmit, onCancel, isSubmitting = false }: AddC
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Email Address (Optional)</FormLabel>
               <FormControl>
                 <Input placeholder="contact@example.com" {...field} />
               </FormControl>

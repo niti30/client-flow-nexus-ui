@@ -29,17 +29,22 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded }: A
       setIsSubmitting(true);
       console.log("New client:", values);
       
+      // Prepare client data object
+      const clientData: any = { 
+        name: values.name,
+        status: 'active',
+        industry: null // This could be added to the form later
+      };
+      
+      // Only add email if it's provided and not empty
+      if (values.email) {
+        clientData.email = values.email;
+      }
+      
       // Save the client to Supabase
       const { data, error } = await supabase
         .from('clients')
-        .insert([
-          { 
-            name: values.name,
-            status: 'active',
-            industry: null, // This could be added to the form later
-            email: values.email // Include the email field
-          }
-        ])
+        .insert([clientData])
         .select();
 
       if (error) {
