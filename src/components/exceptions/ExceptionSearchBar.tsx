@@ -9,6 +9,12 @@ interface ExceptionSearchBarProps {
 }
 
 const ExceptionSearchBar = ({ onSearch, onFilter }: ExceptionSearchBarProps) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onSearch) {
+      onSearch(e.target.value);
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <div className="relative w-full sm:w-auto">
@@ -16,7 +22,7 @@ const ExceptionSearchBar = ({ onSearch, onFilter }: ExceptionSearchBarProps) => 
         <Input 
           placeholder="Search exceptions..." 
           className="pl-9 w-full sm:w-[260px]" 
-          onChange={(e) => onSearch && onSearch(e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
       

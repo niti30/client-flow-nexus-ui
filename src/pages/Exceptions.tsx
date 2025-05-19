@@ -7,16 +7,14 @@ import ExceptionsTable from "@/components/exceptions/ExceptionsTable";
 import { useExceptions } from "@/hooks/useExceptions";
 
 const Exceptions = () => {
-  const { exceptions, loading } = useExceptions();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { exceptions, loading, setSearchQuery } = useExceptions();
 
-  // Handle search functionality - can be expanded in the future
+  // Handle search functionality
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // Filter logic could be added here
   };
 
-  // Filter button handler - placeholder for future functionality
+  // Filter button handler
   const handleFilter = () => {
     console.log("Filter button clicked");
     // Filter logic could be added here

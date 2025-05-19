@@ -12,6 +12,8 @@ import Workflows from "./pages/Workflows";
 import Exceptions from "./pages/Exceptions";
 import Billing from "./pages/Billing";
 import Auth from "./pages/Auth";
+import Subscriptions from "./pages/Subscriptions";
+import Reporting from "./pages/Reporting";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/workflows" element={<Workflows />} />
             <Route path="/exceptions" element={<Exceptions />} />
             <Route path="/billing" element={<Billing />} />
+            <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/reporting" element={<Reporting />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

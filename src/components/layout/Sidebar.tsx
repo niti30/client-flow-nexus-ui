@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -19,6 +19,11 @@ import {
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+
+  // Close sidebar on route change for mobile view
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -46,6 +51,7 @@ const Sidebar = () => {
         <button 
           onClick={toggleSidebar}
           className="p-2 rounded-full bg-white shadow-md"
+          aria-label="Toggle menu"
         >
           {isOpen ? (
             <X className="h-5 w-5" />
@@ -81,11 +87,10 @@ const Sidebar = () => {
                 <li key={item.label}>
                   <Link 
                     to={item.path} 
-                    className={`flex items-center p-2.5 rounded-md transition-colors
+                    className={`flex items-center p-2.5 rounded-md transition-colors duration-150
                       ${active 
-                        ? "bg-gray-200 text-gray-900" 
+                        ? "bg-black text-white" 
                         : "text-gray-700 hover:bg-gray-200 hover:text-gray-900"}`}
-                    onClick={() => setIsOpen(false)}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span className="text-sm">{item.label}</span>
