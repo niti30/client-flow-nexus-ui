@@ -1,27 +1,23 @@
 
-import { useState } from "react";
-import { Bell } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import {
+import { useAuth } from "@/contexts/AuthContext";
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Settings, LogOut, User } from "lucide-react";
 
-interface ClientHeaderProps {
-  title?: string;
-}
-
-const ClientHeader = ({ title = "Acme Corporation" }: ClientHeaderProps) => {
+const ClientHeader = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<number>(3);
-
+  const { toast } = useToast();
+  
   const handleSignOut = async () => {
     try {
       console.log("Client logout - Attempting to sign out");
@@ -70,60 +66,49 @@ const ClientHeader = ({ title = "Acme Corporation" }: ClientHeaderProps) => {
       });
     }
   };
+  
+  const navigateToProfile = () => {
+    navigate('/profile');
+  };
+  
+  const navigateToSettings = () => {
+    navigate('/settings');
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-      <h1 className="text-xl font-semibold">{title}</h1>
+      <h1 className="text-xl font-semibold">Acme Corporation</h1>
       <div className="flex items-center space-x-4">
-        <div className="relative">
-          <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <span className="sr-only">Notifications</span>
-            <Bell className="h-6 w-6 text-gray-500" />
-            {notifications > 0 && (
-              <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
-                {notifications}
-              </span>
-            )}
-          </button>
-        </div>
+        <button className="p-1 rounded-full hover:bg-gray-100">
+          <span className="sr-only">Notifications</span>
+          <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+        
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer">
+          <DropdownMenuTrigger className="focus:outline-none">
+            <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
               <img 
                 src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
                 alt="User avatar" 
                 className="h-full w-full object-cover"
               />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <div className="flex items-center justify-start p-2">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.email}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  Client Account
-                </p>
-              </div>
             </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => navigate('/profile')}
-            >
-              Profile
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={navigateToProfile} className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => navigate('/settings')}
-            >
-              Settings
+            <DropdownMenuItem onClick={navigateToSettings} className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="cursor-pointer text-red-600 focus:text-red-600" 
-              onClick={handleSignOut}
-            >
-              Logout
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 hover:text-red-600">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

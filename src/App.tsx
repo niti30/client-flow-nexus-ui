@@ -135,7 +135,7 @@ const AppRoutes = () => {
       <Route path="/client/exceptions" element={<ClientRoute><ClientExceptions /></ClientRoute>} />
       <Route path="/client/users" element={<ClientRoute><ClientUsers /></ClientRoute>} />
       <Route path="/client/billing" element={<ClientRoute><ClientBilling /></ClientRoute>} />
-      <Route path="/client/messaging" element={<ClientRoute><ClientMessaging /></ClientRoute>} />
+      <Route path="/client/messaging" element={<ClientRoute><ClientSupport /></ClientRoute>} />
       <Route path="/client/support" element={<ClientRoute><ClientSupport /></ClientRoute>} />
       
       {/* 404 route */}

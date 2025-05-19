@@ -16,12 +16,6 @@ interface PipelineStep {
   date: string;
 }
 
-interface Document {
-  id: string;
-  title: string;
-  url: string;
-}
-
 interface SupportEngineer {
   name: string;
   role: string;
@@ -136,17 +130,6 @@ const ClientDashboard = () => {
     moneySaved: { recent: "$2,450", total: "$16,820", period: "Last 7 days" },
     activeWorkflows: 0
   });
-  
-  // Documents
-  const [documents, setDocuments] = useState<Document[]>([
-    { id: '1', title: "Survey Questions", url: "https://docs.example.com/survey" },
-    { id: '2', title: "Survey Results", url: "https://docs.example.com/results" },
-    { id: '3', title: "Process Documentation", url: "https://docs.example.com/process" },
-    { id: '4', title: "ADA Proposal", url: "https://docs.example.com/proposal" },
-    { id: '5', title: "Contract", url: "https://docs.example.com/contract" },
-    { id: '6', title: "Factory Markdown", url: "https://docs.example.com/factory-markdown" },
-    { id: '7', title: "Test Plan", url: "https://docs.example.com/test-plan" }
-  ]);
 
   useEffect(() => {
     // Update metrics when workflows data is available
@@ -284,36 +267,6 @@ const ClientDashboard = () => {
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Message SE
               </Button>
-            </div>
-          </div>
-
-          {/* Document Links */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Document Links</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {documents.map((doc) => (
-                <a 
-                  key={doc.id} 
-                  href={doc.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="block p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <div className="mr-3 text-gray-400">
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium">{doc.title}</h4>
-                    </div>
-                    <div className="text-gray-400">
-                      <ExternalLink className="h-4 w-4" />
-                    </div>
-                  </div>
-                </a>
-              ))}
             </div>
           </div>
         </main>

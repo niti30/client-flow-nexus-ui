@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
+import { ClientUsersList } from "@/components/client-detail/ClientUsersList";
 
 const ClientUsers = () => {
   return (
@@ -14,10 +15,10 @@ const ClientUsers = () => {
         
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-[1200px] mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Users</h1>
+            <h1 className="text-2xl font-bold mb-6">User Management</h1>
             
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <p className="text-gray-500 text-center">User management dashboard will be implemented here.</p>
+              <ClientUsersList clientId="demo" />
             </div>
           </div>
         </main>

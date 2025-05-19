@@ -12,19 +12,12 @@ import {
   AlertTriangle,
   Users,
   CreditCard,
-  MessageSquare
+  MessageCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -46,55 +39,6 @@ const ClientSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSignOut = async () => {
-    try {
-      console.log("Client logout - Attempting to sign out");
-      
-      // Clean up auth state
-      localStorage.removeItem('supabase.auth.token');
-      
-      // Remove all Supabase auth keys
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      
-      // Also clean from sessionStorage if used
-      Object.keys(sessionStorage || {}).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          sessionStorage.removeItem(key);
-        }
-      });
-      
-      // Attempt global sign out
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.error("Error during supabase signOut:", err);
-        // Continue even if this fails
-      }
-      
-      if (signOut) {
-        await signOut();
-        console.log("Client logout - Successfully signed out");
-        toast({
-          title: "Logged out successfully",
-          description: "You have been logged out of your account",
-        });
-        // Force page reload for a clean state
-        window.location.href = '/auth';
-      }
-    } catch (error) {
-      console.error("Client logout - Error during sign out:", error);
-      toast({
-        title: "Logout failed",
-        description: "There was an error during logout. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/client/dashboard" },
     { icon: BarChart2, label: "Workflow ROI", path: "/client/roi" },
@@ -103,7 +47,7 @@ const ClientSidebar = () => {
     { icon: AlertTriangle, label: "Exceptions", path: "/client/exceptions" },
     { icon: Users, label: "Users", path: "/client/users" },
     { icon: CreditCard, label: "Billing", path: "/client/billing" },
-    { icon: MessageSquare, label: "Messaging", path: "/client/messaging" },
+    { icon: MessageCircle, label: "Support", path: "/client/support" },
   ];
 
   const isActive = (path: string) => {
@@ -135,20 +79,20 @@ const ClientSidebar = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {menuItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <li key={item.label}>
                   <Link 
                     to={item.path} 
-                    className={`flex items-center p-3 rounded-xl transition-colors duration-150
+                    className={`flex items-center px-4 py-2.5 rounded-lg transition-colors duration-150
                       ${active 
                         ? "bg-gray-200 text-gray-900" 
                         : "text-gray-700 hover:bg-gray-100"}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
-                    <span className="text-base">{item.label}</span>
+                    <span className="text-sm">{item.label}</span>
                   </Link>
                 </li>
               );

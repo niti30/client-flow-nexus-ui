@@ -6,8 +6,11 @@ import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 const ClientBilling = () => {
+  const { toast } = useToast();
+  
   // Fetch billing data
   const { data: billingData } = useQuery({
     queryKey: ['billing-data'],
@@ -47,35 +50,103 @@ const ClientBilling = () => {
   });
 
   const handleDownloadInvoice = (invoiceNumber: string) => {
-    // This would normally fetch and download the invoice
-    // For now we'll simulate a file download
-    const dummyLink = document.createElement('a');
-    dummyLink.href = 'data:text/plain;charset=utf-8,Invoice Data';
-    dummyLink.download = `Invoice_${invoiceNumber}.pdf`;
-    document.body.appendChild(dummyLink);
-    dummyLink.click();
-    document.body.removeChild(dummyLink);
+    // Generate PDF data
+    const invoiceData = `
+      Invoice #${invoiceNumber}
+      Braintrust Services
+      Amount: $2,450.00
+      Date: May 15, 2025
+      
+      Thank you for your business!
+    `;
+    
+    // Create a Blob with the data
+    const blob = new Blob([invoiceData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Invoice_${invoiceNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Invoice Downloaded",
+      description: `Invoice #${invoiceNumber} has been downloaded.`
+    });
   };
 
   const handleDownloadContract = () => {
-    // This would normally fetch and download the contract
-    // For now we'll simulate a file download
-    const dummyLink = document.createElement('a');
-    dummyLink.href = 'data:text/plain;charset=utf-8,Contract Data';
-    dummyLink.download = 'Service_Contract.pdf';
-    document.body.appendChild(dummyLink);
-    dummyLink.click();
-    document.body.removeChild(dummyLink);
+    // Generate PDF data
+    const contractData = `
+      Service Contract
+      Braintrust - Enterprise Plan
+      
+      This contract outlines the terms of service between Braintrust and Acme Corporation.
+      
+      Services provided:
+      - Workflow automation
+      - API integration
+      - Support services
+      
+      Term: 12 months
+      Monthly fee: $2,000
+      
+      Signed: ____________________
+      Date: May 19, 2025
+    `;
+    
+    // Create a Blob with the data
+    const blob = new Blob([contractData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Service_Contract.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Contract Downloaded",
+      description: "Service contract has been downloaded."
+    });
   };
 
   const handleContactSupport = () => {
-    // This would normally open a support ticket or chat
+    // Navigate to support page
     window.location.href = '/client/support';
   };
 
   const handleUpdatePayment = () => {
     // This would normally open a payment update modal
-    alert('Update payment method functionality would open here');
+    toast({
+      title: "Payment Update",
+      description: "Payment update functionality would open here."
+    });
+  };
+  
+  const handleViewAllInvoices = () => {
+    toast({
+      title: "View All Invoices",
+      description: "All invoices view would open here."
+    });
+  };
+  
+  const handleViewDetailedReport = () => {
+    toast({
+      title: "Detailed Report",
+      description: "Detailed usage report would open here."
+    });
   };
 
   return (
@@ -116,7 +187,14 @@ const ClientBilling = () => {
                 <CardContent className="p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Usage Summary</h2>
-                    <a href="#" className="text-blue-500 text-sm flex items-center">
+                    <a 
+                      href="#" 
+                      className="text-blue-500 text-sm flex items-center"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleViewDetailedReport();
+                      }}
+                    >
                       View detailed report →
                     </a>
                   </div>
@@ -164,7 +242,14 @@ const ClientBilling = () => {
                   </div>
                   
                   <div className="mt-4">
-                    <a href="#" className="text-blue-500 text-sm flex items-center">
+                    <a 
+                      href="#" 
+                      className="text-blue-500 text-sm flex items-center"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleViewAllInvoices();
+                      }}
+                    >
                       View all invoices →
                     </a>
                   </div>
