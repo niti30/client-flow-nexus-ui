@@ -11,17 +11,30 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddWorkflowForm, WorkflowFormValues } from "../forms/AddWorkflowForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddWorkflowDialogProps {
   buttonClassName?: string;
+  onWorkflowAdded?: (workflow: WorkflowFormValues) => void;
 }
 
-export function AddWorkflowDialog({ buttonClassName }: AddWorkflowDialogProps) {
+export function AddWorkflowDialog({ buttonClassName, onWorkflowAdded }: AddWorkflowDialogProps) {
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = (values: WorkflowFormValues) => {
     console.log("New workflow:", values);
     // Here you would typically make an API call to create the workflow
+    
+    toast({
+      title: "Workflow Created",
+      description: `${values.name} workflow has been created successfully.`,
+    });
+    
+    if (onWorkflowAdded) {
+      onWorkflowAdded(values);
+    }
+    
     setOpen(false);
   };
 
