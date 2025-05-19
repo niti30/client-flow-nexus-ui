@@ -1,10 +1,10 @@
 
+import React, { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Clients from "./pages/Clients";
@@ -18,8 +18,8 @@ import Reporting from "./pages/Reporting";
 import Users from "./pages/Users";
 import Messaging from "./pages/Messaging";
 
-const App = () => {
-  // Create a client inside the component function
+const App: React.FC = () => {
+  // Create a client inside the component function with explicit React useState
   const [queryClient] = useState(() => new QueryClient());
 
   return (
