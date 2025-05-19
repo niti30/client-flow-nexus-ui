@@ -1,59 +1,91 @@
 
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import ClientSidebar from "@/components/layout/ClientSidebar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import ClientSidebar from "@/components/layout/ClientSidebar";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 
-interface Workflow {
-  createDate: string;
-  department: string;
+interface WorkflowROI {
+  id: string;
   name: string;
+  created_at: string;
+  workflow_name: string;
+  department: string;
   description: string;
   nodes: number;
   executions: number;
   exceptions: number;
-  timeSaved: string;
-  costSaved: string;
+  time_saved: number;
+  cost_saved: number;
 }
 
 const ClientROI = () => {
   const { user } = useAuth();
-  const location = useLocation();
-  const clientId = location.state?.clientId || 'demo';
+  const [sortColumn, setSortColumn] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   
-  const [workflows, setWorkflows] = useState<Workflow[]>([
-    {
-      createDate: "2025-05-14 09:30",
-      department: "Finance",
-      name: "Invoice Processing",
-      description: "Automated invoice processing workflow",
-      nodes: 12,
-      executions: 1234,
-      exceptions: 23,
-      timeSaved: "156.5 hrs",
-      costSaved: "$15,650"
+  // Fetch workflow ROI data
+  const { data: workflowsData, isLoading, error } = useQuery({
+    queryKey: ['workflow-roi', user?.id, sortColumn, sortOrder],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      // First get the user information including client_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('client_id')
+        .eq('id', user.id)
+        .single();
+        
+      if (userError || !userData?.client_id) {
+        console.error('Error fetching user client_id:', userError);
+        return [];
+      }
+      
+      // Mock data since we don't have actual ROI table yet
+      return [
+        {
+          id: "1",
+          created_at: "2025-05-14 09:30",
+          department: "Finance",
+          workflow_name: "Invoice Processing",
+          description: "Automated invoice processing workflow",
+          nodes: 12,
+          executions: 1234,
+          exceptions: 23,
+          time_saved: 156.5,
+          cost_saved: 15650,
+        },
+        {
+          id: "2",
+          created_at: "2025-05-13 14:15",
+          department: "HR",
+          workflow_name: "Employee Onboarding",
+          description: "New employee onboarding automation",
+          nodes: 8,
+          executions: 456,
+          exceptions: 5,
+          time_saved: 89.2,
+          cost_saved: 8920,
+        }
+      ];
     },
-    {
-      createDate: "2025-05-13 14:15",
-      department: "HR",
-      name: "Employee Onboarding",
-      description: "New employee onboarding automation",
-      nodes: 8,
-      executions: 456,
-      exceptions: 5,
-      timeSaved: "89.2 hrs",
-      costSaved: "$8,920"
+    enabled: !!user
+  });
+  
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortOrder("asc");
     }
-  ]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toISOString().split('T')[0],
-      time: date.toTimeString().slice(0, 5)
-    };
+  };
+  
+  const renderSortIndicator = (column: string) => {
+    if (sortColumn !== column) return null;
+    return sortOrder === "asc" ? "↑" : "↓";
   };
 
   return (
@@ -62,7 +94,7 @@ const ClientROI = () => {
       
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Acme Corporation</h1>
+          <h1 className="text-xl font-semibold">Workflow ROI</h1>
           <div className="flex items-center space-x-4">
             <button className="p-1 rounded-full hover:bg-gray-100">
               <span className="sr-only">Notifications</span>
@@ -81,47 +113,89 @@ const ClientROI = () => {
         </header>
         
         <main className="flex-1 overflow-y-auto p-6">
-          <h1 className="text-2xl font-semibold mb-6">Workflow ROI</h1>
+          <div className="flex justify-end mb-4">
+            <Button variant="outline">New</Button>
+          </div>
           
-          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="whitespace-nowrap">Create Date/Time</TableHead>
-                  <TableHead className="whitespace-nowrap">Department</TableHead>
-                  <TableHead className="whitespace-nowrap">Workflow Name</TableHead>
-                  <TableHead className="whitespace-nowrap">Description</TableHead>
-                  <TableHead className="whitespace-nowrap">Nodes</TableHead>
-                  <TableHead className="whitespace-nowrap">Executions</TableHead>
-                  <TableHead className="whitespace-nowrap">Exceptions</TableHead>
-                  <TableHead className="whitespace-nowrap">Time Saved</TableHead>
-                  <TableHead className="whitespace-nowrap">Cost Saved</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {workflows.map((workflow, idx) => {
-                  const formattedDate = formatDate(workflow.createDate);
-                  return (
-                    <TableRow key={idx}>
-                      <TableCell className="whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span>{formattedDate.date}</span>
-                          <span>{formattedDate.time}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{workflow.department}</TableCell>
-                      <TableCell className="text-blue-600 font-medium">{workflow.name}</TableCell>
-                      <TableCell>{workflow.description}</TableCell>
-                      <TableCell>{workflow.nodes}</TableCell>
-                      <TableCell className="text-blue-600">{workflow.executions}</TableCell>
-                      <TableCell className="text-blue-600">{workflow.exceptions}</TableCell>
-                      <TableCell>{workflow.timeSaved}</TableCell>
-                      <TableCell>{workflow.costSaved}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("created_at")}>
+                      <div className="flex items-center">
+                        Create Date/Time {renderSortIndicator("created_at")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("department")}>
+                      <div className="flex items-center">
+                        Department {renderSortIndicator("department")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("workflow_name")}>
+                      <div className="flex items-center">
+                        Workflow Name {renderSortIndicator("workflow_name")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                      Description
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("nodes")}>
+                      <div className="flex items-center">
+                        Nodes {renderSortIndicator("nodes")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("executions")}>
+                      <div className="flex items-center">
+                        Executions {renderSortIndicator("executions")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("exceptions")}>
+                      <div className="flex items-center">
+                        Exceptions {renderSortIndicator("exceptions")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("time_saved")}>
+                      <div className="flex items-center">
+                        Time Saved {renderSortIndicator("time_saved")}
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("cost_saved")}>
+                      <div className="flex items-center">
+                        Cost Saved {renderSortIndicator("cost_saved")}
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-3 text-center text-gray-500">Loading...</td>
+                    </tr>
+                  ) : workflowsData && workflowsData.length > 0 ? (
+                    workflowsData.map((workflow) => (
+                      <tr key={workflow.id} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm">{workflow.created_at}</td>
+                        <td className="px-4 py-3 text-sm">{workflow.department}</td>
+                        <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
+                          {workflow.workflow_name}
+                        </td>
+                        <td className="px-4 py-3 text-sm">{workflow.description}</td>
+                        <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
+                        <td className="px-4 py-3 text-sm">{workflow.executions}</td>
+                        <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
+                        <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
+                        <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-3 text-center text-gray-500">No workflow data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
       </div>

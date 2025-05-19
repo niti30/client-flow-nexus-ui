@@ -9,16 +9,20 @@ import {
   Menu,
   BarChart2,
   X,
-  LogOut 
+  LogOut,
+  User 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
 
   // Close sidebar on mobile view for route change
@@ -34,10 +38,52 @@ const ClientSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSignOut = () => {
-    if (signOut) {
-      signOut();
-      navigate("/auth");
+  const handleSignOut = async () => {
+    try {
+      console.log("Client logout - Attempting to sign out");
+      
+      // Clean up auth state
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Remove all Supabase auth keys
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Also clean from sessionStorage if used
+      Object.keys(sessionStorage || {}).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      
+      // Attempt global sign out
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.error("Error during supabase signOut:", err);
+        // Continue even if this fails
+      }
+      
+      if (signOut) {
+        await signOut();
+        console.log("Client logout - Successfully signed out");
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out of your account",
+        });
+        // Force page reload for a clean state
+        window.location.href = '/auth';
+      }
+    } catch (error) {
+      console.error("Client logout - Error during sign out:", error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error during logout. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -99,14 +145,27 @@ const ClientSidebar = () => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-700">
-          <button 
-            onClick={handleSignOut}
-            className="w-full flex items-center p-3 rounded-xl text-gray-300 hover:bg-[#333333]"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            <span className="text-base">Sign Out</span>
-          </button>
+        <div className="p-3 border-t border-gray-700">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="w-full flex items-center p-3 rounded-xl text-gray-300 hover:bg-[#333333]">
+                <User className="h-5 w-5 mr-3" />
+                <span className="text-base mr-auto">My Account</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-[#333333] text-white border border-gray-700">
+              <DropdownMenuItem asChild>
+                <Link to="/profile" className="cursor-pointer">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings" className="cursor-pointer">Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-400 focus:text-red-400">
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 

@@ -8,15 +8,116 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, ExternalLink, ChevronRight, Check, Circle } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from "@tanstack/react-query";
+
+interface PipelineStep {
+  name: string;
+  status: "completed" | "in_progress" | "pending";
+  date: string;
+}
+
+interface Document {
+  id: string;
+  title: string;
+  url: string;
+}
+
+interface SupportEngineer {
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+interface ClientMetrics {
+  timeSaved: { recent: string; total: string; period: string };
+  moneySaved: { recent: string; total: string; period: string };
+  activeWorkflows: number;
+}
 
 const ClientDashboard = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const clientId = location.state?.clientId || 'demo';
   const { toast } = useToast();
   
-  const [clientData, setClientData] = useState<any>(null);
-  const [supportEngineers, setSupportEngineers] = useState([
+  // Fetch client data based on logged-in user
+  const { data: clientData, isLoading: clientLoading } = useQuery({
+    queryKey: ['client-data', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      // First get the user information including client_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('client_id')
+        .eq('id', user.id)
+        .single();
+        
+      if (userError || !userData?.client_id) {
+        console.error('Error fetching user client_id:', userError);
+        return null;
+      }
+      
+      // Then get the client information
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('id', userData.client_id)
+        .single();
+        
+      if (clientError) {
+        console.error('Error fetching client info:', clientError);
+        return null;
+      }
+      
+      return clientData;
+    },
+    enabled: !!user
+  });
+  
+  // Fetch workflows for the client
+  const { data: workflows, isLoading: workflowsLoading } = useQuery({
+    queryKey: ['client-workflows', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('client_id')
+        .eq('id', user.id)
+        .single();
+        
+      if (!userData?.client_id) return [];
+      
+      const { data, error } = await supabase
+        .from('workflows')
+        .select('*')
+        .eq('client_id', userData.client_id)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching workflows:', error);
+        return [];
+      }
+      
+      return data || [];
+    },
+    enabled: !!user
+  });
+  
+  // Pipeline steps based on workflow data
+  const [pipelineSteps, setPipelineSteps] = useState<PipelineStep[]>([
+    { name: "Discovery: Initial Survey", status: "completed", date: "Jan 15, 2025" },
+    { name: "Discovery: Process deep dive", status: "completed", date: "Jan 20, 2025" },
+    { name: "ADA Proposal Sent", status: "completed", date: "Jan 25, 2025" },
+    { name: "ADA Proposal Review", status: "in_progress", date: "" },
+    { name: "ADA Contract Sent", status: "pending", date: "" },
+    { name: "ADA Contract Signed", status: "pending", date: "" },
+    { name: "Credentials collected", status: "pending", date: "" },
+    { name: "Factory build initiated", status: "pending", date: "" },
+  ]);
+  
+  // Support engineers for the client
+  const [supportEngineers, setSupportEngineers] = useState<SupportEngineer[]>([
     { 
       name: "John Smith", 
       role: "Solutions Engineer", 
@@ -29,83 +130,34 @@ const ClientDashboard = () => {
     }
   ]);
   
-  const [pipelineSteps, setPipelineSteps] = useState([
-    { name: "Discovery: Initial Survey", status: "completed", date: "Jan 15, 2025" },
-    { name: "Discovery: Process deep dive", status: "completed", date: "Jan 20, 2025" },
-    { name: "ADA Proposal Sent", status: "completed", date: "Jan 25, 2025" },
-    { name: "ADA Proposal Review", status: "in_progress", date: "" },
-    { name: "ADA Contract Sent", status: "pending", date: "" },
-    { name: "ADA Contract Signed", status: "pending", date: "" },
-    { name: "Credentials collected", status: "pending", date: "" },
-    { name: "Factory build initiated", status: "pending", date: "" },
-  ]);
-  
-  const [metrics, setMetrics] = useState({
+  // Metrics
+  const [metrics, setMetrics] = useState<ClientMetrics>({
     timeSaved: { recent: "24.5 hrs", total: "168.2 hrs", period: "Last 7 days" },
     moneySaved: { recent: "$2,450", total: "$16,820", period: "Last 7 days" },
-    activeWorkflows: 12
+    activeWorkflows: 0
   });
   
-  const [documents, setDocuments] = useState([
-    { title: "Survey Questions", url: "https://docs.example.com/survey" },
-    { title: "Survey Results", url: "https://docs.example.com/results" },
-    { title: "Process Documentation", url: "https://docs.example.com/process" },
-    { title: "ADA Proposal", url: "https://docs.example.com/proposal" },
-    { title: "Contract", url: "https://docs.example.com/contract" },
-    { title: "Factory Markdown", url: "https://docs.example.com/factory-markdown" },
-    { title: "Test Plan", url: "https://docs.example.com/test-plan" }
+  // Documents
+  const [documents, setDocuments] = useState<Document[]>([
+    { id: '1', title: "Survey Questions", url: "https://docs.example.com/survey" },
+    { id: '2', title: "Survey Results", url: "https://docs.example.com/results" },
+    { id: '3', title: "Process Documentation", url: "https://docs.example.com/process" },
+    { id: '4', title: "ADA Proposal", url: "https://docs.example.com/proposal" },
+    { id: '5', title: "Contract", url: "https://docs.example.com/contract" },
+    { id: '6', title: "Factory Markdown", url: "https://docs.example.com/factory-markdown" },
+    { id: '7', title: "Test Plan", url: "https://docs.example.com/test-plan" }
   ]);
 
   useEffect(() => {
-    // In a real application, you would fetch the client information
-    // based on the authenticated user's client_id
-    const fetchClientInfo = async () => {
-      try {
-        // First get the user information including client_id
-        if (user) {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('client_id')
-            .eq('id', user.id)
-            .single();
-
-          if (userError || !userData?.client_id) {
-            console.error('Error fetching user client_id:', userError);
-            return;
-          }
-
-          // Then get the client information
-          const { data: clientData, error: clientError } = await supabase
-            .from('clients')
-            .select('*')
-            .eq('id', userData.client_id)
-            .single();
-
-          if (clientError) {
-            console.error('Error fetching client info:', clientError);
-            return;
-          }
-
-          setClientData(clientData);
-        } else {
-          // For demonstration purposes, fetch any client when user isn't logged in
-          const { data, error } = await supabase
-            .from('clients')
-            .select('*')
-            .limit(1)
-            .single();
-          
-          if (!error && data) {
-            setClientData(data);
-          }
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
-
-    fetchClientInfo();
-  }, [user, clientId]);
+    // Update metrics when workflows data is available
+    if (workflows) {
+      const activeCount = workflows.filter(w => w.status !== 'completed').length;
+      setMetrics(prev => ({
+        ...prev,
+        activeWorkflows: activeCount
+      }));
+    }
+  }, [workflows]);
 
   return (
     <div className="flex h-screen bg-[#faf9f8]">
@@ -113,7 +165,7 @@ const ClientDashboard = () => {
       
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Acme Corporation</h1>
+          <h1 className="text-xl font-semibold">{clientData?.name || "Client Dashboard"}</h1>
           <div className="flex items-center space-x-4">
             <button className="p-1 rounded-full hover:bg-gray-100">
               <span className="sr-only">Notifications</span>
@@ -210,7 +262,7 @@ const ClientDashboard = () => {
                 </div>
                 <div className="flex justify-between items-end">
                   <span className="text-3xl font-bold">{metrics.activeWorkflows}</span>
-                  <Link to="/client/workflows" className="text-blue-500 hover:underline text-sm flex items-center">
+                  <Link to="/client/roi" className="text-blue-500 hover:underline text-sm flex items-center">
                     View workflows <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -239,9 +291,9 @@ const ClientDashboard = () => {
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Document Links</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {documents.map((doc, idx) => (
+              {documents.map((doc) => (
                 <a 
-                  key={idx} 
+                  key={doc.id} 
                   href={doc.url} 
                   target="_blank" 
                   rel="noopener noreferrer" 

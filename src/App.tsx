@@ -22,6 +22,12 @@ import Messaging from "./pages/Messaging";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import ClientROI from "./pages/client/ClientROI";
+import ClientReporting from "./pages/client/ClientReporting";
+import ClientSupport from "./pages/client/ClientSupport";
+
+// Create the queryClient outside of the component
+const queryClient = new QueryClient();
 
 // Route protection component for admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
@@ -119,15 +125,15 @@ const AppRoutes = () => {
       
       {/* Client routes */}
       <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />
+      <Route path="/client/roi" element={<ClientRoute><ClientROI /></ClientRoute>} />
+      <Route path="/client/reporting" element={<ClientRoute><ClientReporting /></ClientRoute>} />
+      <Route path="/client/support" element={<ClientRoute><ClientSupport /></ClientRoute>} />
       
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
-
-// Create the queryClient outside of the component
-const queryClient = new QueryClient();
 
 const App = () => {
   return (

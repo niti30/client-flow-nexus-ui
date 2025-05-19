@@ -1,96 +1,70 @@
 
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import ClientSidebar from "@/components/layout/ClientSidebar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 
-interface Log {
+interface ExecutionLog {
+  id: string;
   timestamp: string;
   workflow: string;
-  executionDetails: string;
+  details: string;
 }
 
 const ClientReporting = () => {
   const { user } = useAuth();
-  const location = useLocation();
-  const clientId = location.state?.clientId || 'demo';
-  const { toast } = useToast();
+  const [selectedWorkflow, setSelectedWorkflow] = useState<string>("Invoice Processing");
   
-  const [selectedWorkflow, setSelectedWorkflow] = useState("Invoice Processing Workflow");
-  const [workflowOptions, setWorkflowOptions] = useState(["Invoice Processing Workflow"]);
-  const [logs, setLogs] = useState<Log[]>([
-    {
-      timestamp: "2025-05-14 02:15:47",
-      workflow: "Invoice Processing",
-      executionDetails: "Successfully processed invoice #INV-2025-001"
+  // Fetch execution logs for the selected workflow
+  const { data: logsData, isLoading } = useQuery({
+    queryKey: ['execution-logs', user?.id, selectedWorkflow],
+    queryFn: async () => {
+      // This would normally fetch from the database
+      // Mock data for now
+      return [
+        { 
+          id: "1", 
+          timestamp: "2025-05-14 02:15:47", 
+          workflow: "Invoice Processing", 
+          details: "Successfully processed invoice #INV-2025-001" 
+        },
+        { 
+          id: "2", 
+          timestamp: "2025-05-14 02:14:32", 
+          workflow: "Invoice Processing", 
+          details: "Data extraction completed for invoice #INV-2025-002" 
+        },
+        { 
+          id: "3", 
+          timestamp: "2025-05-14 02:13:15", 
+          workflow: "Invoice Processing", 
+          details: "Started processing invoice batch #BATCH-051" 
+        },
+        { 
+          id: "4", 
+          timestamp: "2025-05-14 02:12:03", 
+          workflow: "Invoice Processing", 
+          details: "Validation checks passed for invoice #INV-2025-003" 
+        },
+        { 
+          id: "5", 
+          timestamp: "2025-05-14 02:10:47", 
+          workflow: "Invoice Processing", 
+          details: "New invoice detected in input folder" 
+        }
+      ];
     },
-    {
-      timestamp: "2025-05-14 02:14:32",
-      workflow: "Invoice Processing",
-      executionDetails: "Data extraction completed for invoice #INV-2025-002"
-    },
-    {
-      timestamp: "2025-05-14 02:13:15",
-      workflow: "Invoice Processing",
-      executionDetails: "Started processing invoice batch #BATCH-051"
-    },
-    {
-      timestamp: "2025-05-14 02:12:03",
-      workflow: "Invoice Processing",
-      executionDetails: "Validation checks passed for invoice #INV-2025-003"
-    },
-    {
-      timestamp: "2025-05-14 02:10:47",
-      workflow: "Invoice Processing",
-      executionDetails: "New invoice detected in input folder"
-    }
-  ]);
-
-  const handleWorkflowChange = (value: string) => {
-    setSelectedWorkflow(value);
-  };
-
-  const handleExportLogs = () => {
-    // Create CSV content
-    const headers = ["Timestamp", "Workflow", "Execution Details"];
-    
-    // Convert logs to CSV rows
-    const csvRows = [
-      headers.join(','),
-      ...logs.map(log => [
-        log.timestamp,
-        log.workflow,
-        `"${log.executionDetails.replace(/"/g, '""')}"`
-      ].join(','))
-    ];
-    
-    // Combine rows into a single CSV string
-    const csvContent = csvRows.join('\n');
-    
-    // Create and download the file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `workflow-logs-${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Logs Exported",
-      description: "Workflow logs have been exported to CSV",
-      variant: "default",
-    });
-  };
+    enabled: !!user && !!selectedWorkflow
+  });
+  
+  const workflows = [
+    "Invoice Processing",
+    "Employee Onboarding",
+    "Contract Review",
+    "Expense Approval"
+  ];
 
   return (
     <div className="flex h-screen bg-[#faf9f8]">
@@ -98,14 +72,8 @@ const ClientReporting = () => {
       
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Acme Corporation</h1>
+          <h1 className="text-xl font-semibold">Workflow Execution Logs</h1>
           <div className="flex items-center space-x-4">
-            <button className="p-1 rounded-full hover:bg-gray-100">
-              <span className="sr-only">Notifications</span>
-              <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
             <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
               <img 
                 src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
@@ -117,53 +85,51 @@ const ClientReporting = () => {
         </header>
         
         <main className="flex-1 overflow-y-auto p-6">
-          <h1 className="text-2xl font-semibold mb-6">Workflow Execution Logs</h1>
-          
-          <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
-            <Select 
-              value={selectedWorkflow}
-              onValueChange={handleWorkflowChange}
-            >
-              <SelectTrigger className="w-full md:w-64">
-                <SelectValue placeholder="Select Workflow" />
-              </SelectTrigger>
-              <SelectContent>
-                {workflowOptions.map(workflow => (
-                  <SelectItem key={workflow} value={workflow}>
-                    {workflow}
-                  </SelectItem>
+          <div className="flex justify-between items-center mb-6">
+            <div className="relative w-64">
+              <select
+                className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                value={selectedWorkflow}
+                onChange={(e) => setSelectedWorkflow(e.target.value)}
+              >
+                {workflows.map((workflow) => (
+                  <option key={workflow} value={workflow}>
+                    {workflow} Workflow
+                  </option>
                 ))}
-              </SelectContent>
-            </Select>
-            
-            <Button 
-              onClick={handleExportLogs}
-              className="bg-black text-white hover:bg-gray-800"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export Logs
-            </Button>
+              </select>
+            </div>
           </div>
           
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>Workflow</TableHead>
-                  <TableHead>Execution Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logs.map((log, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{log.timestamp}</TableCell>
-                    <TableCell>{log.workflow}</TableCell>
-                    <TableCell>{log.executionDetails}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 text-left">
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Timestamp</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Workflow</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Execution Details</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">Loading...</td>
+                  </tr>
+                ) : logsData && logsData.length > 0 ? (
+                  logsData.map((log) => (
+                    <tr key={log.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm text-gray-700">{log.timestamp}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{log.workflow}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{log.details}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">No execution logs found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>
