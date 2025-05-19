@@ -23,35 +23,36 @@ interface Client {
 
 interface ClientsTableProps {
   searchQuery?: string;
+  refreshTrigger?: number;
 }
 
-const ClientsTable = ({ searchQuery = '' }: ClientsTableProps) => {
+const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProps) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    async function fetchClients() {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('clients')
-          .select('*');
-        
-        if (error) {
-          console.error('Error fetching clients:', error);
-        } else {
-          setClients(data || []);
-        }
-      } catch (error) {
-        console.error('Unexpected error:', error);
-      } finally {
-        setLoading(false);
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching clients:', error);
+      } else {
+        setClients(data || []);
       }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchClients();
-  }, []);
+  }, [refreshTrigger]); // Re-fetch when the refresh trigger changes
 
   // Filter clients based on search query
   const filteredClients = clients.filter(client => 

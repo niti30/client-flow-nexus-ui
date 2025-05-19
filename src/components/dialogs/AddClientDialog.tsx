@@ -12,23 +12,66 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddClientForm, ClientFormValues } from "../forms/AddClientForm";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddClientDialogProps {
   buttonClassName?: string;
   className?: string;
+  onClientAdded?: () => void;
 }
 
-export function AddClientDialog({ buttonClassName, className }: AddClientDialogProps) {
+export function AddClientDialog({ buttonClassName, className, onClientAdded }: AddClientDialogProps) {
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (values: ClientFormValues) => {
-    console.log("New client:", values);
-    // Here you would typically make an API call to create the client
-    toast({
-      title: "Client added successfully",
-      description: `${values.name} has been added with contract start date: ${values.contractStart.toLocaleDateString()}`,
-    });
-    setOpen(false);
+  const handleSubmit = async (values: ClientFormValues) => {
+    try {
+      setIsSubmitting(true);
+      console.log("New client:", values);
+      
+      // Save the client to Supabase
+      const { data, error } = await supabase
+        .from('clients')
+        .insert([
+          { 
+            name: values.name,
+            status: 'active',
+            industry: null, // This could be added to the form later
+          }
+        ])
+        .select();
+
+      if (error) {
+        console.error("Error adding client:", error);
+        toast({
+          title: "Error adding client",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Client added successfully",
+        description: `${values.name} has been added with contract start date: ${values.contractStart.toLocaleDateString()}`,
+      });
+      
+      setOpen(false);
+      
+      // Call the callback to refresh the client list
+      if (onClientAdded) {
+        onClientAdded();
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error adding client",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,7 +91,8 @@ export function AddClientDialog({ buttonClassName, className }: AddClientDialogP
         </DialogHeader>
         <AddClientForm 
           onSubmit={handleSubmit} 
-          onCancel={() => setOpen(false)} 
+          onCancel={() => setOpen(false)}
+          isSubmitting={isSubmitting}
         />
       </DialogContent>
     </Dialog>

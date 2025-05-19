@@ -37,9 +37,10 @@ export type ClientFormValues = z.infer<typeof formSchema>;
 interface AddClientFormProps {
   onSubmit: (values: ClientFormValues) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
-export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
+export function AddClientForm({ onSubmit, onCancel, isSubmitting = false }: AddClientFormProps) {
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -125,10 +126,12 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
         />
         
         <DialogFooter className="mt-6">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit">Add Client</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Adding..." : "Add Client"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>

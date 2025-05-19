@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
@@ -13,6 +13,7 @@ import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState("overview");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Sample data for the enhanced view (client workflows)
   const clientWorkflows = [
@@ -40,6 +41,11 @@ const Clients = () => {
     }
   ];
 
+  // Function to trigger a refresh of the clients list
+  const handleClientAdded = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return (
     <div className="flex h-screen bg-[#faf9f8]">
       {/* Sidebar */}
@@ -65,7 +71,10 @@ const Clients = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <AddClientDialog buttonClassName="bg-[#141417] hover:bg-black" />
+                  <AddClientDialog 
+                    buttonClassName="bg-[#141417] hover:bg-black" 
+                    onClientAdded={handleClientAdded}
+                  />
                 </div>
               )}
               
@@ -80,7 +89,10 @@ const Clients = () => {
             </TabsList>
             
             <TabsContent value="overview">
-              <ClientsTable searchQuery={searchQuery} />
+              <ClientsTable 
+                searchQuery={searchQuery} 
+                refreshTrigger={refreshTrigger}
+              />
             </TabsContent>
             
             <TabsContent value="workflows">
