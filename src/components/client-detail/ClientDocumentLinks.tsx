@@ -50,9 +50,11 @@ export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
   });
 
   const onSubmit = (values: DocumentFormValues) => {
+    // Create a new document with the required properties
     const newDocument: Document = {
       id: Date.now().toString(),
-      ...values,
+      title: values.title, // This is guaranteed to exist due to the zod schema
+      url: values.url,     // This is guaranteed to exist due to the zod schema
     };
     
     setDocuments([...documents, newDocument]);

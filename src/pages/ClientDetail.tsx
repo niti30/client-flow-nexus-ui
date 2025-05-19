@@ -20,6 +20,10 @@ const ClientDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
+  
+  // References to toggle the dialogs from parent component
+  const [showUserDialog, setShowUserDialog] = useState(false);
+  const [showDocumentDialog, setShowDocumentDialog] = useState(false);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -95,7 +99,7 @@ const ClientDetail = () => {
                   <div className="bg-white rounded-md border p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-xl font-medium">Client Users</h2>
-                      <Button>
+                      <Button onClick={() => setShowUserDialog(true)}>
                         <Plus size={16} className="mr-2" />
                         Add User
                       </Button>
@@ -107,7 +111,7 @@ const ClientDetail = () => {
                   <div className="bg-white rounded-md border p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-xl font-medium">Document Links</h2>
-                      <Button>
+                      <Button onClick={() => setShowDocumentDialog(true)}>
                         <Plus size={16} className="mr-2" />
                         Add Document
                       </Button>

@@ -74,9 +74,15 @@ export function ClientUsersList({ clientId }: ClientUsersListProps) {
   });
 
   const onSubmit = (values: UserFormValues) => {
+    // Create a new user with all required properties
     const newUser: User = {
       id: Date.now().toString(),
-      ...values,
+      name: values.name,         // Required by schema
+      email: values.email,       // Required by schema
+      phone: values.phone || "", // Convert optional to required with empty string fallback
+      billing: values.billing,   
+      admin: values.admin,
+      notes: values.notes || "", // Convert optional to required with empty string fallback
     };
     
     setUsers([...users, newUser]);
