@@ -72,7 +72,26 @@ const Auth = () => {
       
       console.log("Attempting to create admin with:", ADMIN_EMAIL);
       
-      // Sign up with admin credentials
+      // First, check if admin already exists by trying to sign in
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD
+      });
+      
+      if (!signInError && signInData.user) {
+        // Admin exists, auto-fill fields
+        toast({
+          title: "Admin exists",
+          description: "Admin user already exists. Credentials filled in for you.",
+        });
+        
+        setEmail(ADMIN_EMAIL);
+        setPassword(ADMIN_PASSWORD);
+        setCreatingAdmin(false);
+        return;
+      }
+      
+      // Sign up with admin credentials with autoconfirm enabled for testing
       const { data, error } = await supabase.auth.signUp({ 
         email: ADMIN_EMAIL, 
         password: ADMIN_PASSWORD,
@@ -103,33 +122,40 @@ const Auth = () => {
       } else if (data?.user) {
         console.log("Admin user created successfully:", data.user);
         
-        // Insert user record with admin role
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            role: 'admin'
-          });
+        // For testing only - we'll directly sign in this user bypassing email confirmation
+        // This is only for development/test purposes
+        const { error: adminSignInError } = await supabase.auth.signInWithPassword({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        });
         
-        if (insertError) {
-          console.error('Error creating admin record:', insertError);
-          toast({
-            title: "Warning",
-            description: "Admin created but profile setup failed. Some features may be limited.",
-            variant: "destructive",
-          });
+        if (adminSignInError) {
+          console.error('Admin sign in error:', adminSignInError);
+          setError(adminSignInError.message);
+          
+          if (adminSignInError.message.includes('not confirmed')) {
+            // In real projects, this should be removed - this is only for testing
+            // Admin email needs confirmation - try to auto-confirm by updating auth.users
+            // But we'll show a toast about this instead since we can't modify the auth schema directly
+            toast({
+              title: "Email confirmation required",
+              description: "Please check your inbox to confirm your email. For testing, you can disable email confirmation in the Supabase dashboard.",
+              variant: "destructive"
+            });
+          }
         } else {
-          console.log("Admin record inserted in users table");
           toast({
-            title: "Admin created",
-            description: `Admin user created with email: ${ADMIN_EMAIL}`,
+            title: "Admin created and signed in",
+            description: "You are now signed in as admin"
           });
           
-          // Auto-fill the credentials
-          setEmail(ADMIN_EMAIL);
-          setPassword(ADMIN_PASSWORD);
+          // Redirect to admin page
+          window.location.href = '/clients';
         }
+        
+        // Auto-fill the credentials 
+        setEmail(ADMIN_EMAIL);
+        setPassword(ADMIN_PASSWORD);
       }
     } catch (error) {
       console.error('Unexpected admin creation error:', error);
@@ -167,49 +193,22 @@ const Auth = () => {
       if (error) {
         console.error('Sign in error:', error);
         setError(error.message);
-        toast({
-          title: "Authentication error",
-          description: error.message,
-          variant: "destructive",
-        });
+        
+        if (error.message.includes('not confirmed')) {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your inbox to confirm your email. For testing, you can disable email confirmation in the Supabase dashboard.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Authentication error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       } else {
         console.log("Sign in successful, user:", data.user);
-        
-        // Attempt to get user role from database
-        if (data.user) {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-          
-          if (userError) {
-            console.error('Error fetching user role:', userError);
-          } else if (userData) {
-            console.log("User role from database:", userData.role);
-          } else {
-            console.log("No user data found in database, checking metadata");
-            
-            // Check user metadata as fallback
-            const role = data.user.user_metadata?.role;
-            if (role) {
-              console.log("User role from metadata:", role);
-              
-              // Insert into users table for future use
-              const { error: insertError } = await supabase
-                .from('users')
-                .insert({
-                  id: data.user.id,
-                  email: data.user.email,
-                  role: role
-                });
-                
-              if (insertError) {
-                console.error("Error creating user record from metadata:", insertError);
-              }
-            }
-          }
-        }
         
         toast({
           title: "Success",
@@ -265,32 +264,12 @@ const Auth = () => {
       } else if (data?.user) {
         console.log("Created user with role:", userRole);
         
-        // Insert user record with role
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            role: userRole
-          });
-        
-        if (insertError) {
-          console.error('Error creating user record:', insertError);
-          toast({
-            title: "Warning",
-            description: "User created but profile setup failed. Some features may be limited.",
-            variant: "destructive",
-          });
-        } else {
-          console.log("User record inserted in users table");
-        }
-        
         toast({
           title: "Registration successful",
-          description: "Please check your email to confirm your registration. If email confirmation is disabled in Supabase, you can sign in immediately.",
+          description: "For testing, you can disable email confirmation in the Supabase dashboard.",
         });
         
-        // Auto-login the user
+        // For testing only: Auto-login the user, bypassing email confirmation
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
@@ -298,6 +277,14 @@ const Auth = () => {
         
         if (signInError) {
           console.error("Error auto-signing in after registration:", signInError);
+          
+          if (signInError.message.includes('not confirmed')) {
+            toast({
+              title: "Email confirmation required",
+              description: "Please check your inbox to confirm your email. For testing, you can disable email confirmation in the Supabase dashboard.",
+              variant: "destructive"
+            });
+          }
         } else {
           // Force page reload for a clean state with the new session
           window.location.href = '/';

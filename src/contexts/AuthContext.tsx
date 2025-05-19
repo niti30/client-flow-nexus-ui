@@ -106,6 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               
             if (insertError) {
               console.error("Error inserting user role in DB:", insertError);
+              
+              // If we get Row Level Security (RLS) policy error, log it but use the role from metadata
+              if (insertError.message.includes('row-level security')) {
+                console.log("RLS policy prevented user insertion - using metadata role:", metadataRole);
+              }
             } else {
               console.log("Inserted user role in DB from metadata:", metadataRole);
             }
@@ -140,6 +145,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               
             if (insertError) {
               console.error("Error inserting user role in DB:", insertError);
+              
+              // If we get Row Level Security (RLS) policy error, log it but use the role from metadata
+              if (insertError.message.includes('row-level security')) {
+                console.log("RLS policy prevented user insertion - using metadata role:", metadataRole);
+              }
             } else {
               console.log("Inserted user role in DB from metadata:", metadataRole);
             }

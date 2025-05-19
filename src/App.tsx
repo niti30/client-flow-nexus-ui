@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -88,10 +88,10 @@ const AppRoutes = () => {
     
     if (userRole === 'admin') {
       console.log("✅ Admin detected, redirecting to /clients");
-      return <Navigate to="/clients" />;
+      return <Navigate to="/clients" replace />;
     } else {
       console.log("✅ Client detected, redirecting to /client/dashboard");
-      return <Navigate to="/client/dashboard" />;
+      return <Navigate to="/client/dashboard" replace />;
     }
   };
 
