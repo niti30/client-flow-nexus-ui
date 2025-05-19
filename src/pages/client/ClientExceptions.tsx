@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
@@ -23,7 +22,7 @@ const ClientExceptions = () => {
   const [filteredExceptions, setFilteredExceptions] = useState(exceptions);
 
   // Apply filters whenever filter values or exceptions data changes
-  React.useEffect(() => {
+  useEffect(() => {
     let filtered = [...exceptions];
     
     if (clientFilter !== "All clients") {
