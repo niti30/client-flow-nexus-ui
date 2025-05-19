@@ -83,9 +83,6 @@ const ClientsTableEnhanced = ({ clients }: ClientsTableProps) => {
               // Determine department based on workflow name (this is just example logic)
               const department = client.name.includes("Lead") ? "Sales" : "HR";
               
-              // Determine status randomly for demo purposes
-              const statusActive = index % 2 === 0;
-              
               return (
                 <TableRow key={index}>
                   <TableCell>

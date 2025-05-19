@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 768; // Standard tablet/mobile breakpoint
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = useState<boolean>(() => {
@@ -16,15 +16,22 @@ export function useIsMobile() {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
 
-    // Set on mount
+    // Set on mount and add throttled event listener for better performance
     checkIfMobile();
 
-    // Add event listener
-    window.addEventListener('resize', checkIfMobile);
+    // Add debounced resize listener to prevent excessive rerenders
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkIfMobile, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
     
     // Cleanup
     return () => {
-      window.removeEventListener('resize', checkIfMobile);
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
     };
   }, []);
 
