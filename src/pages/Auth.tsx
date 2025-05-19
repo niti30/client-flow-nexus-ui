@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,22 +7,69 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ExclamationTriangleIcon } from 'lucide-react';
+
+// Helper function to clean up auth state
+const cleanupAuthState = () => {
+  // Remove standard auth tokens
+  localStorage.removeItem('supabase.auth.token');
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  // Remove from sessionStorage if in use
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate('/');
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     try {
       setLoading(true);
+      
+      // Clean up existing auth state to prevent conflicts
+      cleanupAuthState();
+      
+      // Try global signout first to clear any existing sessions
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
+        console.error('Sign in error:', error);
+        setError(error.message);
         toast({
           title: "Authentication error",
           description: error.message,
@@ -33,10 +80,12 @@ const Auth = () => {
           title: "Success",
           description: "You have successfully signed in!",
         });
-        navigate('/');
+        
+        // Force page reload for a clean state with the new session
+        window.location.href = '/';
       }
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Unexpected sign in error:', error);
       toast({
         title: "Unexpected error",
         description: "An unexpected error occurred. Please try again.",
@@ -49,12 +98,19 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     try {
       setLoading(true);
+      
+      // Clean up existing auth state to prevent conflicts
+      cleanupAuthState();
+      
       const { error } = await supabase.auth.signUp({ email, password });
       
       if (error) {
+        console.error('Sign up error:', error);
+        setError(error.message);
         toast({
           title: "Registration error",
           description: error.message,
@@ -63,11 +119,51 @@ const Auth = () => {
       } else {
         toast({
           title: "Registration successful",
-          description: "Please check your email to confirm your registration.",
+          description: "Please check your email to confirm your registration. If email confirmation is disabled in Supabase, you can sign in immediately.",
         });
       }
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('Unexpected sign up error:', error);
+      toast({
+        title: "Unexpected error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address to reset your password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Password reset email sent",
+          description: "Check your email for a password reset link.",
+        });
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
       toast({
         title: "Unexpected error",
         description: "An unexpected error occurred. Please try again.",
@@ -87,6 +183,15 @@ const Auth = () => {
             Enter your email and password to access your account
           </CardDescription>
         </CardHeader>
+        
+        {error && (
+          <div className="px-6 mb-4">
+            <Alert variant="destructive">
+              <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </div>
+        )}
         
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -111,9 +216,13 @@ const Auth = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label htmlFor="password" className="text-sm font-medium">Password</label>
-                    <a href="#" className="text-sm text-blue-600 hover:underline">
+                    <button 
+                      type="button" 
+                      onClick={handleForgotPassword}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
                       Forgot password?
-                    </a>
+                    </button>
                   </div>
                   <Input 
                     id="password" 
@@ -159,6 +268,9 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <p className="text-xs text-gray-500">
+                    Password must be at least 6 characters.
+                  </p>
                 </div>
               </CardContent>
               <CardFooter>
