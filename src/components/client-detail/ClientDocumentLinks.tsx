@@ -18,6 +18,8 @@ interface Document {
 
 interface ClientDocumentLinksProps {
   clientId: string;
+  showDialog?: boolean;
+  onDialogClose?: () => void;
 }
 
 const documentFormSchema = z.object({
@@ -27,8 +29,8 @@ const documentFormSchema = z.object({
 
 type DocumentFormValues = z.infer<typeof documentFormSchema>;
 
-export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
-  const [open, setOpen] = useState(false);
+export function ClientDocumentLinks({ clientId, showDialog = false, onDialogClose }: ClientDocumentLinksProps) {
+  const [open, setOpen] = useState(showDialog);
   const [documents, setDocuments] = useState<Document[]>([
     { id: '1', title: 'Survey Questions', url: 'https://docs.example.com/survey' },
     { id: '2', title: 'Survey Results', url: 'https://docs.example.com/results' },
@@ -40,6 +42,19 @@ export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
   ]);
   
   const { toast } = useToast();
+  
+  // Update dialog open state when showDialog prop changes
+  React.useEffect(() => {
+    setOpen(showDialog);
+  }, [showDialog]);
+
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setOpen(false);
+    if (onDialogClose) {
+      onDialogClose();
+    }
+  };
   
   const form = useForm<DocumentFormValues>({
     resolver: zodResolver(documentFormSchema),
@@ -62,7 +77,7 @@ export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
       title: "Document Added",
       description: `${values.title} has been added to document links.`,
     });
-    setOpen(false);
+    handleDialogClose();
     form.reset();
   };
 
@@ -84,7 +99,10 @@ export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
         ))}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen && onDialogClose) onDialogClose();
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add Document Link</DialogTitle>
@@ -122,7 +140,7 @@ export function ClientDocumentLinks({ clientId }: ClientDocumentLinksProps) {
               />
               
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <Button type="button" variant="outline" onClick={handleDialogClose}>
                   Cancel
                 </Button>
                 <Button type="submit">Save Document</Button>

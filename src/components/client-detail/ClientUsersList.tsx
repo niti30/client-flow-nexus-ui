@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, Minus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,6 +23,8 @@ interface User {
 
 interface ClientUsersListProps {
   clientId: string;
+  showDialog?: boolean;
+  onDialogClose?: () => void;
 }
 
 const userFormSchema = z.object({
@@ -36,8 +38,8 @@ const userFormSchema = z.object({
 
 type UserFormValues = z.infer<typeof userFormSchema>;
 
-export function ClientUsersList({ clientId }: ClientUsersListProps) {
-  const [open, setOpen] = useState(false);
+export function ClientUsersList({ clientId, showDialog = false, onDialogClose }: ClientUsersListProps) {
+  const [open, setOpen] = useState(showDialog);
   const [users, setUsers] = useState<User[]>([
     { 
       id: '1', 
@@ -60,6 +62,19 @@ export function ClientUsersList({ clientId }: ClientUsersListProps) {
   ]);
   
   const { toast } = useToast();
+  
+  // Update dialog open state when showDialog prop changes
+  useEffect(() => {
+    setOpen(showDialog);
+  }, [showDialog]);
+  
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setOpen(false);
+    if (onDialogClose) {
+      onDialogClose();
+    }
+  };
   
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
@@ -90,7 +105,7 @@ export function ClientUsersList({ clientId }: ClientUsersListProps) {
       title: "User Added",
       description: `${values.name} has been added to client users.`,
     });
-    setOpen(false);
+    handleDialogClose();
     form.reset();
   };
 
@@ -127,7 +142,10 @@ export function ClientUsersList({ clientId }: ClientUsersListProps) {
         </Table>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen && onDialogClose) onDialogClose();
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add Client User</DialogTitle>
@@ -229,7 +247,7 @@ export function ClientUsersList({ clientId }: ClientUsersListProps) {
               />
               
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <Button type="button" variant="outline" onClick={handleDialogClose}>
                   Cancel
                 </Button>
                 <Button type="submit">Save User</Button>

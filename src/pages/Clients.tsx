@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import ClientsTable from "@/components/dashboard/ClientsTable";
@@ -10,12 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClientSupportEngineers } from "@/components/client-detail/ClientSupportEngineers";
+import { ClientUsersList } from "@/components/client-detail/ClientUsersList";
+import { ClientDocumentLinks } from "@/components/client-detail/ClientDocumentLinks";
+import { ClientPipelineProgress } from "@/components/client-detail/ClientPipelineProgress";
+import { ClientDetailWorkflows } from "@/components/client-detail/ClientDetailWorkflows";
 
 const Clients = () => {
   const { userRole } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState("overview");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showUserDialog, setShowUserDialog] = useState(false);
+  const [showDocumentDialog, setShowDocumentDialog] = useState(false);
 
   // Redirect client users to client dashboard
   useEffect(() => {
@@ -23,32 +32,6 @@ const Clients = () => {
       window.location.href = '/client/dashboard';
     }
   }, [userRole]);
-
-  // Sample data for the enhanced view (client workflows)
-  const clientWorkflows = [
-    {
-      name: "Lead Processing",
-      contractStart: "Jan 15, 2025",
-      workflows: 12,
-      nodes: 12,
-      executions: 234,
-      exceptions: 2,
-      revenue: "75 USD",
-      timeSaved: "30 min",
-      moneySaved: "—"
-    },
-    {
-      name: "Onboarding",
-      contractStart: "Jan 10, 2025",
-      workflows: 8,
-      nodes: 8,
-      executions: 45,
-      exceptions: 0,
-      revenue: "180 USD",
-      timeSaved: "120 min",
-      moneySaved: "—"
-    }
-  ];
 
   // Function to trigger a refresh of the clients list
   const handleClientAdded = () => {
@@ -98,14 +81,103 @@ const Clients = () => {
             </TabsList>
             
             <TabsContent value="overview">
-              <ClientsTable 
-                searchQuery={searchQuery} 
-                refreshTrigger={refreshTrigger}
-              />
+              {/* First layout with ClientsTable */}
+              <div className="hidden md:block">
+                <ClientsTable 
+                  searchQuery={searchQuery} 
+                  refreshTrigger={refreshTrigger}
+                />
+              </div>
+              
+              {/* Second layout with Client Manager interface */}
+              <div className="block md:hidden">
+                <section className="mb-8">
+                  <h2 className="text-xl font-medium mb-4">Assigned Support Engineers</h2>
+                  <ClientSupportEngineers clientId="demo" />
+                </section>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  <div className="lg:col-span-2">
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Client Users</CardTitle>
+                        <Button onClick={() => setShowUserDialog(true)}>
+                          <Plus size={16} className="mr-2" />
+                          Add User
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <ClientUsersList 
+                          clientId="demo" 
+                          showDialog={showUserDialog} 
+                          onDialogClose={() => setShowUserDialog(false)} 
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div>
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Document Links</CardTitle>
+                        <Button onClick={() => setShowDocumentDialog(true)}>
+                          <Plus size={16} className="mr-2" />
+                          Add Document
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <ClientDocumentLinks 
+                          clientId="demo" 
+                          showDialog={showDocumentDialog} 
+                          onDialogClose={() => setShowDocumentDialog(false)} 
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+                
+                <section>
+                  <h2 className="text-xl font-medium mb-4">Pipeline Progress</h2>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <ClientPipelineProgress clientId="demo" />
+                    </CardContent>
+                  </Card>
+                </section>
+              </div>
             </TabsContent>
             
             <TabsContent value="workflows">
-              <ClientsTableEnhanced clients={clientWorkflows} />
+              <div className="hidden md:block">
+                <ClientsTableEnhanced clients={[
+                  {
+                    name: "Lead Processing",
+                    contractStart: "Jan 15, 2025",
+                    workflows: 12,
+                    nodes: 12,
+                    executions: 234,
+                    exceptions: 2,
+                    revenue: "75 USD",
+                    timeSaved: "30 min",
+                    moneySaved: "—"
+                  },
+                  {
+                    name: "Onboarding",
+                    contractStart: "Jan 10, 2025",
+                    workflows: 8,
+                    nodes: 8,
+                    executions: 45,
+                    exceptions: 0,
+                    revenue: "180 USD",
+                    timeSaved: "120 min",
+                    moneySaved: "—"
+                  }
+                ]} />
+              </div>
+              
+              <div className="block md:hidden">
+                <ClientDetailWorkflows clientId="demo" />
+              </div>
             </TabsContent>
           </Tabs>
         </main>
