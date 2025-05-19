@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import MetricsCard from "@/components/dashboard/MetricsCard";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
+import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("itd");
@@ -137,10 +137,7 @@ const Index = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
-              <Button className="bg-black hover:bg-gray-800 text-white rounded-md">
-                <Plus size={16} className="mr-2" />
-                Add Client
-              </Button>
+              <AddClientDialog className="bg-black hover:bg-gray-800 text-white rounded-md" />
             </div>
             
             {/* Clients Table */}

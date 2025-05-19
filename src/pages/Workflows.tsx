@@ -4,14 +4,10 @@ import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import WorkflowsTable from '@/components/workflows/WorkflowsTable';
 import WorkflowSearchBar from '@/components/workflows/WorkflowSearchBar';
+import { AddWorkflowDialog } from '@/components/dialogs/AddWorkflowDialog';
 
 const Workflows = () => {
   const { workflows, loading } = useWorkflows();
-
-  const handleAddWorkflow = () => {
-    // Placeholder for adding new workflow functionality
-    console.log('Add workflow clicked');
-  };
 
   const handleSearch = (query: string) => {
     // Placeholder for search functionality
@@ -29,10 +25,13 @@ const Workflows = () => {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-2 md:mb-0">Workflows</h1>
-              <WorkflowSearchBar 
-                onSearch={handleSearch} 
-                onAddWorkflow={handleAddWorkflow} 
-              />
+              <div className="flex items-center gap-4">
+                <WorkflowSearchBar 
+                  onSearch={handleSearch} 
+                  onAddWorkflow={() => {}} // This is now handled by the dialog
+                />
+                <AddWorkflowDialog />
+              </div>
             </div>
             
             <WorkflowsTable workflows={workflows} loading={loading} />

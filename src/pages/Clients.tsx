@@ -1,13 +1,14 @@
 
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import ClientsTable from "@/components/dashboard/ClientsTable";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
+import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,18 +65,12 @@ const Clients = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <Button className="bg-[#141417] hover:bg-black">
-                    <Plus size={16} className="mr-2" />
-                    Add Client
-                  </Button>
+                  <AddClientDialog buttonClassName="bg-[#141417] hover:bg-black" />
                 </div>
               )}
               
               {activeTab === "workflows" && (
-                <Button className="bg-[#141417] hover:bg-black">
-                  <Plus size={16} className="mr-2" />
-                  Add Workflow
-                </Button>
+                <AddWorkflowDialog buttonClassName="bg-[#141417] hover:bg-black" />
               )}
             </div>
             
