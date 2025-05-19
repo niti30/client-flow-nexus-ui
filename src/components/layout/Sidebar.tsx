@@ -1,19 +1,24 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
-  FileSpreadsheet, 
-  AlertTriangle, 
+  Briefcase, 
   CreditCard, 
-  Menu, 
+  BarChart, 
+  AlertTriangle, 
+  MessagesSquare,
+  FileText,
+  Settings,
+  RotateCcw,
+  Menu,
   X 
 } from "lucide-react";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -21,28 +26,33 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-    { icon: Users, label: "Clients", path: "/clients" },
-    { icon: FileSpreadsheet, label: "Workflows", path: "/workflows" },
-    { icon: AlertTriangle, label: "Exceptions", path: "/exceptions" },
+    { icon: Users, label: "Users", path: "/users" },
+    { icon: Briefcase, label: "Clients", path: "/clients" },
     { icon: CreditCard, label: "Billing", path: "/billing" },
+    { icon: RotateCcw, label: "Subscriptions", path: "/subscriptions" },
+    { icon: MessagesSquare, label: "Messaging", path: "/messaging" },
+    { icon: FileText, label: "Reporting", path: "/reporting" },
+    { icon: AlertTriangle, label: "Exceptions", path: "/exceptions" }
   ];
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <>
       {/* Mobile menu button */}
       <div className="fixed top-4 left-4 z-50 md:hidden">
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <button 
           onClick={toggleSidebar}
-          className="rounded-full"
+          className="p-2 rounded-full bg-white shadow-md"
         >
           {isOpen ? (
             <X className="h-5 w-5" />
           ) : (
             <Menu className="h-5 w-5" />
           )}
-        </Button>
+        </button>
       </div>
 
       {/* Backdrop for mobile */}
@@ -55,27 +65,34 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-slate-800 text-white w-64 fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out 
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        className={`bg-[#f9f9f9] w-[220px] fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out 
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
+          flex flex-col border-r border-gray-200`}
       >
-        <div className="p-4 border-b border-slate-700">
-          <h1 className="text-xl font-bold">Nexus Dashboard</h1>
+        <div className="p-4 flex items-center">
+          <Settings className="h-5 w-5 text-gray-600" />
         </div>
 
-        <nav className="p-4">
+        <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
-            {menuItems.map((item) => (
-              <li key={item.label}>
-                <Link 
-                  to={item.path} 
-                  className="flex items-center p-2 rounded-md hover:bg-slate-700 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            ))}
+            {menuItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <li key={item.label}>
+                  <Link 
+                    to={item.path} 
+                    className={`flex items-center p-2.5 rounded-md transition-colors
+                      ${active 
+                        ? "bg-gray-200 text-gray-900" 
+                        : "text-gray-700 hover:bg-gray-200 hover:text-gray-900"}`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <item.icon className="h-5 w-5 mr-3" />
+                    <span className="text-sm">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </aside>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, MoreHorizontal, Download } from "lucide-react";
+import { Search, Plus, Download, Edit, Trash, ExternalLink, MoreHorizontal } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,6 +16,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Pagination,
   PaginationContent,
@@ -29,6 +45,8 @@ const Billing = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<any[]>([]);
+  const [showAddPlan, setShowAddPlan] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -86,45 +104,57 @@ const Billing = () => {
     }
   };
 
+  const filteredInvoices = invoices.filter(invoice => 
+    invoice.clients?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `INV-${invoice.id.slice(0, 8)}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const pricingModels = ["Fixed", "Tiered", "Usage"];
+  const billingCycles = ["Monthly", "Quarterly", "Annually"];
+  const contractLengths = ["1 month", "3 months", "6 months", "12 months", "24 months"];
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden ml-[220px]">
         <Header />
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2 md:mb-0">Billing</h1>
-              
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative w-full sm:w-auto">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                  <Input 
-                    placeholder="Search invoices..." 
-                    className="pl-9 w-full sm:w-[260px]" 
-                  />
-                </div>
+              <div className="relative mb-4 md:mb-0 w-full md:max-w-xs">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input 
+                  placeholder="Search invoices or clients..." 
+                  className="pl-10 pr-4 py-2 w-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
+              
+              <Button onClick={() => setShowAddPlan(true)} className="bg-black text-white hover:bg-gray-800">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Plan
+              </Button>
             </div>
             
             {/* Plans */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Plans</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <h2 className="text-lg font-semibold mb-4">Plans</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {plans.map((plan) => (
-                  <Card key={plan.id}>
-                    <CardHeader>
-                      <CardTitle>{plan.name}</CardTitle>
-                      <CardDescription>{plan.description}</CardDescription>
+                  <Card key={plan.id} className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-xl font-medium">{plan.name}</CardTitle>
+                      <CardDescription className="text-gray-600">{plan.description}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="mb-4">
                         <span className="text-3xl font-bold">${plan.price}</span>
                         <span className="text-gray-500">/{plan.billing_cycle}</span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mb-6">
                         {plan.features && typeof plan.features === 'object' && (
                           Object.entries(plan.features as Record<string, any>).map(([key, value]) => (
                             <div key={key} className="flex items-center">
@@ -138,7 +168,10 @@ const Billing = () => {
                           ))
                         )}
                       </div>
-                      <Button className="w-full mt-6">Edit Plan</Button>
+                      <Button variant="outline" className="w-full" size="sm">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Plan
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -147,20 +180,20 @@ const Billing = () => {
             
             {/* Invoices */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Invoices</h2>
-              <div className="bg-white rounded-md border overflow-hidden">
+              <h2 className="text-lg font-semibold mb-4">Invoices</h2>
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[180px]">Invoice ID</TableHead>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Plan</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Due Date</TableHead>
-                        <TableHead>Paid Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="font-medium">Invoice ID</TableHead>
+                        <TableHead className="font-medium">Client</TableHead>
+                        <TableHead className="font-medium">Plan</TableHead>
+                        <TableHead className="font-medium">Amount</TableHead>
+                        <TableHead className="font-medium">Status</TableHead>
+                        <TableHead className="font-medium">Due Date</TableHead>
+                        <TableHead className="font-medium">Paid Date</TableHead>
+                        <TableHead className="text-right font-medium">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -170,14 +203,14 @@ const Billing = () => {
                             Loading invoices...
                           </TableCell>
                         </TableRow>
-                      ) : invoices.length === 0 ? (
+                      ) : filteredInvoices.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={8} className="h-24 text-center">
                             No invoices found.
                           </TableCell>
                         </TableRow>
                       ) : (
-                        invoices.map((invoice) => (
+                        filteredInvoices.map((invoice) => (
                           <TableRow key={invoice.id}>
                             <TableCell className="font-medium">INV-{invoice.id.slice(0, 8)}</TableCell>
                             <TableCell>{invoice.clients?.name || "—"}</TableCell>
@@ -185,7 +218,7 @@ const Billing = () => {
                             <TableCell>${invoice.amount.toFixed(2)}</TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadgeVariant(invoice.status)}>
-                                {invoice.status?.replace('_', ' ') || "—"}
+                                {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1) || "—"}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -196,20 +229,23 @@ const Billing = () => {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end">
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                   <Download className="h-4 w-4" />
                                   <span className="sr-only">Download</span>
                                 </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                       <MoreHorizontal className="h-4 w-4" />
                                       <span className="sr-only">Open menu</span>
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Mark as paid</DropdownMenuItem>
+                                    {invoice.status !== 'paid' && (
+                                      <DropdownMenuItem>Mark as paid</DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem>Send reminder</DropdownMenuItem>
+                                    <DropdownMenuItem>View details</DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -222,7 +258,7 @@ const Billing = () => {
                     </TableBody>
                   </Table>
                 </div>
-                <div className="border-t py-2 px-4">
+                <div className="border-t p-4">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
@@ -248,6 +284,93 @@ const Billing = () => {
           </div>
         </main>
       </div>
+
+      {/* Add Plan Dialog */}
+      <Dialog open={showAddPlan} onOpenChange={setShowAddPlan}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Plan</DialogTitle>
+            <DialogDescription>
+              Create a new billing plan for your clients.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Input placeholder="Enter plan name" />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Fixed" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pricingModels.map(model => (
+                      <SelectItem key={model} value={model}>{model}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                  <Input type="number" className="pl-7" placeholder="0.00" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Contract Length" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {contractLengths.map(length => (
+                      <SelectItem key={length} value={length}>{length}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Billing Cycle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {billingCycles.map(cycle => (
+                      <SelectItem key={cycle} value={cycle}>{cycle}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative">
+                <Input type="number" placeholder="0" />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2">%</span>
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                <Input type="number" className="pl-7" placeholder="0.00" />
+              </div>
+            </div>
+            
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+              <Input type="number" className="pl-7" placeholder="0.00" />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddPlan(false)}>Cancel</Button>
+            <Button>Create Plan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

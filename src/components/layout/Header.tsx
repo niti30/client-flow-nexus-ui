@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Bell, User } from "lucide-react";
+import { Bell, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,33 +8,61 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const location = useLocation();
+  const [pageTitle, setPageTitle] = useState("");
 
   useEffect(() => {
     // In a real app, you would fetch the current user here
-    // For now, we'll use a placeholder
     setCurrentUser({
       name: "Admin User",
       avatar: "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
     });
-  }, []);
+
+    // Set page title based on current route
+    const pathname = location.pathname;
+    if (pathname === "/") {
+      setPageTitle("Dashboard Overview");
+    } else if (pathname.includes("/clients/")) {
+      setPageTitle("Client Manager");
+    } else if (pathname === "/users") {
+      setPageTitle("User Manager");
+    } else if (pathname === "/billing") {
+      setPageTitle("Billing");
+    } else if (pathname === "/workflows") {
+      setPageTitle("Workflows");
+    } else if (pathname === "/exceptions") {
+      setPageTitle("Exceptions");
+    } else if (pathname === "/subscriptions") {
+      setPageTitle("Plan Manager");
+    } else if (pathname === "/clients") {
+      setPageTitle("Clients");
+    } else if (pathname === "/reporting") {
+      setPageTitle("Reporting");
+    } else if (pathname === "/messaging") {
+      setPageTitle("Messaging");
+    } else {
+      setPageTitle("Nexus Dashboard");
+    }
+  }, [location]);
 
   return (
-    <header className="bg-white border-b border-gray-200 p-4 flex items-center justify-end">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <h1 className="text-xl font-medium text-gray-800">{pageTitle}</h1>
+      
       <div className="flex items-center space-x-4">
-        <Button variant="outline" size="icon" className="relative">
+        <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
           <Bell className="h-5 w-5" />
-          <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-        </Button>
+          <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+        </button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative flex items-center gap-2 p-1 px-2 rounded-full">
+            <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors">
               {currentUser && (
                 <>
                   <img
@@ -42,10 +70,10 @@ const Header = () => {
                     alt="User"
                     className="h-8 w-8 rounded-full"
                   />
-                  <span className="hidden md:inline">{currentUser.name}</span>
+                  <ChevronDown className="h-4 w-4 text-gray-600" />
                 </>
               )}
-            </Button>
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem>
