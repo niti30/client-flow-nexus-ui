@@ -14,9 +14,10 @@ import { AddClientForm, ClientFormValues } from "../forms/AddClientForm";
 
 interface AddClientDialogProps {
   buttonClassName?: string;
+  className?: string;
 }
 
-export function AddClientDialog({ buttonClassName }: AddClientDialogProps) {
+export function AddClientDialog({ buttonClassName, className }: AddClientDialogProps) {
   const [open, setOpen] = useState(false);
 
   const handleSubmit = (values: ClientFormValues) => {
@@ -28,7 +29,7 @@ export function AddClientDialog({ buttonClassName }: AddClientDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={buttonClassName}>
+        <Button className={buttonClassName || className}>
           <Plus size={16} className="mr-2" />
           Add Client
         </Button>
