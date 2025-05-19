@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ClientSidebar from "@/components/layout/ClientSidebar";
@@ -6,6 +7,7 @@ import ExceptionsTable from "@/components/exceptions/ExceptionsTable";
 import ExceptionSearchBar from "@/components/exceptions/ExceptionSearchBar";
 import { useExceptions } from "@/hooks/useExceptions";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 const ClientExceptions = () => {
   const {
     exceptions,

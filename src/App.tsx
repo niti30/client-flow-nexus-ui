@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -123,7 +122,6 @@ const AppRoutes = () => {
       <Route path="/subscriptions" element={<AdminRoute><Subscriptions /></AdminRoute>} />
       <Route path="/reporting" element={<AdminRoute><Reporting /></AdminRoute>} />
       <Route path="/messaging" element={<AdminRoute><Messaging /></AdminRoute>} />
-      <Route path="/client/credentials" element={<AdminRoute><ClientCredentials /></AdminRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       
