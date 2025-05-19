@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from '@/hooks/use-toast';
 import { Plus } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 interface Document {
   id: string;
@@ -48,6 +49,37 @@ export function ClientDocumentLinks({ clientId, showDialog = false, onDialogClos
     setOpen(showDialog);
   }, [showDialog]);
 
+  // Fetch documents from database when component mounts
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        // In a real application, we would fetch the documents from the database
+        // For now, we'll use the mock data
+        console.log('Fetching documents for client:', clientId);
+        
+        // In a real application with Supabase, you would do something like:
+        // const { data, error } = await supabase
+        //   .from('documents')
+        //   .select('*')
+        //   .eq('client_id', clientId)
+        //   .order('created_at', { ascending: false });
+        
+        // if (error) {
+        //   console.error('Error fetching documents:', error);
+        //   return;
+        // }
+        
+        // if (data) {
+        //   setDocuments(data);
+        // }
+      } catch (error) {
+        console.error('Failed to fetch documents:', error);
+      }
+    };
+
+    fetchDocuments();
+  }, [clientId]);
+
   // Handle dialog close
   const handleDialogClose = () => {
     setOpen(false);
@@ -64,21 +96,47 @@ export function ClientDocumentLinks({ clientId, showDialog = false, onDialogClos
     },
   });
 
-  const onSubmit = (values: DocumentFormValues) => {
-    // Create a new document with the required properties
-    const newDocument: Document = {
-      id: Date.now().toString(),
-      title: values.title, // This is guaranteed to exist due to the zod schema
-      url: values.url,     // This is guaranteed to exist due to the zod schema
-    };
-    
-    setDocuments([...documents, newDocument]);
-    toast({
-      title: "Document Added",
-      description: `${values.title} has been added to document links.`,
-    });
-    handleDialogClose();
-    form.reset();
+  const onSubmit = async (values: DocumentFormValues) => {
+    try {
+      // Create a new document with the required properties
+      const newDocument: Document = {
+        id: Date.now().toString(),
+        title: values.title,
+        url: values.url,
+      };
+      
+      // Update the state first for immediate UI feedback
+      setDocuments([...documents, newDocument]);
+      
+      // In a real application, save to the database
+      // For example with Supabase:
+      // const { error } = await supabase
+      //   .from('documents')
+      //   .insert([
+      //     { 
+      //       client_id: clientId,
+      //       title: values.title,
+      //       url: values.url
+      //     }
+      //   ]);
+      
+      // if (error) throw error;
+      
+      toast({
+        title: "Document Added",
+        description: `${values.title} has been added to document links.`,
+      });
+      
+      handleDialogClose();
+      form.reset();
+    } catch (error) {
+      console.error('Error adding document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add document.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
