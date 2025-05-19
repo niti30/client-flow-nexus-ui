@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, 0);
         } else if (event === 'SIGNED_OUT') {
           setUserRole('client'); // Reset to default on sign out
+          console.log("User signed out, reset role to client");
         }
       }
     );
@@ -53,6 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        console.log("Existing session found for user:", session.user.email);
+        
         // Get role from user metadata first as a fallback
         const metadataRole = session.user.user_metadata?.role;
         if (metadataRole) {
@@ -63,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Then try to get from database
         fetchUserRole(session.user.id);
       } else {
+        console.log("No existing session found");
         setLoading(false);
       }
     });
@@ -82,26 +86,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error('Error fetching user role from DB:', error);
         // If no role found in DB, try to get from metadata
         const { data: { user } } = await supabase.auth.getUser();
         const metadataRole = user?.user_metadata?.role;
         if (metadataRole) {
           console.log("Using role from metadata after DB error:", metadataRole);
           setUserRole(metadataRole);
+          
+          // Try to insert the user with role in the database
+          try {
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert({
+                id: userId,
+                email: user.email,
+                role: metadataRole
+              });
+              
+            if (insertError) {
+              console.error("Error inserting user role in DB:", insertError);
+            } else {
+              console.log("Inserted user role in DB from metadata:", metadataRole);
+            }
+          } catch (insertErr) {
+            console.error("Unexpected error inserting user role:", insertErr);
+          }
         } else {
+          console.log("No role in metadata after DB error, defaulting to client");
           setUserRole('client'); // Default to client if all else fails
         }
       } else if (data) {
         console.log("User role from DB:", data.role);
         setUserRole(data.role);
       } else {
+        console.log("No user role found in DB");
         // If user not found in 'users' table, try metadata
         const { data: { user } } = await supabase.auth.getUser();
         const metadataRole = user?.user_metadata?.role;
         if (metadataRole) {
           console.log("Using role from metadata (user not in DB):", metadataRole);
           setUserRole(metadataRole);
+          
+          // Try to insert the user with role in the database
+          try {
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert({
+                id: userId,
+                email: user.email,
+                role: metadataRole
+              });
+              
+            if (insertError) {
+              console.error("Error inserting user role in DB:", insertError);
+            } else {
+              console.log("Inserted user role in DB from metadata:", metadataRole);
+            }
+          } catch (insertErr) {
+            console.error("Unexpected error inserting user role:", insertErr);
+          }
         } else {
           console.log("User not found in 'users' table and no metadata role, defaulting to client role");
           setUserRole('client');
@@ -117,6 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log("Signing out user");
       await supabase.auth.signOut({ scope: 'global' });
       // Clear any local storage auth items
       Object.keys(localStorage).forEach((key) => {

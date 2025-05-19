@@ -29,12 +29,14 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
+  console.log("AdminRoute check - Current user role:", userRole, "for path:", location.pathname);
+  
   if (user && userRole === 'admin') {
-    console.log("Admin access granted to:", location.pathname);
+    console.log("✅ Admin access granted to:", location.pathname);
     return <>{children}</>;
   }
   
-  console.log("Access denied: User is not admin. Current role:", userRole);
+  console.log("❌ Access denied to admin route: User role is", userRole);
   return <Navigate to="/client/dashboard" replace />;
 };
 
@@ -47,28 +49,34 @@ const ClientRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
+  console.log("ClientRoute check - Current user role:", userRole, "for path:", location.pathname);
+  
   if (user && userRole === 'client') {
-    console.log("Client access granted to:", location.pathname);
+    console.log("✅ Client access granted to:", location.pathname);
     return <>{children}</>;
   }
   
-  console.log("Access denied: User is not client. Current role:", userRole);
+  console.log("❌ Access denied to client route: User role is", userRole);
   return <Navigate to="/clients" replace />;
 };
 
 // Route protection component for authenticated users
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
   
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
+  
+  console.log("ProtectedRoute check - User authenticated:", !!user, "for path:", location.pathname);
   
   return user ? <>{children}</> : <Navigate to="/auth" replace />;
 };
 
 const AppRoutes = () => {
   const { user, userRole, loading } = useAuth();
+  const location = useLocation();
   
   // Redirect the root path based on user role
   const handleRootRedirect = () => {
@@ -76,13 +84,13 @@ const AppRoutes = () => {
       return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
     
-    console.log("Redirecting root based on role:", userRole);
+    console.log("Root path redirect - Current user role:", userRole, "Current path:", location.pathname);
     
     if (userRole === 'admin') {
-      console.log("Admin detected, redirecting to /clients");
+      console.log("✅ Admin detected, redirecting to /clients");
       return <Navigate to="/clients" />;
     } else {
-      console.log("Client detected, redirecting to /client/dashboard");
+      console.log("✅ Client detected, redirecting to /client/dashboard");
       return <Navigate to="/client/dashboard" />;
     }
   };

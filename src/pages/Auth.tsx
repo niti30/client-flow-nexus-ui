@@ -28,8 +28,8 @@ const cleanupAuthState = () => {
   });
 };
 
-// Predefined admin credentials - for testing purposes only
-const ADMIN_EMAIL = "admin@example.com";
+// Predefined admin credentials - using a real email format that should pass validation
+const ADMIN_EMAIL = "admin1@example-domain.com";
 const ADMIN_PASSWORD = "Admin123!";
 
 const Auth = () => {
@@ -70,6 +70,8 @@ const Auth = () => {
         // Continue even if this fails
       }
       
+      console.log("Attempting to create admin with:", ADMIN_EMAIL);
+      
       // Sign up with admin credentials
       const { data, error } = await supabase.auth.signUp({ 
         email: ADMIN_EMAIL, 
@@ -90,11 +92,17 @@ const Auth = () => {
             title: "Admin exists",
             description: "Admin user already exists. You can sign in with the provided credentials.",
           });
+          
+          // Auto-fill the credentials
+          setEmail(ADMIN_EMAIL);
+          setPassword(ADMIN_PASSWORD);
           return;
         }
         
         setError(error.message);
       } else if (data?.user) {
+        console.log("Admin user created successfully:", data.user);
+        
         // Insert user record with admin role
         const { error: insertError } = await supabase
           .from('users')
@@ -112,10 +120,15 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
+          console.log("Admin record inserted in users table");
           toast({
             title: "Admin created",
-            description: `Admin user created: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`,
+            description: `Admin user created with email: ${ADMIN_EMAIL}`,
           });
+          
+          // Auto-fill the credentials
+          setEmail(ADMIN_EMAIL);
+          setPassword(ADMIN_PASSWORD);
         }
       }
     } catch (error) {
@@ -147,7 +160,9 @@ const Auth = () => {
         // Continue even if this fails
       }
       
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("Attempting sign in with:", email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         console.error('Sign in error:', error);
@@ -158,6 +173,44 @@ const Auth = () => {
           variant: "destructive",
         });
       } else {
+        console.log("Sign in successful, user:", data.user);
+        
+        // Attempt to get user role from database
+        if (data.user) {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+          
+          if (userError) {
+            console.error('Error fetching user role:', userError);
+          } else if (userData) {
+            console.log("User role from database:", userData.role);
+          } else {
+            console.log("No user data found in database, checking metadata");
+            
+            // Check user metadata as fallback
+            const role = data.user.user_metadata?.role;
+            if (role) {
+              console.log("User role from metadata:", role);
+              
+              // Insert into users table for future use
+              const { error: insertError } = await supabase
+                .from('users')
+                .insert({
+                  id: data.user.id,
+                  email: data.user.email,
+                  role: role
+                });
+                
+              if (insertError) {
+                console.error("Error creating user record from metadata:", insertError);
+              }
+            }
+          }
+        }
+        
         toast({
           title: "Success",
           description: "You have successfully signed in!",
@@ -187,6 +240,8 @@ const Auth = () => {
       
       // Clean up existing auth state to prevent conflicts
       cleanupAuthState();
+      
+      console.log("Attempting sign up with:", email, "role:", userRole);
       
       // Sign up with user metadata that includes the role
       const { data, error } = await supabase.auth.signUp({ 
@@ -226,12 +281,27 @@ const Auth = () => {
             description: "User created but profile setup failed. Some features may be limited.",
             variant: "destructive",
           });
+        } else {
+          console.log("User record inserted in users table");
         }
         
         toast({
           title: "Registration successful",
           description: "Please check your email to confirm your registration. If email confirmation is disabled in Supabase, you can sign in immediately.",
         });
+        
+        // Auto-login the user
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (signInError) {
+          console.error("Error auto-signing in after registration:", signInError);
+        } else {
+          // Force page reload for a clean state with the new session
+          window.location.href = '/';
+        }
       }
     } catch (error) {
       console.error('Unexpected sign up error:', error);
