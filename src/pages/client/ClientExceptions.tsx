@@ -5,17 +5,13 @@ import ClientHeader from "@/components/layout/ClientHeader";
 import ExceptionsTable from "@/components/exceptions/ExceptionsTable";
 import ExceptionSearchBar from "@/components/exceptions/ExceptionSearchBar";
 import { useExceptions } from "@/hooks/useExceptions";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 const ClientExceptions = () => {
-  const { exceptions, loading, setSearchQuery } = useExceptions();
+  const {
+    exceptions,
+    loading,
+    setSearchQuery
+  } = useExceptions();
   const [clientFilter, setClientFilter] = useState("All clients");
   const [typeFilter, setTypeFilter] = useState("All types");
   const [severityFilter, setSeverityFilter] = useState("All severities");
@@ -24,25 +20,15 @@ const ClientExceptions = () => {
   // Apply filters whenever filter values or exceptions data changes
   useEffect(() => {
     let filtered = [...exceptions];
-    
     if (clientFilter !== "All clients") {
-      filtered = filtered.filter(exception => 
-        exception.clients?.name === clientFilter
-      );
+      filtered = filtered.filter(exception => exception.clients?.name === clientFilter);
     }
-    
     if (typeFilter !== "All types") {
-      filtered = filtered.filter(exception => 
-        exception.exception_type === typeFilter
-      );
+      filtered = filtered.filter(exception => exception.exception_type === typeFilter);
     }
-    
     if (severityFilter !== "All severities") {
-      filtered = filtered.filter(exception => 
-        exception.severity === severityFilter
-      );
+      filtered = filtered.filter(exception => exception.severity === severityFilter);
     }
-    
     setFilteredExceptions(filtered);
   }, [exceptions, clientFilter, typeFilter, severityFilter]);
 
@@ -51,23 +37,18 @@ const ClientExceptions = () => {
     const uniqueClients = new Set(exceptions.map(e => e.clients?.name).filter(Boolean));
     return Array.from(uniqueClients);
   };
-
   const getUniqueTypes = () => {
     const uniqueTypes = new Set(exceptions.map(e => e.exception_type).filter(Boolean));
     return Array.from(uniqueTypes);
   };
-
   const getUniqueSeverities = () => {
     const uniqueSeverities = new Set(exceptions.map(e => e.severity).filter(Boolean));
     return Array.from(uniqueSeverities);
   };
-
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
-
-  return (
-    <div className="flex h-screen bg-[#f5f5f7]">
+  return <div className="flex h-screen bg-[#f5f5f7]">
       <ClientSidebar />
       
       <div className="flex-1 flex flex-col">
@@ -87,9 +68,7 @@ const ClientExceptions = () => {
                   <SelectContent className="bg-white border-gray-300 text-gray-800">
                     <SelectGroup>
                       <SelectItem value="All types">All types</SelectItem>
-                      {getUniqueTypes().map(type => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                      ))}
+                      {getUniqueTypes().map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -103,30 +82,20 @@ const ClientExceptions = () => {
                   <SelectContent className="bg-white border-gray-300 text-gray-800">
                     <SelectGroup>
                       <SelectItem value="All severities">All severities</SelectItem>
-                      {getUniqueSeverities().map(severity => (
-                        <SelectItem key={severity} value={severity}>{severity}</SelectItem>
-                      ))}
+                      {getUniqueSeverities().map(severity => <SelectItem key={severity} value={severity}>{severity}</SelectItem>)}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <ExceptionSearchBar onSearch={handleSearch} />
-              </div>
+              
             </div>
             
             <div className="bg-white rounded-lg shadow-sm">
-              <ExceptionsTable 
-                exceptions={filteredExceptions} 
-                loading={loading} 
-                onViewCredentials={() => {}} 
-              />
+              <ExceptionsTable exceptions={filteredExceptions} loading={loading} onViewCredentials={() => {}} />
             </div>
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ClientExceptions;
