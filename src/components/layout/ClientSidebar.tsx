@@ -11,18 +11,22 @@ import {
   X 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
   const { signOut } = useAuth();
+  const isMobile = useIsMobile();
 
   // Close sidebar on mobile view for route change
   useEffect(() => {
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       setIsOpen(false);
+    } else {
+      setIsOpen(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
