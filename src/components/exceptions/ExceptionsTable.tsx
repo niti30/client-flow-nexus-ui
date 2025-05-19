@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { 
   Table, 
@@ -8,7 +9,7 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -24,6 +25,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Exception } from "@/hooks/useExceptions";
 
 interface ExceptionsTableProps {
@@ -191,11 +200,11 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
   };
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden rounded-md border border-gray-200">
       <div className="overflow-x-auto">
         <Table className="w-full">
           <TableHeader>
-            <TableRow className="border-b border-gray-200">
+            <TableRow className="bg-gray-50 border-b border-gray-200">
               <TableHead 
                 className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('created_at')}
@@ -295,21 +304,41 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
                   <TableCell>
                     <div className="flex items-center">
                       <span className="text-gray-700 mr-2">{exception.status || "open"}</span>
-                      <Select 
-                        onValueChange={(value) => handleStatusChange(exception.id, value)}
-                        defaultValue={exception.status || "open"}
-                      >
-                        <SelectTrigger className="h-8 w-8 p-0 border-none bg-transparent">
-                          <span className="sr-only">Open menu</span>
-                          <div className="flex justify-center items-center">⋮</div>
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border-gray-200 text-gray-800 min-w-[120px]">
-                          <SelectItem value="open">Open</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="resolved">Resolved</SelectItem>
-                          <SelectItem value="closed">Closed</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-md">
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(exception.id, "open")}
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            Open
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(exception.id, "new")}
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            New
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(exception.id, "resolved")}
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            Resolved
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(exception.id, "closed")}
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            Closed
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

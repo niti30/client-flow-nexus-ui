@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   FileText,
@@ -8,7 +8,8 @@ import {
   Settings,
   Menu,
   BarChart2,
-  X 
+  X,
+  LogOut 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,6 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const isMobile = useIsMobile();
 
@@ -30,6 +32,13 @@ const ClientSidebar = () => {
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleSignOut = () => {
+    if (signOut) {
+      signOut();
+      navigate("/auth");
+    }
   };
 
   const menuItems = [
@@ -92,10 +101,10 @@ const ClientSidebar = () => {
 
         <div className="p-4 border-t border-gray-700">
           <button 
-            onClick={signOut}
+            onClick={handleSignOut}
             className="w-full flex items-center p-3 rounded-xl text-gray-300 hover:bg-[#333333]"
           >
-            <Settings className="h-5 w-5 mr-3" />
+            <LogOut className="h-5 w-5 mr-3" />
             <span className="text-base">Sign Out</span>
           </button>
         </div>

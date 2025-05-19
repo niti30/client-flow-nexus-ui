@@ -20,6 +20,8 @@ import Reporting from "./pages/Reporting";
 import Users from "./pages/Users";
 import Messaging from "./pages/Messaging";
 import ClientDashboard from "./pages/client/ClientDashboard";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 // Route protection component for admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
@@ -112,6 +114,8 @@ const AppRoutes = () => {
       <Route path="/reporting" element={<AdminRoute><Reporting /></AdminRoute>} />
       <Route path="/messaging" element={<AdminRoute><Messaging /></AdminRoute>} />
       <Route path="/client/credentials" element={<AdminRoute><ClientCredentials /></AdminRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       
       {/* Client routes */}
       <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />

@@ -71,10 +71,6 @@ const Clients = () => {
                   />
                 </div>
               )}
-              
-              {activeTab === "workflows" && (
-                <AddWorkflowDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" />
-              )}
             </div>
             
             <TabsList className="mb-6 border-b w-64">
@@ -150,6 +146,10 @@ const Clients = () => {
             </TabsContent>
             
             <TabsContent value="workflows">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-medium">Workflows</h2>
+                <AddWorkflowDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" />
+              </div>
               <ClientDetailWorkflows clientId="demo" />
             </TabsContent>
           </Tabs>

@@ -46,7 +46,7 @@ export const useExceptions = () => {
     {
       id: "2",
       description: "Data extraction error: Unrecognized document format",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-11T09:30:00Z",
       resolved_at: null,
       clients: { name: "Globex Inc" },
@@ -88,7 +88,7 @@ export const useExceptions = () => {
     {
       id: "5",
       description: "Payment processing failed: Invalid card information",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-11T11:10:00Z",
       resolved_at: null,
       clients: { name: "Wayne Enterprises" },
@@ -116,7 +116,7 @@ export const useExceptions = () => {
     {
       id: "7",
       description: "Workflow execution halted: Logic error in step #4",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-12T16:30:00Z",
       resolved_at: null,
       clients: { name: "Oscorp" },
@@ -148,7 +148,7 @@ export const useExceptions = () => {
     {
       id: "9",
       description: "Workflow execution halted: Logic error in step #4",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-12T22:00:00Z",
       resolved_at: null,
       clients: { name: "Oscorp" },
@@ -176,7 +176,7 @@ export const useExceptions = () => {
     {
       id: "11",
       description: "Payment processing failed: Invalid card information",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-11T16:40:00Z",
       resolved_at: null,
       clients: { name: "Wayne Enterprises" },
@@ -190,7 +190,7 @@ export const useExceptions = () => {
     {
       id: "12",
       description: "Data extraction error: Unrecognized document format",
-      status: "in_progress",
+      status: "new",
       created_at: "2025-05-11T15:00:00Z",
       resolved_at: null,
       clients: { name: "Globex Inc" },

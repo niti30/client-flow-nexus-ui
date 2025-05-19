@@ -8,11 +8,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [pageTitle, setPageTitle] = useState("");
 
   useEffect(() => {
@@ -44,10 +47,24 @@ const Header = () => {
       setPageTitle("Reporting");
     } else if (pathname === "/messaging") {
       setPageTitle("Messaging");
+    } else if (pathname === "/profile") {
+      setPageTitle("My Profile");
+    } else if (pathname === "/settings") {
+      setPageTitle("Settings");
     } else {
       setPageTitle("Dashboard");
     }
   }, [location]);
+
+  const handleSignOut = () => {
+    if (signOut) {
+      // Call the signOut method from AuthContext
+      signOut();
+      
+      // Redirect to auth page
+      navigate("/auth");
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -72,7 +89,7 @@ const Header = () => {
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200">
             <DropdownMenuItem>
               <Link to="/profile" className="w-full">Profile</Link>
             </DropdownMenuItem>
@@ -80,8 +97,8 @@ const Header = () => {
               <Link to="/settings" className="w-full">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <button className="w-full text-left">Log out</button>
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
