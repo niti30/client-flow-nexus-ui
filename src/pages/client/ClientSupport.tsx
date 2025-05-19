@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Send, ArrowUpRight, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from '@/hooks/use-toast';
