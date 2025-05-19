@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   session: Session | null;
@@ -53,6 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function fetchUserRole(userId: string) {
     try {
+      console.log("Fetching user role for:", userId);
+      
       // Check if user is in the 'users' table
       const { data, error } = await supabase
         .from('users')
@@ -64,10 +67,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Error fetching user role:', error);
         setUserRole('client'); // Default to client if error
       } else if (data) {
+        console.log("User role from DB:", data.role);
         setUserRole(data.role);
-        console.log("User role set to:", data.role);
       } else {
         // If user not found, default to client
+        console.log("User not found in 'users' table, defaulting to client role");
         setUserRole('client');
       }
     } catch (error) {

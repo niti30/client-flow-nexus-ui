@@ -28,11 +28,12 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
-  return user && userRole === 'admin' ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/client/dashboard" replace />
-  );
+  if (user && userRole === 'admin') {
+    return <>{children}</>;
+  }
+  
+  console.log("Access denied: User is not admin. Current role:", userRole);
+  return <Navigate to="/client/dashboard" replace />;
 };
 
 // Route protection component for client-only routes
@@ -43,11 +44,12 @@ const ClientRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
-  return user && userRole === 'client' ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/" replace />
-  );
+  if (user && userRole === 'client') {
+    return <>{children}</>;
+  }
+  
+  console.log("Access denied: User is not client. Current role:", userRole);
+  return <Navigate to="/clients" replace />;
 };
 
 // Route protection component for authenticated users
@@ -62,10 +64,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => {
-  const { userRole } = useAuth();
+  const { user, userRole, loading } = useAuth();
   
   // Redirect the root path based on user role
   const handleRootRedirect = () => {
+    if (loading) {
+      return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
+    
+    console.log("Redirecting root based on role:", userRole);
+    
     if (userRole === 'admin') {
       return <Navigate to="/clients" />;
     } else {

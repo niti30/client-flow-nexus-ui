@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -138,6 +137,11 @@ const Auth = () => {
         
         if (insertError) {
           console.error('Error creating user record:', insertError);
+          toast({
+            title: "Warning",
+            description: "User created but profile setup failed. Some features may be limited.",
+            variant: "destructive",
+          });
         }
         
         toast({
