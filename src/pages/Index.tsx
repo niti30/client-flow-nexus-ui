@@ -23,24 +23,46 @@ const Index = () => {
       revenue: "$24,500",
       timeSaved: "284h",
       moneySaved: "$42,600"
+    },
+    {
+      name: "Globex Inc",
+      contractStart: "Feb 10, 2025",
+      workflows: 18,
+      nodes: 92,
+      executions: 1232,
+      exceptions: 5,
+      revenue: "$18,750",
+      timeSaved: "196h",
+      moneySaved: "$29,400"
+    },
+    {
+      name: "Initech",
+      contractStart: "Mar 5, 2025",
+      workflows: 12,
+      nodes: 78,
+      executions: 924,
+      exceptions: 8,
+      revenue: "$15,200",
+      timeSaved: "152h",
+      moneySaved: "$22,800"
     }
   ];
   
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden md:ml-[260px]">
         <Header />
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Dashboard Overview</h1>
               
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className="flex flex-wrap gap-2 mb-6">
                 <Tabs defaultValue="7d" className="w-full" onValueChange={setActiveTab}>
                   <TabsList className="grid grid-cols-6 max-w-md">
                     <TabsTrigger value="7d">Last 7 days</TabsTrigger>
@@ -54,7 +76,7 @@ const Index = () => {
               </div>
               
               {/* Dashboard Metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
                 <MetricsCard 
                   title="Total Workflows" 
                   value="2,847" 
@@ -94,7 +116,9 @@ const Index = () => {
                 </div>
                 
                 {/* Clients Table */}
-                <ClientsTableEnhanced clients={clients} />
+                <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+                  <ClientsTableEnhanced clients={clients} />
+                </div>
               </div>
             </div>
           </div>

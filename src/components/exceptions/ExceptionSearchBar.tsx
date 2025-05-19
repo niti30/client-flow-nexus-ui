@@ -17,11 +17,11 @@ const ExceptionSearchBar = ({ onSearch, onFilter }: ExceptionSearchBarProps) => 
 
   return (
     <div className="flex flex-col sm:flex-row gap-2">
-      <div className="relative w-full sm:w-auto">
+      <div className="relative w-full sm:w-auto flex-1 sm:flex-none">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
         <Input 
           placeholder="Search exceptions..." 
-          className="pl-9 w-full sm:w-[260px]" 
+          className="pl-9 w-full sm:max-w-xs" 
           onChange={handleSearchChange}
         />
       </div>
