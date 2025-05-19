@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -23,12 +23,14 @@ import ClientDashboard from "./pages/client/ClientDashboard";
 // Route protection component for admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, userRole, loading } = useAuth();
+  const location = useLocation();
   
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
   if (user && userRole === 'admin') {
+    console.log("Admin access granted to:", location.pathname);
     return <>{children}</>;
   }
   
@@ -39,12 +41,14 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 // Route protection component for client-only routes
 const ClientRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, userRole, loading } = useAuth();
+  const location = useLocation();
   
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
   if (user && userRole === 'client') {
+    console.log("Client access granted to:", location.pathname);
     return <>{children}</>;
   }
   
@@ -75,8 +79,10 @@ const AppRoutes = () => {
     console.log("Redirecting root based on role:", userRole);
     
     if (userRole === 'admin') {
+      console.log("Admin detected, redirecting to /clients");
       return <Navigate to="/clients" />;
     } else {
+      console.log("Client detected, redirecting to /client/dashboard");
       return <Navigate to="/client/dashboard" />;
     }
   };

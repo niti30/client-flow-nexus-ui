@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -27,12 +28,17 @@ const cleanupAuthState = () => {
   });
 };
 
+// Predefined admin credentials - for testing purposes only
+const ADMIN_EMAIL = "admin@example.com";
+const ADMIN_PASSWORD = "Admin123!";
+
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<'admin' | 'client'>('client'); // Default to client
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,6 +53,82 @@ const Auth = () => {
     
     checkSession();
   }, [navigate]);
+
+  // Helper to create predefined admin
+  const createAdminUser = async () => {
+    setCreatingAdmin(true);
+    setError(null);
+    
+    try {
+      // Clean up existing auth state to prevent conflicts
+      cleanupAuthState();
+      
+      // Try global signout first to clear any existing sessions
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+      }
+      
+      // Sign up with admin credentials
+      const { data, error } = await supabase.auth.signUp({ 
+        email: ADMIN_EMAIL, 
+        password: ADMIN_PASSWORD,
+        options: {
+          data: {
+            role: 'admin'
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('Admin creation error:', error);
+        
+        // If user already exists, try to sign in
+        if (error.message.includes('already')) {
+          toast({
+            title: "Admin exists",
+            description: "Admin user already exists. You can sign in with the provided credentials.",
+          });
+          return;
+        }
+        
+        setError(error.message);
+      } else if (data?.user) {
+        // Insert user record with admin role
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            role: 'admin'
+          });
+        
+        if (insertError) {
+          console.error('Error creating admin record:', insertError);
+          toast({
+            title: "Warning",
+            description: "Admin created but profile setup failed. Some features may be limited.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Admin created",
+            description: `Admin user created: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected admin creation error:', error);
+      toast({
+        title: "Unexpected error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +208,8 @@ const Auth = () => {
           variant: "destructive",
         });
       } else if (data?.user) {
+        console.log("Created user with role:", userRole);
+        
         // Insert user record with role
         const { error: insertError } = await supabase
           .from('users')
@@ -260,7 +344,7 @@ const Auth = () => {
                   />
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col space-y-4">
                 <Button 
                   type="submit" 
                   className="w-full" 
@@ -268,6 +352,20 @@ const Auth = () => {
                 >
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full" 
+                  disabled={creatingAdmin} 
+                  onClick={createAdminUser}
+                >
+                  {creatingAdmin ? "Creating Admin..." : "Create Test Admin"}
+                </Button>
+                
+                <div className="text-sm text-center text-gray-500">
+                  Admin: {ADMIN_EMAIL} / {ADMIN_PASSWORD}
+                </div>
               </CardFooter>
             </form>
           </TabsContent>

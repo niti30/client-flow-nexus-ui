@@ -23,16 +23,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
         // When signed in, check user role
-        if (session?.user && event === 'SIGNED_IN') {
+        if (session?.user && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+          // Get role from user metadata first as a fallback
+          const metadataRole = session.user.user_metadata?.role;
+          if (metadataRole) {
+            console.log("Role from metadata:", metadataRole);
+            setUserRole(metadataRole);
+          }
+          
+          // Then try to get from database (this is more reliable)
           setTimeout(() => {
             fetchUserRole(session.user.id);
           }, 0);
+        } else if (event === 'SIGNED_OUT') {
+          setUserRole('client'); // Reset to default on sign out
         }
       }
     );
@@ -43,6 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        // Get role from user metadata first as a fallback
+        const metadataRole = session.user.user_metadata?.role;
+        if (metadataRole) {
+          console.log("Initial role from metadata:", metadataRole);
+          setUserRole(metadataRole);
+        }
+        
+        // Then try to get from database
         fetchUserRole(session.user.id);
       } else {
         setLoading(false);
@@ -65,14 +83,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Error fetching user role:', error);
-        setUserRole('client'); // Default to client if error
+        // If no role found in DB, try to get from metadata
+        const { data: { user } } = await supabase.auth.getUser();
+        const metadataRole = user?.user_metadata?.role;
+        if (metadataRole) {
+          console.log("Using role from metadata after DB error:", metadataRole);
+          setUserRole(metadataRole);
+        } else {
+          setUserRole('client'); // Default to client if all else fails
+        }
       } else if (data) {
         console.log("User role from DB:", data.role);
         setUserRole(data.role);
       } else {
-        // If user not found, default to client
-        console.log("User not found in 'users' table, defaulting to client role");
-        setUserRole('client');
+        // If user not found in 'users' table, try metadata
+        const { data: { user } } = await supabase.auth.getUser();
+        const metadataRole = user?.user_metadata?.role;
+        if (metadataRole) {
+          console.log("Using role from metadata (user not in DB):", metadataRole);
+          setUserRole(metadataRole);
+        } else {
+          console.log("User not found in 'users' table and no metadata role, defaulting to client role");
+          setUserRole('client');
+        }
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -85,6 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut({ scope: 'global' });
+      // Clear any local storage auth items
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
       window.location.href = '/auth'; // Redirect to login page
     } catch (error) {
       console.error('Error signing out:', error);
