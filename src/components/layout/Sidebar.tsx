@@ -111,8 +111,7 @@ const Sidebar = () => {
           borderRadius: '0px',
           flex: 'none',
           order: 0,
-          flexGrow: 0,
-          borderRight: '1px solid #e5e7eb'
+          flexGrow: 0
         }}
       >
         <div className="p-5 flex items-center">

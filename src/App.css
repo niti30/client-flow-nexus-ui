@@ -66,20 +66,6 @@
   border: 1px solid #e5e7eb;
 }
 
-/* Document links title fix */
-.document-links-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.document-links-title h2 {
-  margin-right: 0.5rem;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .app-logo {
     animation: app-logo-spin infinite 20s linear;
