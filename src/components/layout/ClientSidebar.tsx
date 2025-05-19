@@ -11,25 +11,18 @@ import {
   X 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
   const { signOut } = useAuth();
-  const isMobile = useIsMobile();
-
-  // Set initial sidebar state based on screen size
-  useEffect(() => {
-    setIsOpen(!isMobile);
-  }, [isMobile]);
 
   // Close sidebar on mobile view for route change
   useEffect(() => {
-    if (isMobile) {
+    if (window.innerWidth < 768) {
       setIsOpen(false);
     }
-  }, [location.pathname, isMobile]);
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -64,7 +57,7 @@ const ClientSidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center">
           <Settings className="h-6 w-6 text-gray-900" />
@@ -105,7 +98,7 @@ const ClientSidebar = () => {
       </aside>
 
       {/* Main content wrapper with proper margin */}
-      <div className={`transition-all duration-300 ${isOpen ? 'md:ml-[210px]' : 'ml-0'}`}></div>
+      <div className="ml-0 md:ml-[210px] transition-all duration-300"></div>
     </>
   );
 };
