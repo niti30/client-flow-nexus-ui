@@ -74,7 +74,7 @@ const Sidebar = () => {
           <span className="ml-2 font-semibold text-lg text-white">Admin Panel</span>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3 bg-slate-400">
+        <nav className="flex-1 overflow-y-auto p-3 bg-[#faf9f8]">
           <ul className="space-y-6">
             {menuItems.map(item => {
             const active = isActive(item.path);
