@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   Table, 
@@ -45,15 +44,15 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
   const getSeverityBadgeColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'critical':
-        return 'bg-red-800 text-white';
+        return 'bg-red-500 text-white';
       case 'high':
-        return 'bg-amber-800 text-white';
+        return 'bg-amber-500 text-white';
       case 'medium':
-        return 'bg-amber-700 text-white';
+        return 'bg-amber-400 text-white';
       case 'low':
-        return 'bg-green-800 text-white';
+        return 'bg-green-500 text-white';
       default:
-        return 'bg-gray-700 text-white';
+        return 'bg-gray-500 text-white';
     }
   };
 
@@ -196,52 +195,52 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
       <div className="overflow-x-auto">
         <Table className="w-full">
           <TableHeader>
-            <TableRow className="border-b border-gray-700">
+            <TableRow className="border-b border-gray-200">
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('created_at')}
               >
                 Datetime reported {getSortIcon('created_at')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('client')}
               >
                 Client name {getSortIcon('client')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('department')}
               >
                 Department {getSortIcon('department')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('workflow')}
               >
                 Workflow name {getSortIcon('workflow')}
               </TableHead>
-              <TableHead className="whitespace-nowrap text-gray-300 font-medium text-xs uppercase">Notifications</TableHead>
+              <TableHead className="whitespace-nowrap text-gray-700 font-medium text-xs uppercase">Notifications</TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('exception_type')}
               >
                 Exception type {getSortIcon('exception_type')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('severity')}
               >
                 Severity {getSortIcon('severity')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('remedy')}
               >
                 Remedy {getSortIcon('remedy')}
               </TableHead>
               <TableHead 
-                className="whitespace-nowrap cursor-pointer text-gray-300 font-medium text-xs uppercase"
+                className="whitespace-nowrap cursor-pointer text-gray-700 font-medium text-xs uppercase"
                 onClick={() => handleSort('status')}
               >
                 Status {getSortIcon('status')}
@@ -251,30 +250,30 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center text-gray-300">
+                <TableCell colSpan={9} className="h-24 text-center text-gray-500">
                   Loading exceptions...
                 </TableCell>
               </TableRow>
             ) : paginatedExceptions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center text-gray-300">
+                <TableCell colSpan={9} className="h-24 text-center text-gray-500">
                   No exceptions found.
                 </TableCell>
               </TableRow>
             ) : (
               paginatedExceptions.map((exception) => (
-                <TableRow key={exception.id} className="border-b border-gray-700">
-                  <TableCell className="text-gray-300 whitespace-nowrap">{exception.created_at ? formatDateTime(exception.created_at) : "—"}</TableCell>
-                  <TableCell className="text-gray-300">
+                <TableRow key={exception.id} className="border-b border-gray-200">
+                  <TableCell className="text-gray-700 whitespace-nowrap">{exception.created_at ? formatDateTime(exception.created_at) : "—"}</TableCell>
+                  <TableCell className="text-gray-700">
                     <button
                       onClick={() => onViewCredentials && exception.clients && onViewCredentials(exception.id)}
-                      className="text-gray-300 hover:text-blue-400 transition-colors"
+                      className="text-gray-700 hover:text-blue-600 transition-colors"
                     >
                       {exception.clients?.name || "—"}
                     </button>
                   </TableCell>
-                  <TableCell className="text-gray-300">{exception.department || "—"}</TableCell>
-                  <TableCell className="text-gray-300">{exception.workflows?.name || "—"}</TableCell>
+                  <TableCell className="text-gray-700">{exception.department || "—"}</TableCell>
+                  <TableCell className="text-gray-700">{exception.workflows?.name || "—"}</TableCell>
                   <TableCell>
                     <div className="flex">
                       <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
@@ -283,19 +282,19 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
                       <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs -ml-2">
                         A
                       </div>
-                      <span className="text-xs ml-1 text-gray-300">{exception.notifications || "+2 more"}</span>
+                      <span className="text-xs ml-1 text-gray-700">{exception.notifications || "+2 more"}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-gray-300">{exception.exception_type || "—"}</TableCell>
+                  <TableCell className="text-gray-700">{exception.exception_type || "—"}</TableCell>
                   <TableCell>
                     <Badge className={getSeverityBadgeColor(exception.severity || "Critical")}>
                       {exception.severity || "Critical"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-gray-300">{exception.remedy || "—"}</TableCell>
+                  <TableCell className="text-gray-700">{exception.remedy || "—"}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <span className="text-gray-300 mr-2">{exception.status || "open"}</span>
+                      <span className="text-gray-700 mr-2">{exception.status || "open"}</span>
                       <Select 
                         onValueChange={(value) => handleStatusChange(exception.id, value)}
                         defaultValue={exception.status || "open"}
@@ -304,7 +303,7 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
                           <span className="sr-only">Open menu</span>
                           <div className="flex justify-center items-center">⋮</div>
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white min-w-[120px]">
+                        <SelectContent className="bg-white border-gray-200 text-gray-800 min-w-[120px]">
                           <SelectItem value="open">Open</SelectItem>
                           <SelectItem value="in_progress">In Progress</SelectItem>
                           <SelectItem value="resolved">Resolved</SelectItem>
@@ -319,7 +318,7 @@ const ExceptionsTable = ({ exceptions, loading, onViewCredentials }: ExceptionsT
           </TableBody>
         </Table>
       </div>
-      <div className="border-t border-gray-700 py-2 px-4">
+      <div className="border-t border-gray-200 py-2 px-4">
         {renderPagination()}
       </div>
     </div>
