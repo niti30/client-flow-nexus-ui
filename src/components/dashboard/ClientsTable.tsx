@@ -19,6 +19,7 @@ interface Client {
   status: string;
   industry: string;
   logo_url?: string;
+  email?: string;
 }
 
 interface ClientsTableProps {
@@ -34,6 +35,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
   const fetchClients = async () => {
     try {
       setLoading(true);
+      console.log("Fetching clients...");
       const { data, error } = await supabase
         .from('clients')
         .select('*');
@@ -41,6 +43,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
       if (error) {
         console.error('Error fetching clients:', error);
       } else {
+        console.log('Fetched clients:', data);
         setClients(data || []);
       }
     } catch (error) {
@@ -57,7 +60,8 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
   // Filter clients based on search query
   const filteredClients = clients.filter(client => 
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (client.industry && client.industry.toLowerCase().includes(searchQuery.toLowerCase()))
+    (client.industry && client.industry.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -67,6 +71,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
           <TableHeader className="bg-[#FAF9F8]">
             <TableRow>
               <TableHead className="font-bold">CLIENT</TableHead>
+              <TableHead className="font-bold">EMAIL</TableHead>
               <TableHead className="font-bold">INDUSTRY</TableHead>
               <TableHead className="font-bold">STATUS</TableHead>
               <TableHead className="font-bold">WORKFLOWS</TableHead>
@@ -77,13 +82,13 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   Loading clients...
                 </TableCell>
               </TableRow>
             ) : filteredClients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   No clients found.
                 </TableCell>
               </TableRow>
@@ -104,6 +109,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
                       <span className="text-[#4E86CF]">{client.name}</span>
                     </div>
                   </TableCell>
+                  <TableCell>{client.email || "—"}</TableCell>
                   <TableCell>{client.industry || "—"}</TableCell>
                   <TableCell>
                     <Badge variant={client.status === "active" ? "success" : "destructive"} className="capitalize">

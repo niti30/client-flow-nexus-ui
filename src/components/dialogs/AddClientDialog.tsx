@@ -37,6 +37,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded }: A
             name: values.name,
             status: 'active',
             industry: null, // This could be added to the form later
+            email: values.email // Include the email field
           }
         ])
         .select();
