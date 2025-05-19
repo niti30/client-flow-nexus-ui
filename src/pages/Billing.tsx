@@ -114,14 +114,14 @@ const Billing = () => {
   const contractLengths = ["1 month", "3 months", "6 months", "12 months", "24 months"];
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#faf9f8]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-hidden ml-[220px]">
+      <div className="flex-1 flex flex-col">
         <Header />
         
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-full mx-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
               <div className="relative mb-4 md:mb-0 w-full md:max-w-xs">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -133,7 +133,7 @@ const Billing = () => {
                 />
               </div>
               
-              <Button onClick={() => setShowAddPlan(true)} className="bg-black text-white hover:bg-gray-800">
+              <Button onClick={() => setShowAddPlan(true)} className="bg-[#141417] hover:bg-black">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Plan
               </Button>
@@ -367,7 +367,7 @@ const Billing = () => {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddPlan(false)}>Cancel</Button>
-            <Button>Create Plan</Button>
+            <Button className="bg-[#141417] hover:bg-black">Create Plan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
