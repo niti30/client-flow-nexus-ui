@@ -85,7 +85,7 @@ const WorkflowLogs = ({ logs, selectedWorkflow, onWorkflowChange }: WorkflowLogs
                       {log.status}
                     </span>
                   </TableCell>
-                  <TableCell className="max-w-md truncate">{log.executionDetails}</TableCell>
+                  <TableCell className="max-w-md">{log.executionDetails}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm">
                       <FileDown size={16} />

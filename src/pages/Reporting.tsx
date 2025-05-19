@@ -17,11 +17,11 @@ const Reporting = () => {
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-hidden md:ml-[260px]">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-full mx-auto">
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900">Reporting Dashboard</h1>
               <p className="text-gray-500 mt-1">View workflow execution logs and performance metrics</p>
