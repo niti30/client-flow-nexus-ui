@@ -49,7 +49,7 @@ const ClientSidebar = () => {
 
   return (
     <>
-      {/* Mobile menu button - always visible on mobile */}
+      {/* Mobile menu button */}
       <button 
         onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md md:hidden"
@@ -62,11 +62,9 @@ const ClientSidebar = () => {
         )}
       </button>
 
-      {/* Sidebar with improved transitions */}
+      {/* Sidebar */}
       <aside 
-        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
+        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
         <div className="p-5 flex items-center">
           <Settings className="h-6 w-6 text-gray-900" />
@@ -106,7 +104,7 @@ const ClientSidebar = () => {
         </div>
       </aside>
 
-      {/* Improved content wrapper with transition */}
+      {/* Main content wrapper with proper margin */}
       <div className={`transition-all duration-300 ${isOpen ? 'md:ml-[210px]' : 'ml-0'}`}></div>
     </>
   );

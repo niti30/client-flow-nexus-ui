@@ -41,22 +41,22 @@ const Clients = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#faf9f8] overflow-hidden">
+    <div className="flex h-screen bg-[#faf9f8]">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         <Header />
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           <Tabs defaultValue="overview" onValueChange={(value) => setActiveTab(value)}>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+            <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-semibold">Clients</h1>
               
               {activeTab === "overview" && (
-                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full md:w-auto">
-                  <div className="relative flex-grow md:max-w-md">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-full max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <Input 
                       placeholder="Search clients..." 
@@ -77,12 +77,13 @@ const Clients = () => {
               )}
             </div>
             
-            <TabsList className="mb-6 border-b w-full md:w-64 overflow-x-auto">
+            <TabsList className="mb-6 border-b w-64">
               <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-black rounded-none">Overview</TabsTrigger>
               <TabsTrigger value="workflows" className="data-[state=active]:border-b-2 data-[state=active]:border-black rounded-none">Client Workflows</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview">
+              {/* Always use ClientsTable for Overview tab, regardless of screen size */}
               <ClientsTable 
                 searchQuery={searchQuery} 
                 refreshTrigger={refreshTrigger}
@@ -90,6 +91,7 @@ const Clients = () => {
             </TabsContent>
             
             <TabsContent value="workflows">
+              {/* Always use ClientsTableEnhanced for Workflows tab, regardless of screen size */}
               <ClientsTableEnhanced clients={[
                 {
                   name: "Lead Processing",
