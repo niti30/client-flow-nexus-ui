@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 // Helper function to clean up auth state
 const cleanupAuthState = () => {
@@ -187,7 +187,7 @@ const Auth = () => {
         {error && (
           <div className="px-6 mb-4">
             <Alert variant="destructive">
-              <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
+              <AlertTriangle className="h-4 w-4 mr-2" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           </div>
