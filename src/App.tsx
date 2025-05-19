@@ -25,6 +25,10 @@ import Settings from "./pages/Settings";
 import ClientROI from "./pages/client/ClientROI";
 import ClientReporting from "./pages/client/ClientReporting";
 import ClientSupport from "./pages/client/ClientSupport";
+import ClientBilling from "./pages/client/ClientBilling";
+import ClientExceptions from "./pages/client/ClientExceptions";
+import ClientMessaging from "./pages/client/ClientMessaging";
+import ClientUsers from "./pages/client/ClientUsers";
 
 // Create the queryClient outside of the component
 const queryClient = new QueryClient();
@@ -127,6 +131,11 @@ const AppRoutes = () => {
       <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />
       <Route path="/client/roi" element={<ClientRoute><ClientROI /></ClientRoute>} />
       <Route path="/client/reporting" element={<ClientRoute><ClientReporting /></ClientRoute>} />
+      <Route path="/client/credentials" element={<ClientRoute><ClientCredentials /></ClientRoute>} />
+      <Route path="/client/exceptions" element={<ClientRoute><ClientExceptions /></ClientRoute>} />
+      <Route path="/client/users" element={<ClientRoute><ClientUsers /></ClientRoute>} />
+      <Route path="/client/billing" element={<ClientRoute><ClientBilling /></ClientRoute>} />
+      <Route path="/client/messaging" element={<ClientRoute><ClientMessaging /></ClientRoute>} />
       <Route path="/client/support" element={<ClientRoute><ClientSupport /></ClientRoute>} />
       
       {/* 404 route */}

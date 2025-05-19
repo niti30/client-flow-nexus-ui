@@ -2,20 +2,29 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  LayoutDashboard, 
-  FileText,
-  MessagesSquare, 
   Settings,
   Menu,
-  BarChart2,
   X,
-  LogOut,
-  User 
+  LayoutDashboard,
+  BarChart2,
+  FileText,
+  Shield,
+  AlertTriangle,
+  Users,
+  CreditCard,
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -88,10 +97,13 @@ const ClientSidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/client/dashboard" },
-    { icon: BarChart2, label: "ROI", path: "/client/roi" },
+    { icon: BarChart2, label: "Workflow ROI", path: "/client/roi" },
     { icon: FileText, label: "Reporting", path: "/client/reporting" },
-    { icon: Settings, label: "Credentials", path: "/client/credentials" },
-    { icon: MessagesSquare, label: "Support", path: "/client/support" },
+    { icon: Shield, label: "Credentials", path: "/client/credentials" },
+    { icon: AlertTriangle, label: "Exceptions", path: "/client/exceptions" },
+    { icon: Users, label: "Users", path: "/client/users" },
+    { icon: CreditCard, label: "Billing", path: "/client/billing" },
+    { icon: MessageSquare, label: "Messaging", path: "/client/messaging" },
   ];
 
   const isActive = (path: string) => {
@@ -115,11 +127,11 @@ const ClientSidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-[#212121] text-white w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`bg-[#faf9f8] text-gray-900 w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 border-r border-gray-200 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center">
-          <Settings className="h-6 w-6 text-white" />
-          <span className="ml-2 font-semibold text-lg">Client Portal</span>
+          <Settings className="h-6 w-6 text-gray-800" />
+          <span className="ml-2 font-semibold text-lg">Braintrust</span>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
@@ -132,8 +144,8 @@ const ClientSidebar = () => {
                     to={item.path} 
                     className={`flex items-center p-3 rounded-xl transition-colors duration-150
                       ${active 
-                        ? "bg-[#333333] text-white" 
-                        : "text-gray-300 hover:bg-[#333333]"}`}
+                        ? "bg-gray-200 text-gray-900" 
+                        : "text-gray-700 hover:bg-gray-100"}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span className="text-base">{item.label}</span>

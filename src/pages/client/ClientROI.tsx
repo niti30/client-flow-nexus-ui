@@ -1,49 +1,34 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import ClientSidebar from "@/components/layout/ClientSidebar";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import ClientSidebar from "@/components/layout/ClientSidebar";
+import ClientHeader from "@/components/layout/ClientHeader";
+import { Button } from "@/components/ui/button";
 
 interface WorkflowROI {
   id: string;
-  name: string;
   created_at: string;
-  workflow_name: string;
   department: string;
+  workflow_name: string;
   description: string;
   nodes: number;
   executions: number;
   exceptions: number;
   time_saved: number;
   cost_saved: number;
+  status: boolean;
 }
 
 const ClientROI = () => {
-  const { user } = useAuth();
   const [sortColumn, setSortColumn] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   
   // Fetch workflow ROI data
-  const { data: workflowsData, isLoading, error } = useQuery({
-    queryKey: ['workflow-roi', user?.id, sortColumn, sortOrder],
+  const { data: workflowsData, isLoading } = useQuery({
+    queryKey: ['workflow-roi', sortColumn, sortOrder],
     queryFn: async () => {
-      if (!user) return [];
-      
-      // First get the user information including client_id
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('client_id')
-        .eq('id', user.id)
-        .single();
-        
-      if (userError || !userData?.client_id) {
-        console.error('Error fetching user client_id:', userError);
-        return [];
-      }
-      
-      // Mock data since we don't have actual ROI table yet
+      // Mock data based on the UI in the image
       return [
         {
           id: "1",
@@ -56,6 +41,7 @@ const ClientROI = () => {
           exceptions: 23,
           time_saved: 156.5,
           cost_saved: 15650,
+          status: true
         },
         {
           id: "2",
@@ -68,10 +54,10 @@ const ClientROI = () => {
           exceptions: 5,
           time_saved: 89.2,
           cost_saved: 8920,
+          status: true
         }
-      ];
-    },
-    enabled: !!user
+      ] as WorkflowROI[];
+    }
   });
   
   const handleSort = (column: string) => {
@@ -89,113 +75,130 @@ const ClientROI = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#faf9f8]">
+    <div className="flex h-screen bg-[#f5f5f7]">
       <ClientSidebar />
       
       <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Workflow ROI</h1>
-          <div className="flex items-center space-x-4">
-            <button className="p-1 rounded-full hover:bg-gray-100">
-              <span className="sr-only">Notifications</span>
-              <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
-            <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
-              <img 
-                src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
-                alt="User avatar" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </header>
+        <ClientHeader title="Acme Corporation" />
         
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="flex justify-end mb-4">
-            <Button variant="outline">New</Button>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("created_at")}>
-                      <div className="flex items-center">
-                        Create Date/Time {renderSortIndicator("created_at")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("department")}>
-                      <div className="flex items-center">
-                        Department {renderSortIndicator("department")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("workflow_name")}>
-                      <div className="flex items-center">
-                        Workflow Name {renderSortIndicator("workflow_name")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                      Description
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("nodes")}>
-                      <div className="flex items-center">
-                        Nodes {renderSortIndicator("nodes")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("executions")}>
-                      <div className="flex items-center">
-                        Executions {renderSortIndicator("executions")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("exceptions")}>
-                      <div className="flex items-center">
-                        Exceptions {renderSortIndicator("exceptions")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("time_saved")}>
-                      <div className="flex items-center">
-                        Time Saved {renderSortIndicator("time_saved")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600" onClick={() => handleSort("cost_saved")}>
-                      <div className="flex items-center">
-                        Cost Saved {renderSortIndicator("cost_saved")}
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={9} className="px-4 py-3 text-center text-gray-500">Loading...</td>
-                    </tr>
-                  ) : workflowsData && workflowsData.length > 0 ? (
-                    workflowsData.map((workflow) => (
-                      <tr key={workflow.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm">{workflow.created_at}</td>
-                        <td className="px-4 py-3 text-sm">{workflow.department}</td>
-                        <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
-                          {workflow.workflow_name}
-                        </td>
-                        <td className="px-4 py-3 text-sm">{workflow.description}</td>
-                        <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
-                        <td className="px-4 py-3 text-sm">{workflow.executions}</td>
-                        <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
-                        <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
-                        <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={9} className="px-4 py-3 text-center text-gray-500">No workflow data available</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+          <div className="max-w-[1200px] mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold">Workflow ROI</h1>
+              <Button className="bg-black text-white hover:bg-gray-800 rounded-md">
+                <Plus className="mr-2 h-4 w-4" />
+                New Workflow
+              </Button>
             </div>
+            
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800"></div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("created_at")}
+                        >
+                          <div className="flex items-center">
+                            Create Date/Time {renderSortIndicator("created_at")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("department")}
+                        >
+                          <div className="flex items-center">
+                            Department {renderSortIndicator("department")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("workflow_name")}
+                        >
+                          <div className="flex items-center">
+                            Workflow Name {renderSortIndicator("workflow_name")}
+                          </div>
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                          Description
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("nodes")}
+                        >
+                          <div className="flex items-center">
+                            Nodes {renderSortIndicator("nodes")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("executions")}
+                        >
+                          <div className="flex items-center">
+                            Executions {renderSortIndicator("executions")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("exceptions")}
+                        >
+                          <div className="flex items-center">
+                            Exceptions {renderSortIndicator("exceptions")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("time_saved")}
+                        >
+                          <div className="flex items-center">
+                            Time Saved {renderSortIndicator("time_saved")}
+                          </div>
+                        </th>
+                        <th 
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
+                          onClick={() => handleSort("cost_saved")}
+                        >
+                          <div className="flex items-center">
+                            Cost Saved {renderSortIndicator("cost_saved")}
+                          </div>
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {workflowsData && workflowsData.map((workflow) => (
+                        <tr key={workflow.id} className="border-b border-gray-200 hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm">{workflow.created_at}</td>
+                          <td className="px-4 py-3 text-sm">{workflow.department}</td>
+                          <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
+                            {workflow.workflow_name}
+                          </td>
+                          <td className="px-4 py-3 text-sm">{workflow.description}</td>
+                          <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
+                          <td className="px-4 py-3 text-sm">{workflow.executions}</td>
+                          <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
+                          <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
+                          <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="w-10 h-6 rounded-full bg-gray-200 flex items-center">
+                              <div className={`w-5 h-5 rounded-full transform transition-transform duration-200 ${workflow.status ? "translate-x-4 bg-green-500" : "translate-x-1 bg-gray-400"}`}></div>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
