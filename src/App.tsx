@@ -58,7 +58,7 @@ const ClientRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   console.log("❌ Access denied to client route: User role is", userRole);
-  return <Navigate to="/clients" replace />;
+  return <Navigate to="/" replace />;
 };
 
 // Route protection component for authenticated users
@@ -88,8 +88,8 @@ const AppRoutes = () => {
     console.log("Root path redirect - Current user role:", userRole, "Current path:", location.pathname);
     
     if (userRole === 'admin') {
-      console.log("✅ Admin detected, redirecting to /clients");
-      return <Navigate to="/clients" replace />;
+      console.log("✅ Admin detected at root path, showing admin dashboard");
+      return <Index />;
     } else {
       console.log("✅ Client detected, redirecting to /client/dashboard");
       return <Navigate to="/client/dashboard" replace />;
@@ -131,7 +131,7 @@ const App: React.FC = () => {
       <BrowserRouter>
         <AuthProvider>
           <TooltipProvider>
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-[#f5f5f7]">
               <Toaster />
               <Sonner />
               <AppRoutes />

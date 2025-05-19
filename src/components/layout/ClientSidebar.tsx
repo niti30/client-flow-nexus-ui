@@ -61,10 +61,10 @@ const ClientSidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`bg-[#212121] text-white w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center">
-          <Settings className="h-6 w-6 text-gray-900" />
+          <Settings className="h-6 w-6 text-white" />
           <span className="ml-2 font-semibold text-lg">Client Portal</span>
         </div>
 
@@ -78,8 +78,8 @@ const ClientSidebar = () => {
                     to={item.path} 
                     className={`flex items-center p-3 rounded-xl transition-colors duration-150
                       ${active 
-                        ? "bg-[#E3DDDD] text-gray-900" 
-                        : "text-gray-900 hover:bg-gray-200"}`}
+                        ? "bg-[#333333] text-white" 
+                        : "text-gray-300 hover:bg-[#333333]"}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span className="text-base">{item.label}</span>
@@ -90,10 +90,10 @@ const ClientSidebar = () => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-700">
           <button 
             onClick={signOut}
-            className="w-full flex items-center p-3 rounded-xl text-gray-900 hover:bg-gray-200"
+            className="w-full flex items-center p-3 rounded-xl text-gray-300 hover:bg-[#333333]"
           >
             <Settings className="h-5 w-5 mr-3" />
             <span className="text-base">Sign Out</span>

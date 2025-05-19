@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import MetricsCard from "@/components/dashboard/MetricsCard";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("itd");
@@ -52,7 +53,7 @@ const Index = () => {
   };
   
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-[#f5f5f7]">
       {/* Sidebar */}
       <Sidebar />
       
@@ -63,40 +64,40 @@ const Index = () => {
         <main className="flex-1 p-6 md:p-8">
           {/* Time period filter */}
           <div className="mb-6 flex flex-wrap">
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 overflow-x-auto pb-2">
               <button 
                 onClick={() => handleTabChange("7d")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "7d" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "7d" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 Last 7 days
               </button>
               <button 
                 onClick={() => handleTabChange("30d")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "30d" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "30d" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 Last 30 days
               </button>
               <button 
                 onClick={() => handleTabChange("mtd")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "mtd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "mtd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 MTD
               </button>
               <button 
                 onClick={() => handleTabChange("qtd")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "qtd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "qtd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 QTD
               </button>
               <button 
                 onClick={() => handleTabChange("ytd")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "ytd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "ytd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 YTD
               </button>
               <button 
                 onClick={() => handleTabChange("itd")} 
-                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "itd" ? "bg-black text-white" : "text-gray-900 hover:bg-gray-100 border border-gray-200"}`}
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "itd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 ITD
               </button>
@@ -137,7 +138,12 @@ const Index = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
-              <AddClientDialog className="bg-black hover:bg-gray-800 text-white rounded-md" />
+              <AddClientDialog>
+                <Button className="bg-black hover:bg-gray-800 text-white">
+                  <Plus size={16} className="mr-2" />
+                  Add Client
+                </Button>
+              </AddClientDialog>
             </div>
             
             {/* Clients Table */}

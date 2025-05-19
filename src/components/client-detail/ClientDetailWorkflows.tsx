@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Workflow {
   id: string;
@@ -27,6 +28,7 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // In a real app, we would fetch this data from the database
@@ -82,6 +84,18 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
       title: "Workflow Added",
       description: `${workflow.name} workflow has been added.`,
     });
+  };
+
+  // Handle ROI Report download
+  const handleRoiReportClick = () => {
+    // In a real app, this would generate and download a report
+    // For now we'll simulate a file download
+    const dummyLink = document.createElement('a');
+    dummyLink.href = 'data:text/plain;charset=utf-8,ROI Report Data';
+    dummyLink.download = 'ROI_Report.csv';
+    document.body.appendChild(dummyLink);
+    dummyLink.click();
+    document.body.removeChild(dummyLink);
   };
 
   const formatDate = (dateString: string) => {
@@ -143,7 +157,11 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-black"></div>
-                      <Button variant="link" className="p-0 h-auto text-blue-500">
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-blue-500"
+                        onClick={handleRoiReportClick}
+                      >
                         ROI Report
                       </Button>
                     </div>

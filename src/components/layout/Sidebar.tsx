@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
@@ -14,17 +14,22 @@ import {
   Menu,
   X 
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // Close sidebar on mobile view for route change
   useEffect(() => {
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       setIsOpen(false);
+    } else {
+      setIsOpen(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -45,6 +50,13 @@ const Sidebar = () => {
     return location.pathname === path;
   };
 
+  const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (path === "/") {
+      e.preventDefault();
+      navigate("/");
+    }
+  };
+
   return (
     <>
       {/* Mobile menu button */}
@@ -62,11 +74,11 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-[#FAF9F8] w-[256px] min-h-screen fixed inset-y-0 left-0 z-40 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`bg-[#141417] w-[256px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center">
-          <Settings className="h-6 w-6 text-gray-900" />
-          <span className="ml-2 font-semibold text-lg">Admin Panel</span>
+          <Settings className="h-6 w-6 text-white" />
+          <span className="ml-2 font-semibold text-lg text-white">Admin Panel</span>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
@@ -77,10 +89,11 @@ const Sidebar = () => {
                 <li key={item.label}>
                   <Link 
                     to={item.path} 
+                    onClick={(e) => handleDashboardClick(e, item.path)}
                     className={`flex items-center p-3 rounded-xl transition-colors duration-150
                       ${active 
-                        ? "bg-[#E3DDDD] text-gray-900" 
-                        : "text-gray-900 hover:bg-gray-200"}`}
+                        ? "bg-[#2a2a2d] text-white" 
+                        : "text-gray-300 hover:bg-[#2a2a2d]"}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span className="text-base">{item.label}</span>

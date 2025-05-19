@@ -17,6 +17,7 @@ import { ClientUsersList } from "@/components/client-detail/ClientUsersList";
 import { ClientDocumentLinks } from "@/components/client-detail/ClientDocumentLinks";
 import { ClientPipelineProgress } from "@/components/client-detail/ClientPipelineProgress";
 import { ClientDetailWorkflows } from "@/components/client-detail/ClientDetailWorkflows";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Clients = () => {
   const { userRole } = useAuth();
@@ -25,6 +26,7 @@ const Clients = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [showDocumentDialog, setShowDocumentDialog] = useState(false);
+  const isMobile = useIsMobile();
 
   // Redirect client users to client dashboard
   useEffect(() => {
@@ -39,7 +41,7 @@ const Clients = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#faf9f8]">
+    <div className="flex h-screen bg-[#f5f5f7]">
       {/* Sidebar */}
       <Sidebar />
       
@@ -49,11 +51,11 @@ const Clients = () => {
         
         <main className="flex-1 overflow-y-auto p-6">
           <Tabs defaultValue="overview" onValueChange={(value) => setActiveTab(value)}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
               <h1 className="text-2xl font-semibold">Clients</h1>
               
               {activeTab === "overview" && (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full md:w-auto">
                   <div className="relative w-full max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <Input 
@@ -64,14 +66,14 @@ const Clients = () => {
                     />
                   </div>
                   <AddClientDialog 
-                    buttonClassName="bg-[#141417] hover:bg-black" 
+                    buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" 
                     onClientAdded={handleClientAdded}
                   />
                 </div>
               )}
               
               {activeTab === "workflows" && (
-                <AddWorkflowDialog buttonClassName="bg-[#141417] hover:bg-black" />
+                <AddWorkflowDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" />
               )}
             </div>
             
