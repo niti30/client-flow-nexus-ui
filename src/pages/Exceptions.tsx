@@ -74,23 +74,23 @@ const Exceptions = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#1A1F2C]">
+    <div className="flex h-screen bg-[#faf9f8]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         
         <main className="flex-1 p-4 md:p-6 overflow-y-auto">
-          <h1 className="text-2xl font-semibold text-white mb-6">Exceptions</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-6">Exceptions</h1>
             
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Client name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client name</label>
               <Select value={clientFilter} onValueChange={setClientFilter}>
-                <SelectTrigger className="w-full bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-800">
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectContent className="bg-white border-gray-300 text-gray-800">
                   <SelectGroup>
                     <SelectItem value="All clients">All clients</SelectItem>
                     {getUniqueClients().map(client => (
@@ -101,12 +101,12 @@ const Exceptions = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Exception type</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Exception type</label>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-full bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-800">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectContent className="bg-white border-gray-300 text-gray-800">
                   <SelectGroup>
                     <SelectItem value="All types">All types</SelectItem>
                     {getUniqueTypes().map(type => (
@@ -117,12 +117,12 @@ const Exceptions = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Severity</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
               <Select value={severityFilter} onValueChange={setSeverityFilter}>
-                <SelectTrigger className="w-full bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-800">
                   <SelectValue placeholder="Select severity" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1A1F2C] border-gray-700 text-white">
+                <SelectContent className="bg-white border-gray-300 text-gray-800">
                   <SelectGroup>
                     <SelectItem value="All severities">All severities</SelectItem>
                     {getUniqueSeverities().map(severity => (
@@ -134,7 +134,7 @@ const Exceptions = () => {
             </div>
           </div>
           
-          <div className="bg-[#1A1F2C] text-white rounded-md border border-gray-700 overflow-hidden">
+          <div className="bg-white text-gray-800 rounded-md border border-gray-300 overflow-hidden">
             <ExceptionsTable 
               exceptions={filteredExceptions} 
               loading={loading} 

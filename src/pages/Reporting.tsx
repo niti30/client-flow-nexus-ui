@@ -83,7 +83,7 @@ const Reporting = () => {
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="max-w-full mx-auto">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold">Workflow Execution Logs</h1>
+              <h1 className="text-2xl font-bold text-gray-800">Workflow Execution Logs</h1>
               <p className="text-gray-500 mt-1">View detailed execution logs for all workflow runs</p>
             </div>
             
@@ -93,10 +93,10 @@ const Reporting = () => {
                   value={selectedWorkflow} 
                   onValueChange={handleWorkflowChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white border-gray-300">
                     <SelectValue placeholder="Select Workflow" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {workflowOptions.map(workflow => (
                       <SelectItem key={workflow} value={workflow}>
                         {workflow}
@@ -109,7 +109,7 @@ const Reporting = () => {
               <Button 
                 onClick={handleExportLogs}
                 disabled={loading || filteredLogs.length === 0}
-                className="bg-black text-white hover:bg-gray-800"
+                className="bg-gray-800 text-white hover:bg-gray-700"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Export Logs
@@ -118,7 +118,7 @@ const Reporting = () => {
             
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800"></div>
               </div>
             ) : (
               <div className="overflow-x-auto">
