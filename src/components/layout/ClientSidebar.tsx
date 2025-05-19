@@ -47,7 +47,7 @@ const ClientSidebar = () => {
     { icon: AlertTriangle, label: "Exceptions", path: "/client/exceptions" },
     { icon: Users, label: "Users", path: "/client/users" },
     { icon: CreditCard, label: "Billing", path: "/client/billing" },
-    { icon: MessageCircle, label: "Support", path: "/client/support" },
+    { icon: MessageCircle, label: "Messaging", path: "/client/support" },
   ];
 
   const isActive = (path: string) => {
