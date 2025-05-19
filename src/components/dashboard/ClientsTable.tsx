@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Client {
   id: string;
@@ -33,6 +34,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const fetchClients = async () => {
     try {
@@ -70,84 +72,95 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
     navigate(`/client/dashboard`, { state: { clientId } });
   };
 
-  return (
-    <div className="bg-white rounded-md border overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-[#FAF9F8]">
+  // Responsive UI adjustments for table columns
+  const renderTable = () => {
+    return (
+      <Table>
+        <TableHeader className="bg-[#FAF9F8]">
+          <TableRow>
+            <TableHead className="font-bold">CLIENT</TableHead>
+            {!isMobile && <TableHead className="font-bold">EMAIL</TableHead>}
+            {!isMobile && <TableHead className="font-bold">INDUSTRY</TableHead>}
+            <TableHead className="font-bold">STATUS</TableHead>
+            {!isMobile && <TableHead className="font-bold">WORKFLOWS</TableHead>}
+            {!isMobile && <TableHead className="font-bold">SUBSCRIPTION</TableHead>}
+            <TableHead className={`font-bold ${!isMobile ? "text-right" : ""}`}>ACTIONS</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {loading ? (
             <TableRow>
-              <TableHead className="font-bold">CLIENT</TableHead>
-              <TableHead className="font-bold">EMAIL</TableHead>
-              <TableHead className="font-bold">INDUSTRY</TableHead>
-              <TableHead className="font-bold">STATUS</TableHead>
-              <TableHead className="font-bold">WORKFLOWS</TableHead>
-              <TableHead className="font-bold">SUBSCRIPTION</TableHead>
-              <TableHead className="font-bold text-right">ACTIONS</TableHead>
+              <TableCell colSpan={isMobile ? 3 : 7} className="h-24 text-center">
+                Loading clients...
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  Loading clients...
-                </TableCell>
-              </TableRow>
-            ) : filteredClients.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  No clients found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredClients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                        {client.logo_url ? (
-                          <img src={client.logo_url} alt={client.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-gray-500">
-                            {client.name.charAt(0)}
-                          </div>
-                        )}
-                      </div>
-                      <button 
-                        onClick={() => handleClientClick(client.id)}
-                        className="text-[#4E86CF] hover:underline cursor-pointer"
-                      >
-                        {client.name}
-                      </button>
+          ) : filteredClients.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={isMobile ? 3 : 7} className="h-24 text-center">
+                No clients found.
+              </TableCell>
+            </TableRow>
+          ) : (
+            filteredClients.map((client) => (
+              <TableRow key={client.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                      {client.logo_url ? (
+                        <img src={client.logo_url} alt={client.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-gray-500">
+                          {client.name.charAt(0)}
+                        </div>
+                      )}
                     </div>
-                  </TableCell>
-                  <TableCell>{client.email || "—"}</TableCell>
-                  <TableCell>{client.industry || "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant={client.status === "active" ? "success" : "destructive"} className="capitalize">
-                      {client.status || "—"}
-                    </Badge>
-                  </TableCell>
+                    <button 
+                      onClick={() => handleClientClick(client.id)}
+                      className="text-[#4E86CF] hover:underline cursor-pointer"
+                    >
+                      {client.name}
+                    </button>
+                  </div>
+                </TableCell>
+                {!isMobile && <TableCell>{client.email || "—"}</TableCell>}
+                {!isMobile && <TableCell>{client.industry || "—"}</TableCell>}
+                <TableCell>
+                  <Badge variant={client.status === "active" ? "success" : "destructive"} className="capitalize">
+                    {client.status || "—"}
+                  </Badge>
+                </TableCell>
+                {!isMobile && (
                   <TableCell>
                     <span className="text-sm">— / —</span>
                   </TableCell>
+                )}
+                {!isMobile && (
                   <TableCell>
                     <span className="text-sm">—</span>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-[#4E86CF]"
-                      onClick={() => handleClientClick(client.id)}
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                )}
+                <TableCell className={!isMobile ? "text-right" : ""}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-[#4E86CF]"
+                    onClick={() => handleClientClick(client.id)}
+                  >
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-md border overflow-hidden">
+      <div className="overflow-x-auto">
+        {renderTable()}
       </div>
       <div className="border-t py-2 px-4">
         <Pagination>
