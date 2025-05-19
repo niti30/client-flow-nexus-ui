@@ -72,14 +72,14 @@ const Subscriptions = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="font-medium">{plan.name}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">{plan.pricing_model}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{plan.contract_length}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{plan.billing_cadence}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">${plan.setup_fee.toLocaleString()}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{plan.prepayment_percentage}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap">${plan.cap.toLocaleString()}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">${plan.overage_cost}/hr</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{plan.client_count}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.pricingModel}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.contractLength}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.billingCadence}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.setupFee}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.prepaymentPercentage}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.cap}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.overageCost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{plan.clientCount}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -99,7 +99,7 @@ const Subscriptions = () => {
               Configure a new subscription plan for your clients.
             </DialogDescription>
           </DialogHeader>
-          <AddPlanForm onPlanAdded={handlePlanAdded} onCancel={() => setShowAddPlanDialog(false)} />
+          <AddPlanForm isOpen={showAddPlanDialog} onClose={() => setShowAddPlanDialog(false)} onSubmit={handlePlanAdded} />
         </DialogContent>
       </Dialog>
     </div>
