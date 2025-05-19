@@ -9,11 +9,20 @@ import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Clients = () => {
+  const { userRole } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState("overview");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Redirect client users to client dashboard
+  useEffect(() => {
+    if (userRole === 'client') {
+      window.location.href = '/client/dashboard';
+    }
+  }, [userRole]);
 
   // Sample data for the enhanced view (client workflows)
   const clientWorkflows = [

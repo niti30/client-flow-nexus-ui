@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Clients from "./pages/Clients";
@@ -17,6 +18,85 @@ import Subscriptions from "./pages/Subscriptions";
 import Reporting from "./pages/Reporting";
 import Users from "./pages/Users";
 import Messaging from "./pages/Messaging";
+import ClientDashboard from "./pages/client/ClientDashboard";
+
+// Route protection component for admin-only routes
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, userRole, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  return user && userRole === 'admin' ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/client/dashboard" replace />
+  );
+};
+
+// Route protection component for client-only routes
+const ClientRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, userRole, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  return user && userRole === 'client' ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/" replace />
+  );
+};
+
+// Route protection component for authenticated users
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  return user ? <>{children}</> : <Navigate to="/auth" replace />;
+};
+
+const AppRoutes = () => {
+  const { userRole } = useAuth();
+  
+  // Redirect the root path based on user role
+  const handleRootRedirect = () => {
+    if (userRole === 'admin') {
+      return <Navigate to="/clients" />;
+    } else {
+      return <Navigate to="/client/dashboard" />;
+    }
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={<ProtectedRoute>{handleRootRedirect()}</ProtectedRoute>} />
+      <Route path="/auth" element={<Auth />} />
+      
+      {/* Admin routes */}
+      <Route path="/users" element={<AdminRoute><Users /></AdminRoute>} />
+      <Route path="/clients" element={<AdminRoute><Clients /></AdminRoute>} />
+      <Route path="/clients/:id" element={<AdminRoute><ClientDetail /></AdminRoute>} />
+      <Route path="/workflows" element={<AdminRoute><Workflows /></AdminRoute>} />
+      <Route path="/exceptions" element={<AdminRoute><Exceptions /></AdminRoute>} />
+      <Route path="/billing" element={<AdminRoute><Billing /></AdminRoute>} />
+      <Route path="/subscriptions" element={<AdminRoute><Subscriptions /></AdminRoute>} />
+      <Route path="/reporting" element={<AdminRoute><Reporting /></AdminRoute>} />
+      <Route path="/messaging" element={<AdminRoute><Messaging /></AdminRoute>} />
+      
+      {/* Client routes */}
+      <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />
+      
+      {/* 404 route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App: React.FC = () => {
   // Create a client inside the component function with explicit React useState
@@ -25,27 +105,15 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <TooltipProvider>
-          <div className="min-h-screen bg-white">
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/clients" element={<Clients />} />
-              <Route path="/clients/:id" element={<ClientDetail />} />
-              <Route path="/workflows" element={<Workflows />} />
-              <Route path="/exceptions" element={<Exceptions />} />
-              <Route path="/billing" element={<Billing />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="/reporting" element={<Reporting />} />
-              <Route path="/messaging" element={<Messaging />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <div className="min-h-screen bg-white">
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+            </div>
+          </TooltipProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

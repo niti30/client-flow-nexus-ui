@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'client'>('client'); // Default to client
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -105,7 +107,16 @@ const Auth = () => {
       // Clean up existing auth state to prevent conflicts
       cleanupAuthState();
       
-      const { error } = await supabase.auth.signUp({ email, password });
+      // Sign up with user metadata that includes the role
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            role: userRole
+          }
+        }
+      });
       
       if (error) {
         console.error('Sign up error:', error);
@@ -115,7 +126,20 @@ const Auth = () => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data?.user) {
+        // Insert user record with role
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            role: userRole
+          });
+        
+        if (insertError) {
+          console.error('Error creating user record:', insertError);
+        }
+        
         toast({
           title: "Registration successful",
           description: "Please check your email to confirm your registration. If email confirmation is disabled in Supabase, you can sign in immediately.",
@@ -270,6 +294,33 @@ const Auth = () => {
                   <p className="text-xs text-gray-500">
                     Password must be at least 6 characters.
                   </p>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="user-role" className="text-sm font-medium">Account Type</label>
+                  <div className="flex space-x-4">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="user-role"
+                        value="client"
+                        checked={userRole === 'client'}
+                        onChange={() => setUserRole('client')}
+                        className="rounded-full"
+                      />
+                      <span>Client</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="user-role"
+                        value="admin"
+                        checked={userRole === 'admin'}
+                        onChange={() => setUserRole('admin')}
+                        className="rounded-full"
+                      />
+                      <span>Admin</span>
+                    </label>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
