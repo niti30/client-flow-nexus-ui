@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -46,7 +45,7 @@ const Header = () => {
     } else if (pathname === "/messaging") {
       setPageTitle("Messaging");
     } else {
-      setPageTitle("Nexus Dashboard");
+      setPageTitle("Dashboard");
     }
   }, [location]);
 

@@ -25,68 +25,64 @@ interface ClientsTableEnhancedProps {
 }
 
 const ClientsTableEnhanced = ({ clients }: ClientsTableEnhancedProps) => {
-  const isEven = (num: number) => num % 2 === 0;
-
   return (
-    <div className="bg-white rounded-md border overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="cursor-pointer whitespace-nowrap">
+              Client Name <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap">
+              Contract Start <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Workflows <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Nodes <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Executions <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Exceptions <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Revenue <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Time Saved <span>↓</span>
+            </TableHead>
+            <TableHead className="cursor-pointer whitespace-nowrap text-center">
+              Money Saved <span>↓</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {clients.length === 0 ? (
             <TableRow>
-              <TableHead className="cursor-pointer">
-                Client Name <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Contract Start <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Workflows <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Nodes <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Executions <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Exceptions <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Revenue <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Time Saved <span>↓</span>
-              </TableHead>
-              <TableHead className="cursor-pointer">
-                Money Saved <span>↓</span>
-              </TableHead>
+              <TableCell colSpan={9} className="text-center py-8">
+                No clients found
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {clients.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
-                  No clients found
-                </TableCell>
+          ) : (
+            clients.map((client, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium text-blue-600 whitespace-nowrap">{client.name}</TableCell>
+                <TableCell className="whitespace-nowrap">{client.contractStart}</TableCell>
+                <TableCell className="text-center">{client.workflows}</TableCell>
+                <TableCell className="text-center">{client.nodes}</TableCell>
+                <TableCell className="text-center">{client.executions}</TableCell>
+                <TableCell className="text-center text-blue-600">{client.exceptions}</TableCell>
+                <TableCell className="text-center">{client.revenue}</TableCell>
+                <TableCell className="text-center">{client.timeSaved}</TableCell>
+                <TableCell className="text-center">{client.moneySaved}</TableCell>
               </TableRow>
-            ) : (
-              clients.map((client, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium text-blue-600">{client.name}</TableCell>
-                  <TableCell>{client.contractStart}</TableCell>
-                  <TableCell>{client.workflows}</TableCell>
-                  <TableCell>{client.nodes}</TableCell>
-                  <TableCell>{client.executions}</TableCell>
-                  <TableCell className="text-blue-600">{client.exceptions}</TableCell>
-                  <TableCell>{client.revenue}</TableCell>
-                  <TableCell>{client.timeSaved}</TableCell>
-                  <TableCell>{client.moneySaved}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

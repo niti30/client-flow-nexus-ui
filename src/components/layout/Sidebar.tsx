@@ -62,16 +62,16 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-white w-[260px] fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out border-r border-gray-200
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        className={`bg-white w-[220px] min-h-screen fixed inset-y-0 left-0 z-40 border-r border-gray-200
+          transform transition-transform duration-200 ease-in-out md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center border-b border-gray-200">
           <Settings className="h-6 w-6 text-gray-600" />
           <span className="ml-2 font-semibold text-lg">Admin Panel</span>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4">
-          <ul className="space-y-2">
+        <nav className="flex-1 overflow-y-auto p-3">
+          <ul className="space-y-1">
             {menuItems.map((item) => {
               const active = isActive(item.path);
               return (
@@ -81,7 +81,7 @@ const Sidebar = () => {
                     className={`flex items-center p-2.5 rounded-md transition-colors duration-150
                       ${active 
                         ? "bg-black text-white" 
-                        : "text-gray-700 hover:bg-gray-200 hover:text-gray-900"}`}
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span className="text-sm">{item.label}</span>
@@ -92,6 +92,9 @@ const Sidebar = () => {
           </ul>
         </nav>
       </aside>
+
+      {/* Content pusher for fixed sidebar on larger screens */}
+      <div className="md:ml-[220px]"></div>
     </>
   );
 };
