@@ -20,7 +20,7 @@ interface AddPlanFormProps {
 const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
   const [planName, setPlanName] = useState("");
   const [pricingModel, setPricingModel] = useState("Fixed");
-  const [contractLength, setContractLength] = useState("Month");
+  const [contractLength, setContractLength] = useState("3 months");
   const [billingCadence, setBillingCadence] = useState("Monthly");
   const [setupFee, setSetupFee] = useState("");
   const [prepaymentPercentage, setPrepaymentPercentage] = useState("");
@@ -49,7 +49,7 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
   const resetForm = () => {
     setPlanName("");
     setPricingModel("Fixed");
-    setContractLength("Month");
+    setContractLength("3 months");
     setBillingCadence("Monthly");
     setSetupFee("");
     setPrepaymentPercentage("");
@@ -59,7 +59,7 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-[#252A37] border-gray-700 text-white">
         <DialogHeader>
           <DialogTitle className="text-xl">Add New Plan</DialogTitle>
         </DialogHeader>
@@ -71,6 +71,7 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
               required
+              className="bg-[#1D2130] border-gray-700 focus:border-gray-500 text-white"
             />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -78,21 +79,21 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
                 value={pricingModel} 
                 onValueChange={setPricingModel}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#1D2130] border-gray-700 text-white">
                   <SelectValue placeholder="Pricing Model" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Fixed">Fixed</SelectItem>
-                  <SelectItem value="Tiered">Tiered</SelectItem>
-                  <SelectItem value="Usage">Usage</SelectItem>
+                <SelectContent className="bg-[#252A37] border-gray-700 text-white">
+                  <SelectItem value="Fixed" className="hover:bg-gray-700">Fixed</SelectItem>
+                  <SelectItem value="Tiered" className="hover:bg-gray-700">Tiered</SelectItem>
+                  <SelectItem value="Usage" className="hover:bg-gray-700">Usage</SelectItem>
                 </SelectContent>
               </Select>
               
               <div className="flex">
-                <span className="flex items-center justify-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">$</span>
+                <span className="flex items-center justify-center px-3 bg-[#1D2130] border border-r-0 border-gray-700 rounded-l-md text-gray-400">$</span>
                 <Input
                   type="number"
-                  className="rounded-l-none"
+                  className="rounded-l-none bg-[#1D2130] border-gray-700 text-white"
                   placeholder="Price"
                   value={setupFee}
                   onChange={(e) => setSetupFee(e.target.value)}
@@ -106,14 +107,14 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
                 value={contractLength}
                 onValueChange={setContractLength}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#1D2130] border-gray-700 text-white">
                   <SelectValue placeholder="Contract Length" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Month">Month</SelectItem>
-                  <SelectItem value="3 months">3 months</SelectItem>
-                  <SelectItem value="6 months">6 months</SelectItem>
-                  <SelectItem value="12 months">12 months</SelectItem>
+                <SelectContent className="bg-[#252A37] border-gray-700 text-white">
+                  <SelectItem value="Month" className="hover:bg-gray-700">Month</SelectItem>
+                  <SelectItem value="3 months" className="hover:bg-gray-700">3 months</SelectItem>
+                  <SelectItem value="6 months" className="hover:bg-gray-700">6 months</SelectItem>
+                  <SelectItem value="12 months" className="hover:bg-gray-700">12 months</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -121,13 +122,13 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
                 value={billingCadence}
                 onValueChange={setBillingCadence}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#1D2130] border-gray-700 text-white">
                   <SelectValue placeholder="Billing Cadence" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Monthly">Monthly</SelectItem>
-                  <SelectItem value="Quarterly">Quarterly</SelectItem>
-                  <SelectItem value="Annually">Annually</SelectItem>
+                <SelectContent className="bg-[#252A37] border-gray-700 text-white">
+                  <SelectItem value="Monthly" className="hover:bg-gray-700">Monthly</SelectItem>
+                  <SelectItem value="Quarterly" className="hover:bg-gray-700">Quarterly</SelectItem>
+                  <SelectItem value="Annually" className="hover:bg-gray-700">Annually</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -137,19 +138,19 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
                 <Input
                   type="number"
                   placeholder="Prepayment Percentage"
-                  className="rounded-r-none"
+                  className="rounded-r-none bg-[#1D2130] border-gray-700 text-white"
                   value={prepaymentPercentage}
                   onChange={(e) => setPrepaymentPercentage(e.target.value)}
                   required
                 />
-                <span className="flex items-center justify-center px-3 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md">%</span>
+                <span className="flex items-center justify-center px-3 bg-[#1D2130] border border-l-0 border-gray-700 rounded-r-md text-gray-400">%</span>
               </div>
               
               <div className="flex">
-                <span className="flex items-center justify-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">$</span>
+                <span className="flex items-center justify-center px-3 bg-[#1D2130] border border-r-0 border-gray-700 rounded-l-md text-gray-400">$</span>
                 <Input
                   type="number"
-                  className="rounded-l-none"
+                  className="rounded-l-none bg-[#1D2130] border-gray-700 text-white"
                   placeholder="Cap"
                   value={cap}
                   onChange={(e) => setCap(e.target.value)}
@@ -159,10 +160,10 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
             </div>
             
             <div className="flex">
-              <span className="flex items-center justify-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">$</span>
+              <span className="flex items-center justify-center px-3 bg-[#1D2130] border border-r-0 border-gray-700 rounded-l-md text-gray-400">$</span>
               <Input
                 type="number"
-                className="rounded-l-none"
+                className="rounded-l-none bg-[#1D2130] border-gray-700 text-white"
                 placeholder="Overage Cost"
                 value={overageCost}
                 onChange={(e) => setOverageCost(e.target.value)}
@@ -172,10 +173,10 @@ const AddPlanForm = ({ isOpen, onClose, onSubmit }: AddPlanFormProps) => {
           </div>
           
           <DialogFooter className="flex flex-row justify-end gap-2 mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="border-gray-700 text-white hover:bg-gray-700">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="bg-black text-white hover:bg-gray-900">
               Create Plan
             </Button>
           </DialogFooter>
