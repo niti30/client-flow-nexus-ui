@@ -56,7 +56,7 @@ const PlansTable = ({ plans, onAddPlan }: PlansTableProps) => {
               <TableHead>Setup Fee</TableHead>
               <TableHead>Prepayment %</TableHead>
               <TableHead>$ Cap</TableHead>
-              <TableHead>Overage Cost</TableHead>
+              <TableHead className="w-[100px]">Overage</TableHead>
               <TableHead># Clients</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
@@ -71,7 +71,7 @@ const PlansTable = ({ plans, onAddPlan }: PlansTableProps) => {
                 <TableCell>{plan.setupFee}</TableCell>
                 <TableCell>{plan.prepaymentPercentage}</TableCell>
                 <TableCell>{plan.cap}</TableCell>
-                <TableCell>{plan.overageCost}</TableCell>
+                <TableCell className="whitespace-nowrap">{plan.overageCost}</TableCell>
                 <TableCell>{plan.clientCount}</TableCell>
                 <TableCell>
                   <DropdownMenu>

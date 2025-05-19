@@ -109,7 +109,7 @@ const Reporting = () => {
               <Button 
                 onClick={handleExportLogs}
                 disabled={loading || filteredLogs.length === 0}
-                className="bg-gray-800 text-white hover:bg-gray-700"
+                className="bg-black text-white hover:bg-gray-800"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Export Logs
