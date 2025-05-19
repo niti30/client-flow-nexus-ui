@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface MetricsCardProps {
@@ -13,30 +13,28 @@ interface MetricsCardProps {
 
 const MetricsCard = ({ title, value, trend }: MetricsCardProps) => {
   return (
-    <Card className="shadow-sm h-full">
-      <CardContent className="p-6">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-            {trend && (
-              <div className={`flex items-center text-xs font-medium ${trend.positive ? 'text-green-500' : 'text-red-500'}`}>
-                {trend.positive ? (
-                  <span className="flex items-center">
-                    <TrendingUp size={16} className="mr-1" />
-                    +{trend.value}%
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <TrendingDown size={16} className="mr-1" />
-                    {trend.value}%
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="text-3xl font-bold">{value}</div>
+    <Card className="border border-gray-200 rounded-xl shadow-none h-full p-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-normal text-gray-900">{title}</h3>
+          {trend && (
+            <div className={`flex items-center text-sm ${trend.positive ? 'text-[#1D8560]' : 'text-[#CE4343]'}`}>
+              {trend.positive ? (
+                <span className="flex items-center">
+                  <TrendingUp size={12} className="mr-1" />
+                  {trend.value}%
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  <TrendingDown size={12} className="mr-1" />
+                  {trend.value}%
+                </span>
+              )}
+            </div>
+          )}
         </div>
-      </CardContent>
+        <div className="text-3xl font-normal text-gray-900">{value}</div>
+      </div>
     </Card>
   );
 };

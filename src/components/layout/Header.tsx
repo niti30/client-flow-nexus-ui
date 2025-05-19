@@ -18,8 +18,8 @@ const Header = () => {
   useEffect(() => {
     // In a real app, you would fetch the current user here
     setCurrentUser({
-      name: "Admin User",
-      avatar: "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+      name: "AU",
+      avatar: "https://ui-avatars.com/api/?name=A+U&background=1785c1&color=fff"
     });
 
     // Set page title based on current route
@@ -51,7 +51,7 @@ const Header = () => {
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <h1 className="text-xl font-medium text-gray-800">{pageTitle}</h1>
+      <h1 className="text-xl font-semibold text-gray-900">{pageTitle}</h1>
       
       <div className="flex items-center space-x-4">
         <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
@@ -64,11 +64,9 @@ const Header = () => {
             <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors">
               {currentUser && (
                 <>
-                  <img
-                    src={currentUser.avatar}
-                    alt="User"
-                    className="h-8 w-8 rounded-full"
-                  />
+                  <div className="h-8 w-8 rounded-full bg-[#1785c1] text-white flex items-center justify-center">
+                    {currentUser.name}
+                  </div>
                   <ChevronDown className="h-4 w-4 text-gray-600" />
                 </>
               )}

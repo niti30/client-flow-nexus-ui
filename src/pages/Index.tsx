@@ -8,7 +8,7 @@ import MetricsCard from "@/components/dashboard/MetricsCard";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("7d");
+  const [activeTab, setActiveTab] = useState("itd");
   
   // Mock data for clients
   const clients = [
@@ -52,102 +52,100 @@ const Index = () => {
   };
   
   return (
-    <div className="flex min-h-screen overflow-hidden">
+    <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col w-full">
         <Header />
         
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            {/* Time period filter */}
-            <div className="mb-6 flex flex-wrap gap-2">
-              <div className="flex space-x-1 bg-white rounded-md shadow-sm border p-1">
-                <button 
-                  onClick={() => handleTabChange("7d")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "7d" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  Last 7 days
-                </button>
-                <button 
-                  onClick={() => handleTabChange("30d")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "30d" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  Last 30 days
-                </button>
-                <button 
-                  onClick={() => handleTabChange("mtd")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "mtd" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  MTD
-                </button>
-                <button 
-                  onClick={() => handleTabChange("qtd")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "qtd" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  QTD
-                </button>
-                <button 
-                  onClick={() => handleTabChange("ytd")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "ytd" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  YTD
-                </button>
-                <button 
-                  onClick={() => handleTabChange("itd")} 
-                  className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "itd" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                >
-                  ITD
-                </button>
-              </div>
+        <main className="flex-1 p-6 md:p-8">
+          {/* Time period filter */}
+          <div className="mb-6 flex flex-wrap">
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => handleTabChange("7d")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "7d" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+              >
+                Last 7 days
+              </button>
+              <button 
+                onClick={() => handleTabChange("30d")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "30d" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+              >
+                Last 30 days
+              </button>
+              <button 
+                onClick={() => handleTabChange("mtd")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "mtd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+              >
+                MTD
+              </button>
+              <button 
+                onClick={() => handleTabChange("qtd")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "qtd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+              >
+                QTD
+              </button>
+              <button 
+                onClick={() => handleTabChange("ytd")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium border border-gray-200 ${activeTab === "ytd" ? "bg-black text-white border-black" : "text-gray-900 hover:bg-gray-100"}`}
+              >
+                YTD
+              </button>
+              <button 
+                onClick={() => handleTabChange("itd")} 
+                className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "itd" ? "bg-black text-white" : "text-gray-900 hover:bg-gray-100 border border-gray-200"}`}
+              >
+                ITD
+              </button>
             </div>
-            
-            {/* Dashboard Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <MetricsCard 
-                title="Total Workflows" 
-                value="2,847" 
-                trend={{ value: 12, positive: true }}
-              />
-              <MetricsCard 
-                title="Total Exceptions" 
-                value="156" 
-                trend={{ value: 8, positive: false }}
-              />
-              <MetricsCard 
-                title="Time Saved" 
-                value="1,284h" 
-                trend={{ value: 24, positive: true }}
-              />
-              <MetricsCard 
-                title="Revenue" 
-                value="$847K" 
-                trend={{ value: 16, positive: true }}
-              />
-              <MetricsCard 
-                title="Active Clients" 
-                value="128" 
-                trend={{ value: 5, positive: true }}
-              />
-            </div>
-            
-            {/* Clients Section */}
-            <div className="mt-10">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">All Clients</h2>
-                
-                <Button className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white">
-                  <Plus size={16} className="mr-2" />
-                  Add Client
-                </Button>
-              </div>
+          </div>
+          
+          {/* Dashboard Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <MetricsCard 
+              title="Total Workflows" 
+              value="2,847" 
+              trend={{ value: 12, positive: true }}
+            />
+            <MetricsCard 
+              title="Total Exceptions" 
+              value="156" 
+              trend={{ value: 8, positive: false }}
+            />
+            <MetricsCard 
+              title="Time Saved" 
+              value="1,284h" 
+              trend={{ value: 24, positive: true }}
+            />
+            <MetricsCard 
+              title="Revenue" 
+              value="$847K" 
+              trend={{ value: 16, positive: true }}
+            />
+            <MetricsCard 
+              title="Active Clients" 
+              value="128" 
+              trend={{ value: 5, positive: true }}
+            />
+          </div>
+          
+          {/* Clients Section */}
+          <div className="mt-10">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
-              {/* Clients Table */}
-              <div className="bg-white rounded-md border shadow-sm overflow-hidden">
-                <ClientsTableEnhanced clients={clients} />
-              </div>
+              <Button className="bg-black hover:bg-gray-800 text-white rounded-md">
+                <Plus size={16} className="mr-2" />
+                Add Client
+              </Button>
+            </div>
+            
+            {/* Clients Table */}
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
+              <ClientsTableEnhanced clients={clients} />
             </div>
           </div>
         </main>
