@@ -7,6 +7,7 @@ import {
   MessagesSquare, 
   Settings,
   Menu,
+  BarChart2,
   X 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,7 +30,9 @@ const ClientSidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/client/dashboard" },
-    { icon: FileText, label: "Documents", path: "/client/documents" },
+    { icon: BarChart2, label: "ROI", path: "/client/roi" },
+    { icon: FileText, label: "Reporting", path: "/client/reporting" },
+    { icon: Settings, label: "Credentials", path: "/client/credentials" },
     { icon: MessagesSquare, label: "Support", path: "/client/support" },
   ];
 
@@ -54,7 +57,7 @@ const ClientSidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-[#FAF9F8] w-[256px] min-h-screen fixed inset-y-0 left-0 z-40 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`bg-[#FAF9F8] w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center">
           <Settings className="h-6 w-6 text-gray-900" />
@@ -62,7 +65,7 @@ const ClientSidebar = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
-          <ul className="space-y-6">
+          <ul className="space-y-2">
             {menuItems.map((item) => {
               const active = isActive(item.path);
               return (
@@ -95,7 +98,7 @@ const ClientSidebar = () => {
       </aside>
 
       {/* Main content wrapper with proper margin */}
-      <div className="ml-0 md:ml-[256px] transition-all duration-300"></div>
+      <div className="ml-0 md:ml-[210px] transition-all duration-300"></div>
     </>
   );
 };

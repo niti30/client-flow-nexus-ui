@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const fetchClients = async () => {
     try {
@@ -63,6 +65,10 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
     (client.industry && client.industry.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const handleClientClick = (clientId: string) => {
+    navigate(`/client/dashboard`, { state: { clientId } });
+  };
 
   return (
     <div className="bg-white rounded-md border overflow-hidden">
@@ -106,7 +112,12 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
                           </div>
                         )}
                       </div>
-                      <span className="text-[#4E86CF]">{client.name}</span>
+                      <button 
+                        onClick={() => handleClientClick(client.id)}
+                        className="text-[#4E86CF] hover:underline cursor-pointer"
+                      >
+                        {client.name}
+                      </button>
                     </div>
                   </TableCell>
                   <TableCell>{client.email || "—"}</TableCell>
@@ -123,7 +134,12 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
                     <span className="text-sm">—</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="text-[#4E86CF]">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-[#4E86CF]"
+                      onClick={() => handleClientClick(client.id)}
+                    >
                       View
                     </Button>
                   </TableCell>
