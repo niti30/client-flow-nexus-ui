@@ -16,9 +16,10 @@ import { useToast } from "@/hooks/use-toast";
 interface AddWorkflowDialogProps {
   buttonClassName?: string;
   onWorkflowAdded?: (workflow: WorkflowFormValues) => void;
+  children?: React.ReactNode; // Added children prop
 }
 
-export function AddWorkflowDialog({ buttonClassName, onWorkflowAdded }: AddWorkflowDialogProps) {
+export function AddWorkflowDialog({ buttonClassName, onWorkflowAdded, children }: AddWorkflowDialogProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
@@ -41,10 +42,12 @@ export function AddWorkflowDialog({ buttonClassName, onWorkflowAdded }: AddWorkf
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={buttonClassName}>
-          <Plus size={16} className="mr-2" />
-          Add Workflow
-        </Button>
+        {children || (
+          <Button className={buttonClassName}>
+            <Plus size={16} className="mr-2" />
+            Add Workflow
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -18,9 +18,10 @@ interface AddClientDialogProps {
   buttonClassName?: string;
   className?: string;
   onClientAdded?: () => void;
+  children?: React.ReactNode; // Added children prop
 }
 
-export function AddClientDialog({ buttonClassName, className, onClientAdded }: AddClientDialogProps) {
+export function AddClientDialog({ buttonClassName, className, onClientAdded, children }: AddClientDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,10 +84,12 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded }: A
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={buttonClassName || className}>
-          <Plus size={16} className="mr-2" />
-          Add Client
-        </Button>
+        {children || (
+          <Button className={buttonClassName || className}>
+            <Plus size={16} className="mr-2" />
+            Add Client
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

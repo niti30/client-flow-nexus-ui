@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
@@ -138,12 +137,7 @@ const Index = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
-              <AddClientDialog>
-                <Button className="bg-black hover:bg-gray-800 text-white">
-                  <Plus size={16} className="mr-2" />
-                  Add Client
-                </Button>
-              </AddClientDialog>
+              <AddClientDialog buttonClassName="bg-black hover:bg-gray-800 text-white" />
             </div>
             
             {/* Clients Table */}

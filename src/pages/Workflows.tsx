@@ -43,12 +43,7 @@ const Workflows = () => {
                 <WorkflowSearchBar 
                   onSearch={handleSearch} 
                 />
-                <AddWorkflowDialog buttonClassName="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white">
-                  <Button className="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white">
-                    <Plus size={16} className="mr-2" />
-                    Add Workflow
-                  </Button>
-                </AddWorkflowDialog>
+                <AddWorkflowDialog buttonClassName="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white" />
               </div>
             </div>
             
