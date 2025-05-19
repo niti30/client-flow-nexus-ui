@@ -148,7 +148,7 @@ const Clients = () => {
             <TabsContent value="workflows">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-medium">Workflows</h2>
-                <AddWorkflowDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" />
+                {/* Removed the AddWorkflowDialog from here to eliminate duplicate button */}
               </div>
               <ClientDetailWorkflows clientId="demo" />
             </TabsContent>
