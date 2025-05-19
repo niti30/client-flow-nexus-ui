@@ -153,7 +153,10 @@ export const useExceptions = () => {
         ? mockExceptions.filter(exception => 
             exception.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
             exception.clients?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            exception.workflows?.name.toLowerCase().includes(searchQuery.toLowerCase())
+            exception.workflows?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            exception.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            exception.exception_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            exception.severity?.toLowerCase().includes(searchQuery.toLowerCase())
           )
         : mockExceptions;
       
