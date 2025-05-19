@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
@@ -7,7 +8,6 @@ import ClientsTable from "@/components/dashboard/ClientsTable";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
-import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import { ClientDocumentLinks } from "@/components/client-detail/ClientDocumentLi
 import { ClientPipelineProgress } from "@/components/client-detail/ClientPipelineProgress";
 import { ClientDetailWorkflows } from "@/components/client-detail/ClientDetailWorkflows";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 const Clients = () => {
   const {
     userRole
@@ -39,6 +40,7 @@ const Clients = () => {
   const handleClientAdded = () => {
     setRefreshTrigger(prev => prev + 1);
   };
+  
   return <div className="flex h-screen bg-[#f5f5f7]">
       {/* Sidebar */}
       <Sidebar />
@@ -123,7 +125,6 @@ const Clients = () => {
             </TabsContent>
             
             <TabsContent value="workflows">
-              
               <ClientDetailWorkflows clientId="demo" />
             </TabsContent>
           </Tabs>

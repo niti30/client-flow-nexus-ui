@@ -14,6 +14,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Utility function to clean up auth state
+const cleanupAuthState = () => {
+  // Remove standard auth tokens
+  localStorage.removeItem('supabase.auth.token');
+  
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Also clean from sessionStorage if used
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -172,14 +192,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       console.log("Signing out user");
-      await supabase.auth.signOut({ scope: 'global' });
-      // Clear any local storage auth items
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      window.location.href = '/auth'; // Redirect to login page
+      
+      // Clean up auth state before signing out
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.error("Error during supabase signOut:", err);
+        // Continue even if this fails
+      }
+      
+      // Reset state
+      setUser(null);
+      setSession(null);
+      setUserRole('client');
+      
+      // Force page reload for a clean state
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Error signing out:', error);
     }

@@ -10,20 +10,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/components/ui/use-toast";
 
 const Header = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut, userRole } = useAuth();
   const [pageTitle, setPageTitle] = useState("");
 
   useEffect(() => {
-    // In a real app, you would fetch the current user here
-    setCurrentUser({
-      name: "AU",
-      avatar: "https://ui-avatars.com/api/?name=A+U&background=1785c1&color=fff"
-    });
+    // Set current user based on auth context
+    if (user) {
+      setCurrentUser({
+        name: user.user_metadata?.name || user.email?.substring(0, 2)?.toUpperCase() || "AU",
+        avatar: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || "A U")}&background=1785c1&color=fff`
+      });
+    } else {
+      setCurrentUser({
+        name: "AU",
+        avatar: "https://ui-avatars.com/api/?name=A+U&background=1785c1&color=fff"
+      });
+    }
 
     // Set page title based on current route
     const pathname = location.pathname;
@@ -54,15 +62,25 @@ const Header = () => {
     } else {
       setPageTitle("Dashboard");
     }
-  }, [location]);
+  }, [location, user]);
 
-  const handleSignOut = () => {
-    if (signOut) {
+  const handleSignOut = async () => {
+    try {
       // Call the signOut method from AuthContext
-      signOut();
-      
-      // Redirect to auth page
-      navigate("/auth");
+      if (signOut) {
+        await signOut();
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out of your account.",
+        });
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error during logout. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -90,6 +108,12 @@ const Header = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200">
+            <div className="px-2 py-1.5 text-sm text-gray-500">
+              Signed in as: {user?.email || 'Guest'}
+            </div>
+            <div className="px-2 py-1.5 text-sm text-gray-500 border-b border-gray-100">
+              Role: {userRole}
+            </div>
             <DropdownMenuItem>
               <Link to="/profile" className="w-full">Profile</Link>
             </DropdownMenuItem>
@@ -97,7 +121,7 @@ const Header = () => {
               <Link to="/settings" className="w-full">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 focus:text-red-500">
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -1,7 +1,7 @@
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Client {
   name: string;
@@ -15,112 +15,70 @@ interface Client {
   moneySaved: string;
 }
 
-interface ClientsTableProps {
+interface ClientsTableEnhancedProps {
   clients: Client[];
+  isLoading?: boolean;
 }
 
-const ClientsTableEnhanced = ({ clients }: ClientsTableProps) => {
-  // Function to extract the actual date parts from strings like "Jan 15, 2025"
-  const extractDateParts = (dateString: string) => {
-    const parts = dateString.split(" ");
-    return {
-      month: parts[0],
-      day: parts[1].replace(",", ""),
-      year: parts[2]
-    };
-  };
+const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({ clients, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-1/4 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!clients.length) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        No clients found. Add your first client to get started.
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-md border overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-[#FAF9F8]">
-            <TableRow>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                Create Date
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                Department
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                Workflow Name
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                # of Nodes
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                # of Executions
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                # of Exceptions
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                Time Saved
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                $ Saved
-              </TableHead>
-              <TableHead className="font-medium text-gray-500 text-xs uppercase">
-                Status
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {clients.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
-                  No workflows found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              clients.map((client, index) => {
-                const dateParts = extractDateParts(client.contractStart);
-                
-                // Determine department based on workflow name (this is just example logic)
-                const department = client.name.includes("Lead") ? "Sales" : "HR";
-                
-                return (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{dateParts.month}</span>
-                        <span className="font-medium">{dateParts.day},</span>
-                        <span className="font-medium">{dateParts.year}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{department}</TableCell>
-                    <TableCell className="font-medium text-[#4E86CF]">{client.name}</TableCell>
-                    <TableCell>{client.nodes}</TableCell>
-                    <TableCell className="text-[#4E86CF]">{client.executions}</TableCell>
-                    <TableCell className="text-[#4E86CF]">{client.exceptions}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <span>{client.timeSaved.split(" ")[0]}</span>
-                        <span className="text-xs text-gray-500 ml-1">min</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <span>{client.revenue.split(" ")[0]}</span>
-                        <span className="text-xs text-gray-500 ml-1">USD</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-black"></div>
-                        <Button variant="link" className="p-0 h-auto text-blue-500">
-                          ROI Report
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <table className="w-full">
+      <thead>
+        <tr className="border-b border-gray-200 text-left text-sm font-medium text-gray-500">
+          <th className="p-4">CLIENT NAME</th>
+          <th className="p-4">START DATE</th>
+          <th className="p-4">WORKFLOWS</th>
+          <th className="p-4">NODES</th>
+          <th className="p-4">EXECUTIONS</th>
+          <th className="p-4">EXCEPTIONS</th>
+          <th className="p-4">ROI</th>
+          <th className="p-4">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {clients.map((client, index) => (
+          <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+            <td className="p-4 font-medium">{client.name}</td>
+            <td className="p-4 text-gray-600">{client.contractStart}</td>
+            <td className="p-4">{client.workflows}</td>
+            <td className="p-4">{client.nodes}</td>
+            <td className="p-4">{client.executions}</td>
+            <td className="p-4">{client.exceptions}</td>
+            <td className="p-4">
+              <div>Revenue: {client.revenue}</div>
+              <div>Time Saved: {client.timeSaved}</div>
+              <div>Money Saved: {client.moneySaved}</div>
+            </td>
+            <td className="p-4">
+              <Link to={`/clients/${index}`} className="text-blue-600 hover:text-blue-800 flex items-center">
+                Details <ChevronRight size={16} />
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
