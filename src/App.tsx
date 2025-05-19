@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -126,10 +126,10 @@ const AppRoutes = () => {
   );
 };
 
-const App: React.FC = () => {
-  // Create a client inside the component function with explicit React useState
-  const [queryClient] = useState(() => new QueryClient());
+// Create the queryClient outside of the component
+const queryClient = new QueryClient();
 
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
