@@ -1,9 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePlans } from "@/hooks/usePlans";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
-import PlansTable from "@/components/subscriptions/PlansTable";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import AddPlanForm from "@/components/subscriptions/AddPlanForm";
