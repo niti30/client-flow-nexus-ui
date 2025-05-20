@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ClientSidebar from "@/components/layout/ClientSidebar";
@@ -35,10 +34,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-// Define the user type
+// Define the user type - ensuring all required properties are clearly marked
 interface User {
   id: string;
-  name: string;
+  name: string;  // This is required
   email: string;
   phone: string;
   department: string;
@@ -209,9 +208,14 @@ const ClientUsers = () => {
   
   // User management handlers
   const handleAddUser = (values: UserFormValues) => {
+    // Fix: Ensure that we're creating a complete User object with all required properties
     const newUser: User = {
       id: (users.length + 1).toString(),
-      ...values
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      department: values.department,
+      role: values.role
     };
     
     setUsers([...users, newUser]);
@@ -223,8 +227,18 @@ const ClientUsers = () => {
   const handleEditUser = (values: UserFormValues) => {
     if (!selectedUser) return;
     
+    // Fix: Create a complete updated user object with all required properties
+    const updatedUser: User = {
+      ...selectedUser,
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      department: values.department,
+      role: values.role
+    };
+    
     const updatedUsers = users.map(user => 
-      user.id === selectedUser.id ? { ...user, ...values } : user
+      user.id === selectedUser.id ? updatedUser : user
     );
     
     setUsers(updatedUsers);
