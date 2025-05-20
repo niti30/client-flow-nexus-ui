@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -126,8 +127,8 @@ const ClientROI = () => {
       nodes: newWorkflow.nodes,
       executions: newWorkflow.executions,
       exceptions: newWorkflow.exceptions,
-      time_saved: parseFloat(newWorkflow.timeSaved || '0'),
-      cost_saved: parseFloat(newWorkflow.moneySaved || '0'),
+      time_saved: newWorkflow.time_saved || 0,
+      cost_saved: newWorkflow.cost_saved || 0,
       status: newWorkflow.status === 'active'
     };
     

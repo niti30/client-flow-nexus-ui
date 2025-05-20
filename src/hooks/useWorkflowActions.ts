@@ -26,7 +26,7 @@ export const useWorkflowActions = () => {
     try {
       const workflowData = {
         client_id: clientId,
-        name: values.name, // Ensure name is present and not optional
+        name: values.name, // Ensure name is present and required
         department: values.department || '',
         description: values.description || '',
         nodes: values.nodes || 0,
@@ -34,7 +34,9 @@ export const useWorkflowActions = () => {
         exceptions: values.exceptions || 0,
         status: 'active',
         progress: 0,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        time_saved: 0, // Initialize with 0
+        cost_saved: 0  // Initialize with 0
       };
 
       const { data, error } = await supabase
@@ -66,7 +68,10 @@ export const useWorkflowActions = () => {
         progress: data.progress || 0,
         timeSaved: data.time_saved ? data.time_saved.toString() : '0',
         moneySaved: data.cost_saved ? data.cost_saved.toString() : '0',
-        client_id: data.client_id
+        client_id: data.client_id,
+        time_saved: data.time_saved,
+        cost_saved: data.cost_saved,
+        completed_at: data.completed_at
       };
 
       if (onSuccess) {

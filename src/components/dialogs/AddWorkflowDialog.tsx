@@ -13,8 +13,6 @@ import { PlusCircle } from "lucide-react";
 import { useWorkflowActions } from "@/hooks/useWorkflowActions";
 import { Workflow } from "@/types/workflow";
 
-export type { Workflow };
-
 interface AddWorkflowDialogProps {
   clientId: string;
   onWorkflowAdded?: (workflow?: Workflow) => void;
