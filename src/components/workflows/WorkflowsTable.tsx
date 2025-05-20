@@ -19,6 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useWorkflows } from "@/hooks/useWorkflows";
 
 // Helper function to determine badge variant based on status
 const getStatusBadgeVariant = (status: string) => {
@@ -47,11 +48,26 @@ interface Workflow {
 }
 
 interface WorkflowsTableProps {
-  workflows: Workflow[];
-  loading: boolean;
+  workflows?: Workflow[];
+  loading?: boolean;
+  refreshTrigger?: number;
 }
 
-const WorkflowsTable = ({ workflows, loading }: WorkflowsTableProps) => {
+const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refreshTrigger }: WorkflowsTableProps) => {
+  // Use the hook if workflows aren't passed as props
+  const { workflows: hookWorkflows, loading: hookLoading, fetchWorkflows } = useWorkflows();
+  
+  // Use props if provided, otherwise use hook data
+  const workflows = propWorkflows || hookWorkflows;
+  const loading = propLoading !== undefined ? propLoading : hookLoading;
+  
+  // Re-fetch when refresh trigger changes
+  React.useEffect(() => {
+    if (refreshTrigger && !propWorkflows) {
+      fetchWorkflows();
+    }
+  }, [refreshTrigger, propWorkflows, fetchWorkflows]);
+
   return (
     <div className="bg-white rounded-md border overflow-hidden">
       <div className="overflow-x-auto">

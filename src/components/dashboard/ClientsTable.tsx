@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useToast } from "@/hooks/use-toast";
 
 interface Client {
   id: string;
@@ -33,6 +34,7 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const fetchClients = async () => {
     try {
@@ -44,6 +46,11 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
       
       if (error) {
         console.error('Error fetching clients:', error);
+        toast({
+          title: "Error fetching clients",
+          description: error.message,
+          variant: "destructive"
+        });
       } else {
         console.log('Fetched clients:', data);
         setClients(data || []);

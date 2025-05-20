@@ -9,8 +9,10 @@ import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("itd");
   const [dashboardData, setDashboardData] = useState({
     totalWorkflows: '2,847',
@@ -19,20 +21,59 @@ const Index = () => {
     revenue: '$847K',
     activeClients: '128'
   });
-  const [clients, setClients] = useState([
-    {
-      name: 'Acme Corp',
-      contractStart: 'Jan 15, 2025',
-      workflows: 24,
-      nodes: 156,
-      executions: 1847,
-      exceptions: 12,
-      revenue: '$24,500',
-      timeSaved: '284h',
-      moneySaved: '$42,600'
-    }
-  ]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Fetch clients for dashboard
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch real clients from Supabase
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*');
+          
+        if (error) {
+          console.error("Error fetching clients:", error);
+          toast({
+            title: "Error fetching clients",
+            description: error.message,
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        console.log("Fetched clients for dashboard:", data);
+        
+        // Process clients to match the expected format for ClientsTableEnhanced
+        const formattedClients = data.map(client => ({
+          name: client.name,
+          contractStart: client.created_at ? new Date(client.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-',
+          workflows: 0, // You could fetch this from workflows table
+          nodes: 0,
+          executions: 0,
+          exceptions: 0,
+          revenue: '-',
+          timeSaved: '-',
+          moneySaved: '-',
+          id: client.id,
+          status: client.status
+        }));
+        
+        setClients(formattedClients);
+        
+      } catch (error) {
+        console.error("Error in client fetch:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchClients();
+  }, [refreshTrigger]); // Refetch when refreshTrigger changes
   
   // Fetch dashboard data
   useEffect(() => {
@@ -86,6 +127,18 @@ const Index = () => {
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+  };
+  
+  // Handle client added event
+  const handleClientAdded = () => {
+    console.log("Client added, refreshing dashboard...");
+    setRefreshTrigger(prev => prev + 1);
+    
+    toast({
+      title: "Success",
+      description: "Client added successfully!",
+      variant: "default"
+    });
   };
   
   return (
@@ -174,12 +227,18 @@ const Index = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
-              <AddClientDialog buttonClassName="bg-black hover:bg-gray-800 text-white" />
+              <AddClientDialog 
+                buttonClassName="bg-black hover:bg-gray-800 text-white" 
+                onClientAdded={handleClientAdded}
+              />
             </div>
             
             {/* Clients Table */}
             <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
-              <ClientsTableEnhanced clients={clients} isLoading={loading} />
+              <ClientsTableEnhanced 
+                clients={clients} 
+                isLoading={loading} 
+              />
             </div>
           </div>
         </main>
