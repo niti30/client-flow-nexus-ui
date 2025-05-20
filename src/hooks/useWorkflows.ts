@@ -15,6 +15,15 @@ export interface Workflow {
   };
 }
 
+interface ClientWorkflowStats {
+  clientId: string;
+  totalWorkflows: number;
+  exceptions: number;
+  timeSaved: string;
+  revenue: string;
+  moneySaved: string;
+}
+
 interface UseWorkflowsOptions {
   pageSize?: number;
   clientId?: string;
@@ -84,6 +93,74 @@ export const useWorkflows = (options?: UseWorkflowsOptions) => {
     }
   }, [clientId, pageSize, toast]);
 
+  // New function to fetch workflow stats by client
+  const fetchClientWorkflowStats = async (): Promise<ClientWorkflowStats[]> => {
+    try {
+      setLoading(true);
+      
+      // Step 1: Get all clients
+      const { data: clients, error: clientsError } = await supabase
+        .from('clients')
+        .select('id, name');
+        
+      if (clientsError) {
+        console.error('Error fetching clients:', clientsError);
+        toast({
+          title: "Error fetching client stats",
+          description: clientsError.message,
+          variant: "destructive"
+        });
+        return [];
+      }
+      
+      // Step 2: For each client, get workflow count and other metrics
+      const clientStats = await Promise.all(clients.map(async (client) => {
+        // Get workflow count
+        const { count: workflowCount, error: workflowError } = await supabase
+          .from('workflows')
+          .select('*', { count: 'exact' })
+          .eq('client_id', client.id);
+          
+        if (workflowError) {
+          console.error(`Error fetching workflows for client ${client.id}:`, workflowError);
+        }
+        
+        // Get exception count
+        const { count: exceptionCount, error: exceptionError } = await supabase
+          .from('exceptions')
+          .select('*', { count: 'exact' })
+          .eq('client_id', client.id);
+          
+        if (exceptionError) {
+          console.error(`Error fetching exceptions for client ${client.id}:`, exceptionError);
+        }
+        
+        // Return client stats
+        return {
+          clientId: client.id,
+          totalWorkflows: workflowCount || 0,
+          exceptions: exceptionCount || 0,
+          // Calculate these values based on workflow count/exceptions for now
+          timeSaved: `${Math.round((workflowCount || 0) * 0.45)}h`,
+          revenue: `$${Math.round((workflowCount || 0) * 297)}`,
+          moneySaved: `$${Math.round((workflowCount || 0) * 142)}`
+        };
+      }));
+      
+      return clientStats;
+    } catch (error) {
+      console.error('Error in fetchClientWorkflowStats:', error);
+      toast({
+        title: "Error fetching client statistics",
+        description: "Failed to fetch client workflow statistics",
+        variant: "destructive"
+      });
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchWorkflows();
   }, [fetchWorkflows]);
@@ -94,6 +171,7 @@ export const useWorkflows = (options?: UseWorkflowsOptions) => {
     error, 
     totalCount,
     fetchWorkflows,
+    fetchClientWorkflowStats,
     pageSize
   };
 };

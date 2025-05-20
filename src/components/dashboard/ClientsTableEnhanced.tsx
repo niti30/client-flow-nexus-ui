@@ -14,6 +14,8 @@ interface Client {
   revenue: string;
   timeSaved: string;
   moneySaved: string;
+  id?: string;
+  status?: string;
 }
 
 interface ClientsTableEnhancedProps {
