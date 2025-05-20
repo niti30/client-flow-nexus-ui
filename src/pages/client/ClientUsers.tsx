@@ -130,16 +130,16 @@ const ClientUsers = () => {
               
               <div className="flex items-center gap-4">
                 <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input 
                     placeholder="Search users..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 w-full max-w-xs"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
                 
-                <Button className="bg-black hover:bg-gray-800">
+                <Button variant="outline" className="bg-white hover:bg-gray-100">
                   <Plus size={16} className="mr-2" />
                   Add User
                 </Button>

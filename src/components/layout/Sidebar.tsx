@@ -81,11 +81,9 @@ const Sidebar = () => {
     return location.pathname === path;
   };
 
-  const handleDashboardClick = (e, path) => {
-    if (path === "/") {
-      e.preventDefault();
-      navigate("/");
-    }
+  const handleNavigation = (e, path) => {
+    e.preventDefault();
+    navigate(path);
   };
 
   return (
@@ -119,7 +117,7 @@ const Sidebar = () => {
                 <li key={item.label}>
                   <Link
                     to={item.path}
-                    onClick={(e) => handleDashboardClick(e, item.path)}
+                    onClick={(e) => handleNavigation(e, item.path)}
                     className={`flex items-center p-3 rounded-xl transition-colors duration-150
                       ${active ? "bg-black text-white dark:bg-white dark:text-black font-medium" : "text-foreground hover:bg-muted"}`}
                   >

@@ -11,7 +11,7 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, Edit, Trash, ChevronUp, ChevronDown, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -93,6 +93,18 @@ const Users = () => {
 
   const sortedUsers = getSortedData();
   
+  const filteredUsers = sortedUsers.filter(user => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.phone.toLowerCase().includes(query) ||
+      user.costRate.toLowerCase().includes(query) ||
+      user.billRate.toLowerCase().includes(query)
+    );
+  });
+  
   const handleAddUser = () => {
     toast({
       title: "Feature coming soon",
@@ -128,7 +140,7 @@ const Users = () => {
             <div className="flex flex-col space-y-4 mb-6">
               <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-semibold text-gray-900">Manage Users</h1>
-                <Button onClick={handleAddUser} className="bg-black hover:bg-gray-800">
+                <Button onClick={handleAddUser} variant="outline" className="bg-white hover:bg-gray-100">
                   <Plus size={16} className="mr-2" />
                   Add New User
                 </Button>
@@ -159,15 +171,13 @@ const Users = () => {
                 </div>
                 
                 <div className="relative w-full md:w-auto max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <Input 
                     placeholder="Search users..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 pr-4 py-2 w-full"
                   />
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                  </span>
                 </div>
               </div>
             </div>
@@ -196,7 +206,7 @@ const Users = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedUsers.map((user, index) => (
+                  {filteredUsers.map((user, index) => (
                     <TableRow key={index} className="bg-white">
                       <TableCell className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">

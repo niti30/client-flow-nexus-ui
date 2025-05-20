@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from "react";
 
 type Theme = "light" | "dark";
@@ -17,13 +18,12 @@ export const useTheme = () => {
   return context;
 };
 
-// We're keeping this provider but making it always return light theme
-// This ensures that components depending on this context will still work
+// Provider only uses light theme and has no toggle functionality
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Always light theme, toggle does nothing
+  // Always light theme
   const theme: Theme = "light";
   const toggleTheme = () => {
-    // No-op function - theme toggle disabled
+    // No-op function - theme toggle completely disabled
     console.log("Theme toggle disabled");
   };
 

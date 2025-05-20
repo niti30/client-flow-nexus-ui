@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { ChevronRight, ArrowDown, ArrowUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
@@ -86,13 +86,13 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
     }
   });
 
-  // Helper to render sort indicators
+  // Helper to render sort indicators using ChevronUp/Down instead of Arrow
   const renderSortIndicator = (key: SortKey) => {
     if (sortKey !== key) return null;
     
     return sortDirection === 'asc' 
-      ? <ArrowUp className="inline ml-1 h-4 w-4" /> 
-      : <ArrowDown className="inline ml-1 h-4 w-4" />;
+      ? <ChevronUp className="inline ml-1 h-4 w-4" /> 
+      : <ChevronDown className="inline ml-1 h-4 w-4" />;
   };
 
   return <Table>
