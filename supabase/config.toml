@@ -1,4 +1,5 @@
 
+
 # This file controls the configuration of your Supabase setup
 #
 # Database password configuration
@@ -44,3 +45,19 @@ params = [
   { name = "client_name", type = "text" },
   { name = "client_status", type = "text", default = "'active'::text" }
 ]
+
+# Create Row Level Security policy for clients table
+[[development.policies]]
+name = "Enable read access for all users"
+schema = "public"
+table = "clients"
+operation = "select"
+definition = "true"
+
+[[development.policies]]
+name = "Enable insert for authenticated users only"
+schema = "public"
+table = "clients"
+operation = "insert"
+definition = "(auth.role() = 'authenticated')"
+
