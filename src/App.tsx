@@ -73,6 +73,7 @@ function App() {
 
           {/* Redirect to Dashboard for the admin path */}
           <Route path="/admin" element={<Navigate to="/dashboard" />} />
+          <Route path="/admin/dashboard" element={<Navigate to="/dashboard" />} />
 
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

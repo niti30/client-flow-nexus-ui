@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
   session: Session | null;
@@ -34,12 +34,45 @@ const cleanupAuthState = () => {
   });
 };
 
+// Function to check if a user should have access to a path
+const isPathAllowed = (path: string, role: string): boolean => {
+  // Admin pages
+  if (path.startsWith('/admin') || 
+      path === '/dashboard' || 
+      path === '/billing' || 
+      path === '/clients' || 
+      path === '/exceptions' || 
+      path === '/messaging' || 
+      path === '/reporting' || 
+      path === '/settings' || 
+      path === '/subscriptions' || 
+      path === '/users' || 
+      path === '/workflows' ||
+      path.startsWith('/client-detail')) {
+    return role === 'admin' || role === 'se';
+  }
+  
+  // Client pages
+  if (path.startsWith('/client/')) {
+    return role === 'client';
+  }
+  
+  // Public pages like auth, home, etc.
+  if (path === '/' || path === '/auth' || path === '/profile') {
+    return true;
+  }
+  
+  return false;
+};
+
 // Fixing the component definition to properly use React function component syntax
 export function AuthProvider({ children }: { children: ReactNode }): React.ReactElement {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string>('client'); // Default role
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -94,6 +127,29 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Effect to check route permissions
+  useEffect(() => {
+    if (loading) return;
+
+    // If user is not logged in and trying to access protected page, redirect to auth
+    if (!user && location.pathname !== '/auth' && location.pathname !== '/') {
+      navigate('/auth');
+      return;
+    }
+
+    // If user is logged in, check route permissions based on role
+    if (user && !isPathAllowed(location.pathname, userRole)) {
+      console.log("Access denied to path:", location.pathname, "for role:", userRole);
+
+      // If route is not allowed, redirect to appropriate dashboard based on role
+      if (userRole === 'client') {
+        navigate('/client/dashboard');
+      } else if (userRole === 'admin' || userRole === 'se') {
+        navigate('/dashboard');
+      }
+    }
+  }, [location.pathname, userRole, user, loading, navigate]);
 
   async function fetchUserRole(userId: string) {
     try {

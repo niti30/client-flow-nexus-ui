@@ -28,6 +28,18 @@ const cleanupAuthState = () => {
   });
 };
 
+// Function to redirect based on user role
+const redirectBasedOnRole = (role) => {
+  if (role === 'client') {
+    window.location.href = '/client/dashboard';
+  } else if (role === 'admin' || role === 'se') {
+    window.location.href = '/dashboard';
+  } else {
+    // Default to client dashboard if role is unknown
+    window.location.href = '/client/dashboard';
+  }
+};
+
 // Predefined admin credentials - using a real email format that should pass validation
 const ADMIN_EMAIL = "admin1@example-domain.com";
 const ADMIN_PASSWORD = "Admin123!";
@@ -47,7 +59,8 @@ const Auth = () => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate('/');
+        const role = data.session.user.user_metadata.role;
+        redirectBasedOnRole(role);
       }
     };
     
@@ -149,8 +162,8 @@ const Auth = () => {
             description: "You are now signed in as admin"
           });
           
-          // Redirect to admin page
-          window.location.href = '/clients';
+          // Redirect to admin dashboard
+          window.location.href = '/dashboard';
         }
         
         // Auto-fill the credentials 
@@ -215,8 +228,9 @@ const Auth = () => {
           description: "You have successfully signed in!",
         });
         
-        // Force page reload for a clean state with the new session
-        window.location.href = '/';
+        // Get the user role and redirect accordingly
+        const role = data.user.user_metadata.role;
+        redirectBasedOnRole(role);
       }
     } catch (error) {
       console.error('Unexpected sign in error:', error);
@@ -286,8 +300,8 @@ const Auth = () => {
             });
           }
         } else {
-          // Force page reload for a clean state with the new session
-          window.location.href = '/';
+          // Redirect to the appropriate dashboard based on role
+          redirectBasedOnRole(userRole);
         }
       }
     } catch (error) {
