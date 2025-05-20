@@ -63,11 +63,10 @@ const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refres
   
   // Re-fetch when refresh trigger changes
   useEffect(() => {
-    if (refreshTrigger !== undefined) {
-      console.log("Refresh trigger changed, fetching workflows");
+    if (refreshTrigger && !propWorkflows) {
       fetchWorkflows();
     }
-  }, [refreshTrigger, fetchWorkflows]);
+  }, [refreshTrigger, propWorkflows, fetchWorkflows]);
 
   return (
     <div className="bg-white rounded-md border overflow-hidden">
