@@ -204,35 +204,80 @@ export type Database = {
           },
         ]
       }
+      user_client_assignments: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_client_assignments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_client_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
+          bill_rate: number | null
           client_id: string | null
+          cost_rate: number | null
           created_at: string | null
           email: string
           first_name: string | null
           id: string
           last_name: string | null
+          phone: string | null
           role: string
         }
         Insert: {
           avatar_url?: string | null
+          bill_rate?: number | null
           client_id?: string | null
+          cost_rate?: number | null
           created_at?: string | null
           email: string
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           role: string
         }
         Update: {
           avatar_url?: string | null
+          bill_rate?: number | null
           client_id?: string | null
+          cost_rate?: number | null
           created_at?: string | null
           email?: string
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           role?: string
         }
         Relationships: [
@@ -298,7 +343,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "se"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -413,6 +458,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "se"],
+    },
   },
 } as const
