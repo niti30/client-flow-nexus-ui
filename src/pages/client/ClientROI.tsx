@@ -101,6 +101,16 @@ const ClientROI = () => {
     return sortOrder === "asc" ? "↑" : "↓";
   };
 
+  // Check if clientId is available
+  useEffect(() => {
+    if (!clientId) {
+      console.error("No client ID available in params");
+      toast.error("Client ID is missing. Please return to the clients page.");
+    } else {
+      console.log("Client ID from params:", clientId);
+    }
+  }, [clientId]);
+
   return (
     <div className="flex h-screen bg-background">
       <ClientSidebar />
@@ -112,15 +122,17 @@ const ClientROI = () => {
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
-              <AddWorkflowDialog
-                onWorkflowAdded={handleAddWorkflow}
-                clientId={clientId}
-              >
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Workflow
-                </Button>
-              </AddWorkflowDialog>
+              {clientId && (
+                <AddWorkflowDialog
+                  onWorkflowAdded={handleAddWorkflow}
+                  clientId={clientId}
+                >
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Workflow
+                  </Button>
+                </AddWorkflowDialog>
+              )}
             </div>
             
             {isLoading ? (

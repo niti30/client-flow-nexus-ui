@@ -51,6 +51,7 @@ export function AddWorkflowDialog({
     
     try {
       if (!clientId) {
+        console.error("Client ID is required to create a workflow");
         throw new Error("Client ID is required to create a workflow");
       }
       

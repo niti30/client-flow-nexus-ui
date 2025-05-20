@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 const Workflows = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { workflows, loading } = useWorkflows();
+  // This is a placeholder - in a real app, you'd get the client ID from context or state
+  const [selectedClientId, setSelectedClientId] = useState<string | undefined>(undefined);
 
   const handleSearch = (query: string) => {
     // Placeholder for search functionality
@@ -38,6 +40,22 @@ const Workflows = () => {
     document.body.removeChild(dummyLink);
   };
 
+  // For demonstration, let's fetch clients to get a default client ID
+  useEffect(() => {
+    const fetchDefaultClient = async () => {
+      const { data } = await supabase
+        .from('clients')
+        .select('id')
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        setSelectedClientId(data[0].id);
+      }
+    };
+
+    fetchDefaultClient();
+  }, []);
+
   return (
     <div className="flex h-screen bg-[#121212] text-white">
       <Sidebar />
@@ -56,6 +74,7 @@ const Workflows = () => {
                 <AddWorkflowDialog 
                   buttonClassName="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white" 
                   onWorkflowAdded={handleWorkflowAdded}
+                  clientId={selectedClientId}
                 />
               </div>
             </div>

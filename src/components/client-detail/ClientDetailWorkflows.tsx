@@ -19,8 +19,21 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   
   // Fetch workflows from the database
   const fetchWorkflows = async () => {
+    if (!clientId) {
+      console.error("Cannot fetch workflows: Client ID is missing");
+      toast({
+        title: "Error",
+        description: "Client ID is required to fetch workflows.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
+      console.log("Fetching workflows for client:", clientId);
+      
       const { data, error } = await supabase
         .from('workflows')
         .select('*')
@@ -36,6 +49,8 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
         });
         return;
       }
+      
+      console.log("Fetched workflows:", data);
       
       // Transform the data to match our Workflow interface
       const transformedWorkflows: Workflow[] = data.map(workflow => ({
@@ -63,7 +78,10 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   // Fetch workflows on component mount and when clientId changes
   useEffect(() => {
     if (clientId) {
+      console.log("Client ID changed, fetching workflows for:", clientId);
       fetchWorkflows();
+    } else {
+      console.error("No client ID provided to ClientDetailWorkflows");
     }
   }, [clientId]);
 
@@ -108,11 +126,15 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">Workflows</h2>
-        <AddWorkflowDialog 
-          buttonClassName="bg-black text-white" 
-          onWorkflowAdded={handleWorkflowAdded}
-          clientId={clientId}
-        />
+        {clientId ? (
+          <AddWorkflowDialog 
+            buttonClassName="bg-black text-white" 
+            onWorkflowAdded={handleWorkflowAdded}
+            clientId={clientId}
+          />
+        ) : (
+          <div className="text-sm text-red-500">Client ID missing - cannot add workflows</div>
+        )}
       </div>
       
       <div className="bg-white rounded-md border overflow-hidden">
