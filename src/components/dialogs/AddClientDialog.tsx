@@ -75,8 +75,8 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
             client_status?: string;
           };
           
-          // Explicitly type the RPC function call with both return type and params type
-          const { data: rpcData, error: rpcError } = await supabase.rpc<string, AdminInsertClientParams>(
+          // Use proper typing for the RPC call without generic constraints
+          const { data: rpcData, error: rpcError } = await supabase.rpc(
             'admin_insert_client', 
             { 
               client_name: companyName,

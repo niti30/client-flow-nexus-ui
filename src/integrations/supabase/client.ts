@@ -10,3 +10,14 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// Add type declaration for the admin_insert_client function
+declare module '@supabase/supabase-js' {
+  interface SupabaseClient<Database> {
+    rpc<T = any, P = any>(
+      fn: string,
+      params?: P,
+      options?: { head?: boolean; count?: null | 'exact' | 'planned' | 'estimated' }
+    ): Promise<{ data: T; error: null } | { data: null; error: any }>;
+  }
+}
