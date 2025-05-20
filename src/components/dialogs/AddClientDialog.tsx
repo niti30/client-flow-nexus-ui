@@ -75,13 +75,13 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
             client_status?: string;
           };
           
-          // Explicitly type the RPC function call with the correct return and parameter types
-          const { data: rpcData, error: rpcError } = await supabase.rpc<string>(
+          // Explicitly type the RPC function call with both return type and params type
+          const { data: rpcData, error: rpcError } = await supabase.rpc<string, AdminInsertClientParams>(
             'admin_insert_client', 
             { 
               client_name: companyName,
               client_status: 'active'
-            } as AdminInsertClientParams
+            }
           );
           
           if (rpcError) {
