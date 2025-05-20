@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { DialogFooter } from "@/components/ui/dialog";
 
+// Update the schema to be more explicit about the type transformations
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   department: z.string().min(2, { message: "Department is required." }),
@@ -34,6 +35,7 @@ interface AddWorkflowFormProps {
 }
 
 export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: AddWorkflowFormProps) {
+  // Fix the types in the defaultValues to match what the input fields expect (strings)
   const form = useForm<WorkflowFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
