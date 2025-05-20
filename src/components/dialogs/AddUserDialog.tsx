@@ -75,6 +75,7 @@ export function AddUserDialog({
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const { toast } = useToast();
 
   // Set up form with validation
@@ -302,7 +303,7 @@ export function AddUserDialog({
                     <FormItem>
                       <FormLabel>Assigned Clients</FormLabel>
                       <FormControl>
-                        <Popover>
+                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
@@ -315,59 +316,65 @@ export function AddUserDialog({
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-[300px] p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Search clients..." />
-                              <CommandEmpty>No clients found.</CommandEmpty>
-                              <ScrollArea className="h-52">
-                                <CommandGroup>
-                                  {clients.map((client) => (
-                                    <CommandItem
-                                      key={client.id}
-                                      onSelect={() => {
-                                        setSelectedClients((prev) => {
-                                          const isSelected = prev.includes(client.id);
-                                          if (isSelected) {
-                                            return prev.filter((id) => id !== client.id);
-                                          } else {
-                                            return [...prev, client.id];
-                                          }
-                                        });
-                                        form.setValue(
-                                          "assigned_clients",
-                                          selectedClients.includes(client.id)
-                                            ? selectedClients.filter((id) => id !== client.id)
-                                            : [...selectedClients, client.id]
-                                        );
-                                      }}
-                                    >
-                                      <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                          checked={selectedClients.includes(client.id)}
-                                          onCheckedChange={(checked) => {
-                                            if (checked) {
-                                              setSelectedClients((prev) => [...prev, client.id]);
-                                              form.setValue(
-                                                "assigned_clients",
-                                                [...selectedClients, client.id]
-                                              );
+                            {clients.length > 0 ? (
+                              <Command>
+                                <CommandInput placeholder="Search clients..." />
+                                <CommandEmpty>No clients found.</CommandEmpty>
+                                <ScrollArea className="h-52">
+                                  <CommandGroup>
+                                    {clients.map((client) => (
+                                      <CommandItem
+                                        key={client.id}
+                                        onSelect={() => {
+                                          setSelectedClients((prev) => {
+                                            const isSelected = prev.includes(client.id);
+                                            if (isSelected) {
+                                              return prev.filter((id) => id !== client.id);
                                             } else {
-                                              setSelectedClients((prev) =>
-                                                prev.filter((id) => id !== client.id)
-                                              );
-                                              form.setValue(
-                                                "assigned_clients",
-                                                selectedClients.filter((id) => id !== client.id)
-                                              );
+                                              return [...prev, client.id];
                                             }
-                                          }}
-                                        />
-                                        <span>{client.name}</span>
-                                      </div>
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </ScrollArea>
-                            </Command>
+                                          });
+                                          form.setValue(
+                                            "assigned_clients",
+                                            selectedClients.includes(client.id)
+                                              ? selectedClients.filter((id) => id !== client.id)
+                                              : [...selectedClients, client.id]
+                                          );
+                                        }}
+                                      >
+                                        <div className="flex items-center space-x-2">
+                                          <Checkbox
+                                            checked={selectedClients.includes(client.id)}
+                                            onCheckedChange={(checked) => {
+                                              if (checked) {
+                                                setSelectedClients((prev) => [...prev, client.id]);
+                                                form.setValue(
+                                                  "assigned_clients",
+                                                  [...selectedClients, client.id]
+                                                );
+                                              } else {
+                                                setSelectedClients((prev) =>
+                                                  prev.filter((id) => id !== client.id)
+                                                );
+                                                form.setValue(
+                                                  "assigned_clients",
+                                                  selectedClients.filter((id) => id !== client.id)
+                                                );
+                                              }
+                                            }}
+                                          />
+                                          <span>{client.name}</span>
+                                        </div>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </ScrollArea>
+                              </Command>
+                            ) : (
+                              <div className="p-4 text-center text-sm">
+                                No clients available to assign.
+                              </div>
+                            )}
                           </PopoverContent>
                         </Popover>
                       </FormControl>
