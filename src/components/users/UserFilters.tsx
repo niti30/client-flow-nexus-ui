@@ -2,7 +2,7 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
 
 interface UserFiltersProps {
   activeTab: "admin" | "se";
@@ -20,39 +20,41 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
   refreshUsers,
 }) => {
   // Handle tab change
-  const handleTabChange = (value: string) => {
-    if (value === "admin" || value === "se") {
-      setActiveTab(value);
-      // Clear search when switching tabs
-      setSearchQuery("");
-      // Refresh users when changing tabs to ensure we get the latest data
-      refreshUsers();
-    }
+  const handleTabChange = (value: "admin" | "se") => {
+    setActiveTab(value);
+    // Clear search when switching tabs
+    setSearchQuery("");
+    // Refresh users when changing tabs to ensure we get the latest data
+    refreshUsers();
   };
 
   return (
     <div className="flex justify-between items-center flex-wrap gap-4">
-      <ToggleGroup
-        type="single"
-        value={activeTab}
-        onValueChange={(value) => value && handleTabChange(value)}
-        className="border rounded-lg"
-      >
-        <ToggleGroupItem
-          value="admin"
-          aria-label="Admin Users"
-          className={`${activeTab === "admin" ? "bg-black text-white" : "bg-white"} rounded-l-lg`}
+      <div className="inline-flex rounded-full border border-gray-200 p-1">
+        <Button
+          type="button"
+          className={`px-4 py-1 rounded-full font-medium transition ${
+            activeTab === "admin"
+              ? "bg-black text-white"
+              : "border-0 text-black bg-white hover:bg-gray-50"
+          }`}
+          onClick={() => handleTabChange("admin")}
         >
           Admin Users
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="se"
-          aria-label="SE Users"
-          className={`${activeTab === "se" ? "bg-black text-white" : "bg-white"} rounded-r-lg`}
+        </Button>
+        
+        <Button
+          type="button"
+          className={`px-4 py-1 rounded-full font-medium transition ${
+            activeTab === "se"
+              ? "bg-black text-white"
+              : "border-0 text-black bg-white hover:bg-gray-50"
+          }`}
+          onClick={() => handleTabChange("se")}
         >
           SE Users
-        </ToggleGroupItem>
-      </ToggleGroup>
+        </Button>
+      </div>
 
       <div className="relative w-full md:w-auto max-w-md">
         <Search
