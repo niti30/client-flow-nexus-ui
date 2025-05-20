@@ -27,6 +27,17 @@ const formSchema = z.object({
   exceptions: z.string().regex(/^\d*$/, { message: "Must be a number" }).transform(val => val ? parseInt(val, 10) : 0),
 });
 
+// Define the type for the form values BEFORE transformation
+type WorkflowFormInputs = {
+  name: string;
+  department: string;
+  description?: string;
+  nodes: string;
+  executions: string;
+  exceptions: string;
+};
+
+// Define the type for the form values AFTER transformation
 export type WorkflowFormValues = z.infer<typeof formSchema>;
 
 interface AddWorkflowFormProps {
@@ -36,7 +47,8 @@ interface AddWorkflowFormProps {
 }
 
 export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: AddWorkflowFormProps) {
-  const form = useForm<WorkflowFormValues>({
+  // Use the pre-transformation type for the form itself
+  const form = useForm<WorkflowFormInputs>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -48,8 +60,9 @@ export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: Ad
     },
   });
 
-  const handleSubmit = (values: WorkflowFormValues) => {
-    onSubmit(values);
+  const handleSubmit = (values: WorkflowFormInputs) => {
+    // The zodResolver will transform the values according to the schema
+    onSubmit(values as unknown as WorkflowFormValues);
     form.reset();
   };
 
