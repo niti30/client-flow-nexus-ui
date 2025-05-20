@@ -79,8 +79,8 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     } else {
       // For time values (which end with 'h')
-      let aCompare = aValue?.toString().replace('h', '') || '0';
-      let bCompare = bValue?.toString().replace('h', '') || '0';
+      let aCompare = String(aValue).replace('h', '') || '0';
+      let bCompare = String(bValue).replace('h', '') || '0';
       
       return sortDirection === 'asc' 
         ? parseFloat(aCompare) - parseFloat(bCompare) 
