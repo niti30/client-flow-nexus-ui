@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -19,8 +19,8 @@ interface ClientSelectionFieldProps {
 }
 
 export function ClientSelectionField({
-  clients,
-  selectedClients,
+  clients = [],
+  selectedClients = [],
   setSelectedClients,
   isLoading,
   popoverOpen,
@@ -76,31 +76,33 @@ export function ClientSelectionField({
                 ) : clients && clients.length > 0 ? (
                   <Command>
                     <CommandInput placeholder="Search clients..." />
-                    <CommandEmpty>No clients found.</CommandEmpty>
-                    <CommandGroup>
-                      <ScrollArea className="h-52">
-                        {clients.map((client) => (
-                          <CommandItem
-                            key={client.id}
-                            onSelect={() => handleClientSelection(client.id)}
-                            className="flex items-center px-2 py-1"
-                          >
-                            <div className="flex items-center space-x-2 flex-1">
-                              <Checkbox
-                                checked={selectedClients.includes(client.id)}
-                                onCheckedChange={() => handleClientSelection(client.id)}
-                                className="mr-2"
-                                aria-label={`Select ${client.name}`}
-                              />
-                              <span>{client.name}</span>
-                            </div>
-                            {selectedClients.includes(client.id) && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
-                          </CommandItem>
-                        ))}
-                      </ScrollArea>
-                    </CommandGroup>
+                    <CommandList>
+                      <CommandEmpty>No clients found.</CommandEmpty>
+                      <CommandGroup>
+                        <ScrollArea className="h-52">
+                          {clients.map((client) => (
+                            <CommandItem
+                              key={client.id}
+                              onSelect={() => handleClientSelection(client.id)}
+                              className="flex items-center px-2 py-1"
+                            >
+                              <div className="flex items-center space-x-2 flex-1">
+                                <Checkbox
+                                  checked={selectedClients.includes(client.id)}
+                                  onCheckedChange={() => handleClientSelection(client.id)}
+                                  className="mr-2"
+                                  aria-label={`Select ${client.name}`}
+                                />
+                                <span>{client.name}</span>
+                              </div>
+                              {selectedClients.includes(client.id) && (
+                                <Check className="h-4 w-4 text-primary" />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </ScrollArea>
+                      </CommandGroup>
+                    </CommandList>
                   </Command>
                 ) : (
                   <div className="p-4 text-center text-sm">
