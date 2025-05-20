@@ -27,9 +27,10 @@ export type WorkflowFormValues = z.infer<typeof formSchema>;
 interface AddWorkflowFormProps {
   onSubmit: (values: WorkflowFormValues) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
-export function AddWorkflowForm({ onSubmit, onCancel }: AddWorkflowFormProps) {
+export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: AddWorkflowFormProps) {
   const form = useForm<WorkflowFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -94,10 +95,12 @@ export function AddWorkflowForm({ onSubmit, onCancel }: AddWorkflowFormProps) {
         />
         
         <DialogFooter className="mt-6">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit">Add Workflow</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Adding..." : "Add Workflow"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>
