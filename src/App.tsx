@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +29,8 @@ import ClientBilling from "./pages/client/ClientBilling";
 import ClientExceptions from "./pages/client/ClientExceptions";
 import ClientMessaging from "./pages/client/ClientMessaging";
 import ClientUsers from "./pages/client/ClientUsers";
+import ClientCredentialsPage from "./pages/client/ClientCredentials";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Create the queryClient outside of the component
 const queryClient = new QueryClient();
@@ -129,11 +132,11 @@ const AppRoutes = () => {
       <Route path="/client/dashboard" element={<ClientRoute><ClientDashboard /></ClientRoute>} />
       <Route path="/client/roi" element={<ClientRoute><ClientROI /></ClientRoute>} />
       <Route path="/client/reporting" element={<ClientRoute><ClientReporting /></ClientRoute>} />
-      <Route path="/client/credentials" element={<ClientRoute><ClientCredentials /></ClientRoute>} />
+      <Route path="/client/credentials" element={<ProtectedRoute><ClientCredentialsPage /></ProtectedRoute>} />
       <Route path="/client/exceptions" element={<ClientRoute><ClientExceptions /></ClientRoute>} />
       <Route path="/client/users" element={<ClientRoute><ClientUsers /></ClientRoute>} />
       <Route path="/client/billing" element={<ClientRoute><ClientBilling /></ClientRoute>} />
-      <Route path="/client/messaging" element={<ClientRoute><ClientSupport /></ClientRoute>} />
+      <Route path="/client/messaging" element={<ClientRoute><ClientMessaging /></ClientRoute>} />
       <Route path="/client/support" element={<ClientRoute><ClientSupport /></ClientRoute>} />
       
       {/* 404 route */}
@@ -147,13 +150,15 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <TooltipProvider>
-            <div className="min-h-screen bg-[#f5f5f7]">
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-            </div>
-          </TooltipProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <div className="min-h-screen bg-background transition-colors duration-300">
+                <Toaster />
+                <Sonner />
+                <AppRoutes />
+              </div>
+            </TooltipProvider>
+          </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

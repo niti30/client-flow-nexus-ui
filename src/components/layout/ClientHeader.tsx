@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, LogOut, User } from "lucide-react";
+import { Settings, LogOut, User, Menu } from "lucide-react";
 
 const ClientHeader = () => {
   const { user, signOut } = useAuth();
@@ -76,19 +76,21 @@ const ClientHeader = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-      <h1 className="text-xl font-semibold">Acme Corporation</h1>
+    <header className="bg-card border-b border-border p-4 flex justify-between items-center relative z-10">
+      <div className="flex items-center">
+        <h1 className="text-xl font-semibold ml-12 md:ml-0 truncate">Acme Corporation</h1>
+      </div>
       <div className="flex items-center space-x-4">
-        <button className="p-1 rounded-full hover:bg-gray-100">
+        <button className="p-1 rounded-full hover:bg-muted">
           <span className="sr-only">Notifications</span>
-          <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-6 w-6 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </button>
         
         <DropdownMenu>
           <DropdownMenuTrigger className="focus:outline-none">
-            <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
+            <div className="h-8 w-8 rounded-full bg-muted overflow-hidden">
               <img 
                 src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
                 alt="User avatar" 
@@ -96,7 +98,7 @@ const ClientHeader = () => {
               />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent align="end" className="w-48 bg-card border-border text-card-foreground">
             <DropdownMenuItem onClick={navigateToProfile} className="cursor-pointer">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
@@ -105,7 +107,7 @@ const ClientHeader = () => {
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 hover:text-red-600">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>

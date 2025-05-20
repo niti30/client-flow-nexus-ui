@@ -101,17 +101,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  @apply bg-muted;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  @apply bg-muted-foreground/30;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  @apply bg-muted-foreground/50;
 }
 
 /* Utility Classes */
@@ -162,7 +162,7 @@
   flex: none;
   order: 0;
   flex-grow: 0;
-  background-color: white;
+  @apply bg-card text-card-foreground;
 }
 
 .sidebar-item {
@@ -174,12 +174,11 @@
 }
 
 .sidebar-item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  @apply bg-muted/50;
 }
 
 .sidebar-item.active {
-  background-color: #F0F0F0;
-  font-weight: 500;
+  @apply bg-muted font-medium;
 }
 
 .sidebar-icon {
