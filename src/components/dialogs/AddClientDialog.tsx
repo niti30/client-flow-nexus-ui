@@ -53,8 +53,9 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
     try {
       setIsSubmitting(true);
       
+      console.log("Adding client:", companyName);
+      
       // Add client to the database
-      console.log("Inserting client as:", userRole);
       const { data, error } = await supabase
         .from('clients')
         .insert([{ 
@@ -111,6 +112,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         return;
       }
       
+      console.log("Client added successfully:", data);
       toast({
         title: "Client added successfully",
         description: `${companyName} has been added`,

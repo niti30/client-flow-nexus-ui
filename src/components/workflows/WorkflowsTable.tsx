@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refres
   const loading = propLoading !== undefined ? propLoading : hookLoading;
   
   // Re-fetch when refresh trigger changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (refreshTrigger && !propWorkflows) {
       fetchWorkflows();
     }

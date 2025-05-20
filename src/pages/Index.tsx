@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
@@ -9,7 +8,7 @@ import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const { toast } = useToast();
@@ -67,13 +66,18 @@ const Index = () => {
         
       } catch (error) {
         console.error("Error in client fetch:", error);
+        toast({
+          title: "Unexpected error",
+          description: "Failed to fetch clients. Please try again.",
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
     };
     
     fetchClients();
-  }, [refreshTrigger]); // Refetch when refreshTrigger changes
+  }, [refreshTrigger, toast]); // Added toast to dependency array
   
   // Fetch dashboard data
   useEffect(() => {

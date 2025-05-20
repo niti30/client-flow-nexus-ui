@@ -13,7 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Client {
   id: string;
@@ -57,14 +57,20 @@ const ClientsTable = ({ searchQuery = '', refreshTrigger = 0 }: ClientsTableProp
       }
     } catch (error) {
       console.error('Unexpected error:', error);
+      toast({
+        title: "Unexpected error",
+        description: "Failed to fetch clients. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Fetch clients when component mounts or refresh trigger changes
     fetchClients();
-  }, [refreshTrigger]); // Re-fetch when the refresh trigger changes
+  }, [refreshTrigger]); 
 
   // Filter clients based on search query
   const filteredClients = clients.filter(client => 
