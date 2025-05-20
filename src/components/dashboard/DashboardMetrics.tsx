@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle } from "lucide-react";
 import { useWorkflows } from "@/hooks/useWorkflows";
@@ -10,7 +9,7 @@ interface DashboardMetricsProps {
 }
 
 const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
-  const { clientMetrics, loading } = useWorkflows();
+  const { clientMetrics, loading } = useWorkflows(timeframe);
   const [metrics, setMetrics] = useState({
     totalSaved: { value: 0, change: 0 },
     avgCycleTime: { value: 0, change: 0 },
@@ -33,16 +32,37 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
       switch (timeframe) {
         case "7d":
           setMetrics({
-            totalSaved: { value: totalMoneySaved / 4, change: 5.2 },
+            totalSaved: { value: totalMoneySaved, change: 5.2 },
             avgCycleTime: { value: 3.2, change: -8.4 },
-            exceptions: { value: totalExceptions / 4, change: 2.5 }
+            exceptions: { value: totalExceptions, change: 2.5 }
           });
           break;
         case "30d":
           setMetrics({
-            totalSaved: { value: totalMoneySaved / 2, change: 12.1 },
+            totalSaved: { value: totalMoneySaved, change: 12.1 },
             avgCycleTime: { value: 3.8, change: -5.1 },
-            exceptions: { value: totalExceptions / 2, change: -3.2 }
+            exceptions: { value: totalExceptions, change: -3.2 }
+          });
+          break;
+        case "mtd":
+          setMetrics({
+            totalSaved: { value: totalMoneySaved, change: 7.5 },
+            avgCycleTime: { value: 3.5, change: -6.2 },
+            exceptions: { value: totalExceptions, change: 1.8 }
+          });
+          break;
+        case "qtd":
+          setMetrics({
+            totalSaved: { value: totalMoneySaved, change: 9.3 },
+            avgCycleTime: { value: 3.6, change: -5.8 },
+            exceptions: { value: totalExceptions, change: -2.1 }
+          });
+          break;
+        case "ytd":
+          setMetrics({
+            totalSaved: { value: totalMoneySaved, change: 10.5 },
+            avgCycleTime: { value: 3.7, change: -6.5 },
+            exceptions: { value: totalExceptions, change: -1.5 }
           });
           break;
         default:
@@ -63,7 +83,7 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-xl font-medium">Total $ Saved</p>
-              <p className="text-3xl font-bold mt-2">${metrics.totalSaved.value.toLocaleString()}</p>
+              <p className="text-3xl font-bold mt-2">${loading ? "..." : metrics.totalSaved.value.toLocaleString()}</p>
               <div className="flex items-center mt-1">
                 {metrics.totalSaved.change > 0 ? (
                   <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
@@ -88,7 +108,7 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-xl font-medium">Avg Cycle Time</p>
-              <p className="text-3xl font-bold mt-2">{metrics.avgCycleTime.value} days</p>
+              <p className="text-3xl font-bold mt-2">{loading ? "..." : metrics.avgCycleTime.value} days</p>
               <div className="flex items-center mt-1">
                 {metrics.avgCycleTime.change < 0 ? (
                   <TrendingDown className="h-4 w-4 text-green-500 mr-1" />
@@ -113,7 +133,7 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-xl font-medium"># Exceptions</p>
-              <p className="text-3xl font-bold mt-2">{metrics.exceptions.value}</p>
+              <p className="text-3xl font-bold mt-2">{loading ? "..." : metrics.exceptions.value}</p>
               <div className="flex items-center mt-1">
                 {metrics.exceptions.change < 0 ? (
                   <TrendingDown className="h-4 w-4 text-green-500 mr-1" />

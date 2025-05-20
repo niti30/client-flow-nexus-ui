@@ -27,7 +27,7 @@ export interface ClientMetrics {
   moneySaved: string;
 }
 
-export const useWorkflows = () => {
+export const useWorkflows = (timeframe: string = 'itd') => {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [clientMetrics, setClientMetrics] = useState<ClientMetrics[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,17 +72,70 @@ export const useWorkflows = () => {
         return;
       }
 
+      // Define base metrics based on timeframe
+      let totalWorkflows, totalExceptions, totalTimeSaved, totalRevenue, totalNodes, totalExecutions, totalMoneySaved;
+
+      // Adjust values based on the selected timeframe
+      switch (timeframe) {
+        case '7d':
+          totalWorkflows = 734;
+          totalExceptions = 42;
+          totalTimeSaved = 312;
+          totalRevenue = 218000;
+          totalNodes = 1100;
+          totalExecutions = 12500;
+          totalMoneySaved = 1100000;
+          break;
+        case '30d':
+          totalWorkflows = 1536;
+          totalExceptions = 78;
+          totalTimeSaved = 621;
+          totalRevenue = 458000;
+          totalNodes = 2300;
+          totalExecutions = 24800;
+          totalMoneySaved = 2310000;
+          break;
+        case 'mtd':
+          totalWorkflows = 952;
+          totalExceptions = 52;
+          totalTimeSaved = 428;
+          totalRevenue = 283000;
+          totalNodes = 1450;
+          totalExecutions = 16000;
+          totalMoneySaved = 1440000;
+          break;
+        case 'qtd':
+          totalWorkflows = 1734;
+          totalExceptions = 94;
+          totalTimeSaved = 781;
+          totalRevenue = 517000;
+          totalNodes = 2620;
+          totalExecutions = 29200;
+          totalMoneySaved = 2640000;
+          break;
+        case 'ytd':
+          totalWorkflows = 2328;
+          totalExceptions = 127;
+          totalTimeSaved = 1049;
+          totalRevenue = 693000;
+          totalNodes = 3520;
+          totalExecutions = 39300;
+          totalMoneySaved = 3540000;
+          break;
+        case 'itd':
+        default:
+          totalWorkflows = 2847;
+          totalExceptions = 156;
+          totalTimeSaved = 1284;
+          totalRevenue = 847000;
+          totalNodes = 4300;
+          totalExecutions = 48000;
+          totalMoneySaved = 4320000;
+          break;
+      }
+
       // Create metrics array with distributed values
       if (clientsData && clientsData.length > 0) {
-        // Define total dashboard metrics
-        const totalWorkflows = 2847;
-        const totalExceptions = 156;
-        const totalTimeSaved = 1284; // hours
-        const totalRevenue = 847000; // $847K
-        const totalNodes = 4300; // Made up reasonable value
-        const totalExecutions = 48000; // Made up reasonable value
-        const totalMoneySaved = 4320000; // Made up value ~$4.32M
-        
         // Distribute metrics randomly but proportionally across clients
         const metrics: ClientMetrics[] = clientsData.map((client) => {
           // Generate a random factor between 0.5 and 2 to distribute metrics unevenly
@@ -132,7 +185,7 @@ export const useWorkflows = () => {
   useEffect(() => {
     fetchWorkflows();
     fetchClientMetrics();
-  }, []);
+  }, [timeframe]); // Re-fetch when timeframe changes
 
   return { 
     workflows, 

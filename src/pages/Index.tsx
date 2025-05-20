@@ -7,7 +7,6 @@ import MetricsCard from "@/components/dashboard/MetricsCard";
 import ClientsTableEnhanced from "@/components/dashboard/ClientsTableEnhanced";
 import { AddClientDialog } from "@/components/dialogs/AddClientDialog";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 import { useToast } from "@/components/ui/use-toast";
 import { useWorkflows } from "@/hooks/useWorkflows";
@@ -17,23 +16,23 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("itd");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
-  // Use our updated hook to get client metrics
+  // Use our updated hook to get client metrics with the selected timeframe
   const { 
     clientMetrics, 
     loading, 
     error, 
     fetchClientMetrics 
-  } = useWorkflows();
+  } = useWorkflows(activeTab);
   
   // Calculate dashboard totals from the client metrics
   const calculateDashboardTotals = () => {
     if (!clientMetrics || clientMetrics.length === 0) {
       return {
-        totalWorkflows: '2,847',
-        totalExceptions: '156',
-        timeSaved: '1,284h',
-        revenue: '$847K',
-        activeClients: `${clientMetrics.length || 0}`
+        totalWorkflows: '0',
+        totalExceptions: '0',
+        timeSaved: '0h',
+        revenue: '$0K',
+        activeClients: '0'
       };
     }
     
@@ -140,6 +139,8 @@ const Index = () => {
           </div>
           
           {/* Dashboard Metrics */}
+          <DashboardMetrics timeframe={activeTab} />
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <MetricsCard 
               title="Total Workflows" 
