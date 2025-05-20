@@ -292,6 +292,10 @@ export type Database = {
         Args: { client_name: string; client_status?: string }
         Returns: string
       }
+      get_dashboard_metrics: {
+        Args: { time_period: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
