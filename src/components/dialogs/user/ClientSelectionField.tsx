@@ -30,17 +30,14 @@ export function ClientSelectionField({
 
   // Safely handle client selection and deselection
   const handleClientSelection = (clientId: string) => {
-    setSelectedClients((prev) => {
-      const isSelected = prev.includes(clientId);
-      const updatedSelection = isSelected
-        ? prev.filter((id) => id !== clientId)
-        : [...prev, clientId];
-      
-      // Update the form value
-      form.setValue("assigned_clients", updatedSelection);
-      
-      return updatedSelection;
-    });
+    const isSelected = selectedClients.includes(clientId);
+    const updatedSelection = isSelected
+      ? selectedClients.filter((id) => id !== clientId)
+      : [...selectedClients, clientId];
+    
+    // Update the form value and state
+    form.setValue("assigned_clients", updatedSelection);
+    setSelectedClients(updatedSelection);
   };
 
   return (
@@ -76,7 +73,7 @@ export function ClientSelectionField({
                     <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
                     <p className="mt-2 text-sm text-muted-foreground">Loading clients...</p>
                   </div>
-                ) : clients.length > 0 ? (
+                ) : clients && clients.length > 0 ? (
                   <Command>
                     <CommandInput placeholder="Search clients..." />
                     <CommandEmpty>No clients found.</CommandEmpty>

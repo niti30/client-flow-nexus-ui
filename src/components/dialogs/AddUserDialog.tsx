@@ -34,7 +34,7 @@ const formSchema = z.object({
   cost_rate: z.coerce.number().optional(),
   bill_rate: z.coerce.number().optional(),
   role: z.enum(["admin", "se"]),
-  assigned_clients: z.array(z.string()).optional(),
+  assigned_clients: z.array(z.string()).default([]),
 });
 
 export function AddUserDialog({ 
