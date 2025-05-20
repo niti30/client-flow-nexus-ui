@@ -67,6 +67,8 @@ export function useUsers(role: "admin" | "se" | null = null) {
 
           return {
             ...user,
+            // Ensure role is explicitly cast as "admin" | "se"
+            role: user.role as "admin" | "se",
             assigned_clients: assignedClients,
           };
         });

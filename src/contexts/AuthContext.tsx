@@ -34,7 +34,8 @@ const cleanupAuthState = () => {
   });
 };
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+// Fixing the component definition to properly use React function component syntax
+export function AuthProvider({ children }: { children: ReactNode }): React.ReactElement {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string>('client'); // Default role
