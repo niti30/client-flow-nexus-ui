@@ -1,14 +1,24 @@
 
-import { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
-import { useFormContext } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from 'react';
+import { Check, ChevronsUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FormLabel } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 
 interface ClientSelectionFieldProps {
   clients: { id: string; name: string }[];
@@ -20,109 +30,111 @@ interface ClientSelectionFieldProps {
 }
 
 export function ClientSelectionField({
-  clients = [],
-  selectedClients = [],
+  clients,
+  selectedClients,
   setSelectedClients,
   isLoading,
   popoverOpen,
-  setPopoverOpen
+  setPopoverOpen,
 }: ClientSelectionFieldProps) {
-  const form = useFormContext();
+  const [searchValue, setSearchValue] = useState("");
 
-  // Safely handle client selection and deselection
-  const handleClientSelection = (clientId: string) => {
-    const isSelected = selectedClients.includes(clientId);
-    const updatedSelection = isSelected
-      ? selectedClients.filter((id) => id !== clientId)
-      : [...selectedClients, clientId];
-    
-    // Update the form value and state
-    form.setValue("assigned_clients", updatedSelection);
-    setSelectedClients(updatedSelection);
+  const toggleClient = (clientId: string) => {
+    setSelectedClients(
+      selectedClients.includes(clientId)
+        ? selectedClients.filter((id) => id !== clientId)
+        : [...selectedClients, clientId]
+    );
   };
 
-  // Get client names for selected clients to display in the trigger button
-  const getSelectedClientNames = () => {
-    return clients
-      .filter(client => selectedClients.includes(client.id))
-      .map(client => client.name);
-  };
+  // Filter clients based on search
+  const filteredClients = clients.filter((client) =>
+    client.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  // Get names of selected clients for display
+  const selectedClientNames = selectedClients
+    .map((id) => {
+      const client = clients.find((c) => c.id === id);
+      return client ? client.name : "";
+    })
+    .filter(Boolean);
 
   return (
-    <FormField
-      control={form.control}
-      name="assigned_clients"
-      render={() => (
-        <FormItem>
-          <FormLabel>Assigned Clients</FormLabel>
-          <FormControl>
-            <Popover 
-              open={popoverOpen} 
-              onOpenChange={setPopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : selectedClients.length > 0 ? (
-                    `${selectedClients.length} client${selectedClients.length > 1 ? "s" : ""} selected`
-                  ) : (
-                    "Select clients..."
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[300px] p-0" align="start">
+    <div className="space-y-2">
+      <FormLabel>Assigned Clients</FormLabel>
+      
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={popoverOpen}
+            className="w-full justify-between h-auto min-h-10 py-2"
+          >
+            {selectedClients.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {selectedClientNames.map((name) => (
+                  <Badge key={name} variant="secondary">
+                    {name}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              "Select clients..."
+            )}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0">
+          <Command>
+            <CommandInput 
+              placeholder="Search clients..." 
+              value={searchValue}
+              onValueChange={setSearchValue}
+            />
+            <CommandList>
+              <CommandEmpty>
+                {isLoading ? "Loading..." : "No clients found."}
+              </CommandEmpty>
+              <CommandGroup>
                 {isLoading ? (
-                  <div className="p-4 text-center">
-                    <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
-                    <p className="mt-2 text-sm text-muted-foreground">Loading clients...</p>
-                  </div>
-                ) : clients && clients.length > 0 ? (
-                  <Command>
-                    <CommandInput placeholder="Search clients..." />
-                    <CommandList>
-                      <CommandEmpty>No clients found.</CommandEmpty>
-                      <CommandGroup>
-                        <ScrollArea className="h-52">
-                          {clients.map((client) => (
-                            <CommandItem
-                              key={client.id}
-                              onSelect={() => handleClientSelection(client.id)}
-                              className="flex items-center px-2 py-1"
-                            >
-                              <div className="flex items-center space-x-2 flex-1">
-                                <Checkbox
-                                  checked={selectedClients.includes(client.id)}
-                                  onCheckedChange={() => handleClientSelection(client.id)}
-                                  className="mr-2"
-                                  aria-label={`Select ${client.name}`}
-                                />
-                                <span>{client.name}</span>
-                              </div>
-                              {selectedClients.includes(client.id) && (
-                                <Check className="h-4 w-4 text-primary" />
-                              )}
-                            </CommandItem>
-                          ))}
-                        </ScrollArea>
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                  // Show skeletons while loading
+                  [...Array(3)].map((_, i) => (
+                    <div key={i} className="px-2 py-1.5">
+                      <Skeleton className="h-5 w-full" />
+                    </div>
+                  ))
                 ) : (
-                  <div className="p-4 text-center text-sm">
-                    No clients available to assign.
-                  </div>
+                  // Show filtered clients
+                  filteredClients.map((client) => {
+                    const isSelected = selectedClients.includes(client.id);
+                    return (
+                      <CommandItem
+                        key={client.id}
+                        value={client.id}
+                        onSelect={() => toggleClient(client.id)}
+                        className={cn(
+                          "flex items-center gap-2",
+                          isSelected ? "bg-secondary/20" : ""
+                        )}
+                      >
+                        <Check
+                          className={cn(
+                            "h-4 w-4",
+                            isSelected ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <span>{client.name}</span>
+                      </CommandItem>
+                    );
+                  })
                 )}
-              </PopoverContent>
-            </Popover>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

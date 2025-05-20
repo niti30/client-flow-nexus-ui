@@ -63,10 +63,20 @@ export function AddUserDialog({
       phone: "",
       cost_rate: undefined,
       bill_rate: undefined,
-      role: userRole,
+      role: userRole, // Set role based on the tab (userRole prop)
       assigned_clients: [],
     },
   });
+
+  // Reset form when userRole changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        ...form.getValues(),
+        role: userRole, // Ensure role is set correctly when dialog opens
+      });
+    }
+  }, [userRole, open, form]);
 
   // Fetch clients for SE user role
   useEffect(() => {
@@ -110,6 +120,8 @@ export function AddUserDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      console.log("Submitting user with role:", values.role);
+      
       // Add user to the database
       const { data: userData, error: userError } = await supabase
         .from("users")
@@ -118,7 +130,7 @@ export function AddUserDialog({
           last_name: values.last_name,
           email: values.email,
           phone: values.phone,
-          role: values.role,
+          role: values.role, // Explicitly use the role from the form
           cost_rate: values.role === "se" ? values.cost_rate : null,
           bill_rate: values.role === "se" ? values.bill_rate : null,
         })
@@ -143,7 +155,7 @@ export function AddUserDialog({
 
       toast({
         title: "Success",
-        description: "User added successfully",
+        description: `${values.role === "admin" ? "Admin" : "SE"} user added successfully`,
       });
 
       // Reset form and close dialog

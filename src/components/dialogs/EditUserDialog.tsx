@@ -69,6 +69,8 @@ export function EditUserDialog({
   useEffect(() => {
     if (user.assigned_clients && user.assigned_clients.length > 0) {
       setSelectedClients(user.assigned_clients.map(client => client.client_id));
+    } else {
+      setSelectedClients([]);
     }
   }, [user]);
 
@@ -109,6 +111,8 @@ export function EditUserDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      console.log("Updating user with role:", values.role);
+      
       // Update user in the database
       const { data: userData, error: userError } = await supabase
         .from("users")
@@ -117,7 +121,7 @@ export function EditUserDialog({
           last_name: values.last_name,
           email: values.email,
           phone: values.phone,
-          role: values.role,
+          role: values.role, // Preserve the role
           cost_rate: values.role === "se" ? values.cost_rate : null,
           bill_rate: values.role === "se" ? values.bill_rate : null,
         })

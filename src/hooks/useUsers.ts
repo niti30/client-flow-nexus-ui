@@ -25,6 +25,7 @@ export function useUsers(role: "admin" | "se" | null = null) {
   const { toast } = useToast();
 
   const refreshUsers = () => {
+    console.log("Refreshing users with role:", role);
     setRefreshTrigger(prev => prev + 1);
   };
 
@@ -32,6 +33,8 @@ export function useUsers(role: "admin" | "se" | null = null) {
     const fetchUsers = async () => {
       setLoading(true);
       try {
+        console.log("Fetching users with role filter:", role);
+        
         // Basic query for users with optional role filter
         let query = supabase
           .from("users")
@@ -59,6 +62,8 @@ export function useUsers(role: "admin" | "se" | null = null) {
           setUsers([]);
           return;
         }
+
+        console.log("Fetched users data:", data);
 
         // Transform data into expected format
         const formattedUsers = data.map((user): User => {
