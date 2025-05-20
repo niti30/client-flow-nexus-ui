@@ -2,6 +2,14 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { 
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell
+} from "@/components/ui/table";
 
 interface Client {
   name: string;
@@ -43,42 +51,42 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({ clients, is
   }
 
   return (
-    <table className="w-full">
-      <thead>
-        <tr className="border-b border-gray-200 text-left text-sm font-medium text-gray-500">
-          <th className="p-4">CLIENT NAME</th>
-          <th className="p-4">START DATE</th>
-          <th className="p-4">WORKFLOWS</th>
-          <th className="p-4">NODES</th>
-          <th className="p-4">EXECUTIONS</th>
-          <th className="p-4">EXCEPTIONS</th>
-          <th className="p-4">ROI</th>
-          <th className="p-4">ACTIONS</th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="font-medium">Client Name</TableHead>
+          <TableHead className="font-medium">Contract Start</TableHead>
+          <TableHead className="font-medium">Workflows</TableHead>
+          <TableHead className="font-medium">Nodes</TableHead>
+          <TableHead className="font-medium">Executions</TableHead>
+          <TableHead className="font-medium">Exceptions</TableHead>
+          <TableHead className="font-medium">Revenue</TableHead>
+          <TableHead className="font-medium">Time Saved</TableHead>
+          <TableHead className="font-medium">Money Saved</TableHead>
+          <TableHead className="w-[50px]"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {clients.map((client, index) => (
-          <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-            <td className="p-4 font-medium">{client.name}</td>
-            <td className="p-4 text-gray-600">{client.contractStart}</td>
-            <td className="p-4">{client.workflows}</td>
-            <td className="p-4">{client.nodes}</td>
-            <td className="p-4">{client.executions}</td>
-            <td className="p-4">{client.exceptions}</td>
-            <td className="p-4">
-              <div>Revenue: {client.revenue}</div>
-              <div>Time Saved: {client.timeSaved}</div>
-              <div>Money Saved: {client.moneySaved}</div>
-            </td>
-            <td className="p-4">
+          <TableRow key={index}>
+            <TableCell className="font-medium">{client.name}</TableCell>
+            <TableCell>{client.contractStart}</TableCell>
+            <TableCell>{client.workflows}</TableCell>
+            <TableCell>{client.nodes}</TableCell>
+            <TableCell>{client.executions}</TableCell>
+            <TableCell>{client.exceptions}</TableCell>
+            <TableCell>{client.revenue}</TableCell>
+            <TableCell>{client.timeSaved}</TableCell>
+            <TableCell>{client.moneySaved}</TableCell>
+            <TableCell>
               <Link to={`/clients/${index}`} className="text-blue-600 hover:text-blue-800 flex items-center">
-                Details <ChevronRight size={16} />
+                <ChevronRight size={16} />
               </Link>
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 };
 

@@ -13,27 +13,27 @@ interface MetricsCardProps {
 
 const MetricsCard = ({ title, value, trend }: MetricsCardProps) => {
   return (
-    <Card className="border border-gray-200 rounded-xl shadow-none h-full p-6">
-      <div className="space-y-6">
+    <Card className="border border-gray-200 rounded-lg shadow-sm overflow-hidden p-6">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-normal text-gray-900">{title}</h3>
+          <h3 className="text-base font-medium text-gray-700">{title}</h3>
           {trend && (
-            <div className={`flex items-center text-sm ${trend.positive ? 'text-[#1D8560]' : 'text-[#CE4343]'}`}>
+            <div className={`flex items-center text-sm ${trend.positive ? 'text-green-500' : 'text-red-500'}`}>
               {trend.positive ? (
                 <span className="flex items-center">
-                  <TrendingUp size={12} className="mr-1" />
+                  <TrendingUp size={16} className="mr-1" />
                   {trend.value}%
                 </span>
               ) : (
                 <span className="flex items-center">
-                  <TrendingDown size={12} className="mr-1" />
+                  <TrendingDown size={16} className="mr-1" />
                   {trend.value}%
                 </span>
               )}
             </div>
           )}
         </div>
-        <div className="text-3xl font-normal text-gray-900">{value}</div>
+        <div className="text-3xl font-bold text-gray-900">{value}</div>
       </div>
     </Card>
   );

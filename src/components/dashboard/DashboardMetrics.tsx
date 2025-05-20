@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle } from "lucide-react";
 
 interface DashboardMetricsProps {
@@ -43,16 +43,14 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
   }, [timeframe]);
 
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-3 mb-8">
       {/* Total $ Saved Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500">Total $ Saved</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <CardContent className="p-6">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-2xl font-bold">${metrics.totalSaved.value.toLocaleString()}</p>
+              <p className="text-xl font-medium">Total $ Saved</p>
+              <p className="text-3xl font-bold mt-2">${metrics.totalSaved.value.toLocaleString()}</p>
               <div className="flex items-center mt-1">
                 {metrics.totalSaved.change > 0 ? (
                   <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
@@ -72,14 +70,12 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
       </Card>
 
       {/* Avg Cycle Time Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500">Avg Cycle Time</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <CardContent className="p-6">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-2xl font-bold">{metrics.avgCycleTime.value} days</p>
+              <p className="text-xl font-medium">Avg Cycle Time</p>
+              <p className="text-3xl font-bold mt-2">{metrics.avgCycleTime.value} days</p>
               <div className="flex items-center mt-1">
                 {metrics.avgCycleTime.change < 0 ? (
                   <TrendingDown className="h-4 w-4 text-green-500 mr-1" />
@@ -99,14 +95,12 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
       </Card>
 
       {/* Exceptions Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500"># Exceptions</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <CardContent className="p-6">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-2xl font-bold">{metrics.exceptions.value}</p>
+              <p className="text-xl font-medium"># Exceptions</p>
+              <p className="text-3xl font-bold mt-2">{metrics.exceptions.value}</p>
               <div className="flex items-center mt-1">
                 {metrics.exceptions.change < 0 ? (
                   <TrendingDown className="h-4 w-4 text-green-500 mr-1" />

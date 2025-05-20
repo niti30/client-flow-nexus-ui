@@ -52,17 +52,25 @@ interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
   VariantProps<typeof sheetVariants> { 
     hideCloseButton?: boolean;
+    onOpenChange?: (open: boolean) => void;
   }
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, hideCloseButton = false, ...props }, ref) => (
+>(({ side = "right", className, children, hideCloseButton = false, onOpenChange, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
+      onOpenAutoFocus={(e) => e.preventDefault()}
+      onInteractOutside={(e) => {
+        if (onOpenChange) {
+          e.preventDefault()
+          onOpenChange(false)
+        }
+      }}
       {...props}
     >
       {children}

@@ -13,13 +13,25 @@ import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("itd");
   const [dashboardData, setDashboardData] = useState({
-    totalWorkflows: '0',
-    totalExceptions: '0',
-    timeSaved: '0h',
-    revenue: '$0',
-    activeClients: '0'
+    totalWorkflows: '2,847',
+    totalExceptions: '156',
+    timeSaved: '1,284h',
+    revenue: '$847K',
+    activeClients: '128'
   });
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([
+    {
+      name: 'Acme Corp',
+      contractStart: 'Jan 15, 2025',
+      workflows: 24,
+      nodes: 156,
+      executions: 1847,
+      exceptions: 12,
+      revenue: '$24,500',
+      timeSaved: '284h',
+      moneySaved: '$42,600'
+    }
+  ]);
   const [loading, setLoading] = useState(true);
   
   // Fetch dashboard data
@@ -27,88 +39,44 @@ const Index = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // Fetch total workflows
-        const { data: workflows, error: workflowsError } = await supabase
-          .from('workflows')
-          .select('*');
+        // In a real app, we'd fetch this data from Supabase
+        // For now, we'll just simulate the data loading
         
-        // Fetch total exceptions
-        const { data: exceptions, error: exceptionsError } = await supabase
-          .from('exceptions')
-          .select('*');
+        // Set static data based on activeTab to simulate different time periods
+        let data = {
+          totalWorkflows: '2,847',
+          totalExceptions: '156',
+          timeSaved: '1,284h',
+          revenue: '$847K',
+          activeClients: '128'
+        };
         
-        // Fetch clients
-        const { data: clientsData, error: clientsError } = await supabase
-          .from('clients')
-          .select('*');
-        
-        if (workflowsError || exceptionsError || clientsError) {
-          console.error("Error fetching data:", { workflowsError, exceptionsError, clientsError });
-          return;
+        if (activeTab === '7d') {
+          data = {
+            totalWorkflows: '732',
+            totalExceptions: '42',
+            timeSaved: '312h',
+            revenue: '$198K',
+            activeClients: '115'
+          };
+        } else if (activeTab === '30d') {
+          data = {
+            totalWorkflows: '1,564',
+            totalExceptions: '87',
+            timeSaved: '724h',
+            revenue: '$412K',
+            activeClients: '122'
+          };
         }
         
-        // Calculate metrics (this would be more advanced in a real app)
-        const totalWorkflows = workflows?.length || 0;
-        const totalExceptions = exceptions?.length || 0;
-        const activeClients = clientsData?.filter(c => c.status === 'active')?.length || 0;
+        setDashboardData(data);
         
-        // Mock calculations for time saved and revenue (would be from real data in production)
-        const timeSaved = totalWorkflows * 4.5; // Example calculation
-        const revenue = totalWorkflows * 300; // Example calculation
-        
-        setDashboardData({
-          totalWorkflows: totalWorkflows.toLocaleString(),
-          totalExceptions: totalExceptions.toLocaleString(),
-          timeSaved: `${Math.round(timeSaved).toLocaleString()}h`,
-          revenue: `$${Math.round(revenue).toLocaleString()}K`,
-          activeClients: activeClients.toLocaleString()
-        });
-        
-        // Prepare clients data for the table
-        if (clientsData) {
-          const formattedClients = await Promise.all(clientsData.map(async (client) => {
-            // Fetch client's workflows
-            const { data: clientWorkflows } = await supabase
-              .from('workflows')
-              .select('*')
-              .eq('client_id', client.id);
-            
-            // Fetch client's exceptions
-            const { data: clientExceptions } = await supabase
-              .from('exceptions')
-              .select('*')
-              .eq('client_id', client.id);
-            
-            // Calculate derived metrics
-            const workflowCount = clientWorkflows?.length || 0;
-            const nodeCount = workflowCount * 6; // Example calculation
-            const executionCount = workflowCount * 75; // Example calculation
-            const exceptionCount = clientExceptions?.length || 0;
-            const timeSaved = workflowCount * 12; // Example: 12 hours per workflow
-            const revenue = workflowCount * 1000; // Example calculation
-            
-            return {
-              name: client.name,
-              contractStart: new Date(client.created_at).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-              }),
-              workflows: workflowCount,
-              nodes: nodeCount,
-              executions: executionCount,
-              exceptions: exceptionCount,
-              revenue: `$${revenue.toLocaleString()}`,
-              timeSaved: `${timeSaved}h`,
-              moneySaved: `$${(timeSaved * 150).toLocaleString()}` // Example: $150 per hour saved
-            };
-          }));
-          
-          setClients(formattedClients);
-        }
+        // Simulate loading delay
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-      } finally {
         setLoading(false);
       }
     };
@@ -173,7 +141,7 @@ const Index = () => {
           </div>
           
           {/* Dashboard Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <MetricsCard 
               title="Total Workflows" 
               value={loading ? "Loading..." : dashboardData.totalWorkflows} 
@@ -201,11 +169,8 @@ const Index = () => {
             />
           </div>
           
-          {/* Enhanced metrics for specific time periods */}
-          <DashboardMetrics timeframe={activeTab} />
-          
           {/* Clients Section */}
-          <div className="mt-10">
+          <div className="mt-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium text-gray-900">All Clients</h2>
               
