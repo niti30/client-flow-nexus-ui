@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import ClientSidebar from "@/components/layout/ClientSidebar";
+import ClientHeader from "@/components/layout/ClientHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -143,33 +144,16 @@ const ClientDashboard = () => {
   }, [workflows]);
 
   return (
-    <div className="flex h-screen bg-[#faf9f8]">
+    <div className="flex h-screen bg-[#faf9f8] dark:bg-gray-900">
       <ClientSidebar />
       
       <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">{clientData?.name || "Client Dashboard"}</h1>
-          <div className="flex items-center space-x-4">
-            <button className="p-1 rounded-full hover:bg-gray-100">
-              <span className="sr-only">Notifications</span>
-              <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
-            <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
-              <img 
-                src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
-                alt="User avatar" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </header>
+        <ClientHeader />
         
         <main className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Pipeline Progress */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <h2 className="text-xl font-semibold mb-4">Pipeline Progress</h2>
               <ul className="space-y-6">
                 {pipelineSteps.slice(0, 8).map((step, idx) => (
@@ -181,22 +165,28 @@ const ClientDashboard = () => {
                         </div>
                       )}
                       {step.status === "in_progress" && (
-                        <div className="h-6 w-6 rounded-full border-2 border-blue-500 bg-blue-100"></div>
+                        <div className="h-6 w-6 rounded-full border-2 border-blue-500 bg-blue-100 dark:bg-blue-900"></div>
                       )}
                       {step.status === "pending" && (
-                        <Circle className="h-6 w-6 text-gray-300" />
+                        <Circle className="h-6 w-6 text-gray-300 dark:text-gray-600" />
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <h4 className={`font-medium ${step.status === "completed" ? "text-gray-700" : step.status === "in_progress" ? "text-black" : "text-gray-500"}`}>
+                        <h4 className={`font-medium ${
+                          step.status === "completed" 
+                            ? "text-gray-700 dark:text-gray-300" 
+                            : step.status === "in_progress" 
+                              ? "text-black dark:text-white" 
+                              : "text-gray-500 dark:text-gray-400"
+                        }`}>
                           {step.name}
                         </h4>
-                        {step.date && <span className="text-sm text-gray-500">{step.date}</span>}
+                        {step.date && <span className="text-sm text-gray-500 dark:text-gray-400">{step.date}</span>}
                       </div>
                       {step.status === "in_progress" && (
                         <div className="mt-2">
-                          <span className="text-sm text-gray-500">In Progress</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">In Progress</span>
                         </div>
                       )}
                     </div>
@@ -207,44 +197,44 @@ const ClientDashboard = () => {
 
             {/* Time and Money Metrics */}
             <div className="space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                 <div className="flex justify-between mb-1">
-                  <h3 className="text-gray-500">Time Saved</h3>
-                  <span className="text-gray-500 text-sm">{metrics.timeSaved.period}</span>
+                  <h3 className="text-gray-500 dark:text-gray-400">Time Saved</h3>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">{metrics.timeSaved.period}</span>
                 </div>
                 <div className="flex justify-between items-end">
                   <div>
-                    <span className="text-3xl font-bold">{metrics.timeSaved.recent}</span>
+                    <span className="text-3xl font-bold dark:text-white">{metrics.timeSaved.recent}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold">{metrics.timeSaved.total}</span>
-                    <div className="text-sm text-gray-500">All time</div>
+                    <span className="text-2xl font-bold dark:text-white">{metrics.timeSaved.total}</span>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">All time</div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                 <div className="flex justify-between mb-1">
-                  <h3 className="text-gray-500">Money Saved</h3>
-                  <span className="text-gray-500 text-sm">{metrics.moneySaved.period}</span>
+                  <h3 className="text-gray-500 dark:text-gray-400">Money Saved</h3>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">{metrics.moneySaved.period}</span>
                 </div>
                 <div className="flex justify-between items-end">
                   <div>
-                    <span className="text-3xl font-bold">{metrics.moneySaved.recent}</span>
+                    <span className="text-3xl font-bold dark:text-white">{metrics.moneySaved.recent}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold">{metrics.moneySaved.total}</span>
-                    <div className="text-sm text-gray-500">All time</div>
+                    <span className="text-2xl font-bold dark:text-white">{metrics.moneySaved.total}</span>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">All time</div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                 <div className="mb-2">
-                  <h3 className="text-gray-500">Active Workflows</h3>
+                  <h3 className="text-gray-500 dark:text-gray-400">Active Workflows</h3>
                 </div>
                 <div className="flex justify-between items-end">
-                  <span className="text-3xl font-bold">{metrics.activeWorkflows}</span>
+                  <span className="text-3xl font-bold dark:text-white">{metrics.activeWorkflows}</span>
                   <Link to="/client/roi" className="text-blue-500 hover:underline text-sm flex items-center">
                     View workflows <ChevronRight className="h-4 w-4" />
                   </Link>
@@ -253,17 +243,17 @@ const ClientDashboard = () => {
             </div>
 
             {/* Support Engineer */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <div className="flex items-center mb-6">
                 <div className="h-16 w-16 rounded-full overflow-hidden">
                   <img src={supportEngineers[0].avatar} alt={supportEngineers[0].name} className="h-full w-full object-cover" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-xl font-semibold">{supportEngineers[0].name}</h3>
-                  <p className="text-gray-500">{supportEngineers[0].role}</p>
+                  <h3 className="text-xl font-semibold dark:text-white">{supportEngineers[0].name}</h3>
+                  <p className="text-gray-500 dark:text-gray-400">{supportEngineers[0].role}</p>
                 </div>
               </div>
-              <Button className="w-full bg-black text-white hover:bg-gray-800 rounded-md py-2 flex items-center justify-center">
+              <Button className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 rounded-md py-2 flex items-center justify-center">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Message SE
               </Button>

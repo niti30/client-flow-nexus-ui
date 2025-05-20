@@ -99,7 +99,7 @@ const ClientHeader = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border p-4 flex justify-between items-center relative z-10">
+    <header className="bg-card border-b border-border p-4 flex justify-between items-center relative z-30">
       <div className="flex items-center">
         <h1 className={`text-xl font-semibold truncate ${isMobile ? 'ml-12' : 'ml-0'}`}>Acme Corporation</h1>
       </div>
@@ -139,16 +139,18 @@ const ClientHeader = () => {
         
         {/* User avatar and menu */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="focus:outline-none">
-            <Avatar className="h-8 w-8 border border-border">
-              <AvatarImage 
-                src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
-                alt="User avatar" 
-              />
-              <AvatarFallback className="bg-muted text-foreground">
-                {getUserInitials()}
-              </AvatarFallback>
-            </Avatar>
+          <DropdownMenuTrigger asChild className="focus:outline-none">
+            <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
+              <Avatar className="h-8 w-8 border border-border cursor-pointer">
+                <AvatarImage 
+                  src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
+                  alt="User avatar" 
+                />
+                <AvatarFallback className="bg-muted text-foreground">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 bg-card border-border text-card-foreground">
             <DropdownMenuItem onClick={navigateToProfile} className="cursor-pointer">
