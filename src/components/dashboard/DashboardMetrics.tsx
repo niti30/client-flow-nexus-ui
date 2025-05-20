@@ -1,13 +1,16 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle } from "lucide-react";
+import { useWorkflows } from "@/hooks/useWorkflows";
 
 interface DashboardMetricsProps {
   timeframe: string;
 }
 
 const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
+  const { clientMetrics, loading } = useWorkflows();
   const [metrics, setMetrics] = useState({
     totalSaved: { value: 0, change: 0 },
     avgCycleTime: { value: 0, change: 0 },
@@ -15,32 +18,42 @@ const DashboardMetrics = ({ timeframe }: DashboardMetricsProps) => {
   });
 
   useEffect(() => {
-    // In a real app, we'd fetch metrics from Supabase based on the timeframe
-    // For now, we'll use placeholder data
-    switch (timeframe) {
-      case "7d":
-        setMetrics({
-          totalSaved: { value: 12500, change: 5.2 },
-          avgCycleTime: { value: 3.2, change: -8.4 },
-          exceptions: { value: 12, change: 2.5 }
-        });
-        break;
-      case "30d":
-        setMetrics({
-          totalSaved: { value: 42800, change: 12.1 },
-          avgCycleTime: { value: 3.8, change: -5.1 },
-          exceptions: { value: 48, change: -3.2 }
-        });
-        break;
-      // Other timeframes would have similar logic
-      default:
-        setMetrics({
-          totalSaved: { value: 12500, change: 5.2 },
-          avgCycleTime: { value: 3.2, change: -8.4 },
-          exceptions: { value: 12, change: 2.5 }
-        });
+    // Calculate metrics based on client data
+    if (!loading && clientMetrics.length > 0) {
+      // Calculate total saved amount from client metrics
+      const totalMoneySaved = clientMetrics.reduce((sum, client) => {
+        const moneyValue = parseInt(client.moneySaved.replace('$', '').replace('K', ''), 10) || 0;
+        return sum + moneyValue;
+      }, 0);
+
+      // Calculate total exceptions
+      const totalExceptions = clientMetrics.reduce((sum, client) => sum + client.exceptions, 0);
+
+      // Set metrics based on timeframe
+      switch (timeframe) {
+        case "7d":
+          setMetrics({
+            totalSaved: { value: totalMoneySaved / 4, change: 5.2 },
+            avgCycleTime: { value: 3.2, change: -8.4 },
+            exceptions: { value: totalExceptions / 4, change: 2.5 }
+          });
+          break;
+        case "30d":
+          setMetrics({
+            totalSaved: { value: totalMoneySaved / 2, change: 12.1 },
+            avgCycleTime: { value: 3.8, change: -5.1 },
+            exceptions: { value: totalExceptions / 2, change: -3.2 }
+          });
+          break;
+        default:
+          setMetrics({
+            totalSaved: { value: totalMoneySaved, change: 5.2 },
+            avgCycleTime: { value: 3.2, change: -8.4 },
+            exceptions: { value: totalExceptions, change: 2.5 }
+          });
+      }
     }
-  }, [timeframe]);
+  }, [timeframe, clientMetrics, loading]);
 
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-3 mb-8">

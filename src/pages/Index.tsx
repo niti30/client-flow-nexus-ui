@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
@@ -9,134 +10,75 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 import { useToast } from "@/components/ui/use-toast";
+import { useWorkflows } from "@/hooks/useWorkflows";
 
 const Index = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("itd");
-  const [dashboardData, setDashboardData] = useState({
-    totalWorkflows: '2,847',
-    totalExceptions: '156',
-    timeSaved: '1,284h',
-    revenue: '$847K',
-    activeClients: '128'
-  });
-  const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
-  // Fetch clients for dashboard
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch real clients from Supabase
-        const { data, error } = await supabase
-          .from('clients')
-          .select('*');
-          
-        if (error) {
-          console.error("Error fetching clients:", error);
-          toast({
-            title: "Error fetching clients",
-            description: error.message,
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        console.log("Fetched clients for dashboard:", data);
-        
-        // Process clients to match the expected format for ClientsTableEnhanced
-        const formattedClients = data.map(client => ({
-          name: client.name,
-          contractStart: client.created_at ? new Date(client.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-',
-          workflows: 0, // You could fetch this from workflows table
-          nodes: 0,
-          executions: 0,
-          exceptions: 0,
-          revenue: '-',
-          timeSaved: '-',
-          moneySaved: '-',
-          id: client.id,
-          status: client.status
-        }));
-        
-        setClients(formattedClients);
-        
-      } catch (error) {
-        console.error("Error in client fetch:", error);
-        toast({
-          title: "Unexpected error",
-          description: "Failed to fetch clients. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
+  // Use our updated hook to get client metrics
+  const { 
+    clientMetrics, 
+    loading, 
+    error, 
+    fetchClientMetrics 
+  } = useWorkflows();
+  
+  // Calculate dashboard totals from the client metrics
+  const calculateDashboardTotals = () => {
+    if (!clientMetrics || clientMetrics.length === 0) {
+      return {
+        totalWorkflows: '2,847',
+        totalExceptions: '156',
+        timeSaved: '1,284h',
+        revenue: '$847K',
+        activeClients: `${clientMetrics.length || 0}`
+      };
+    }
+    
+    // Sum up the values from all clients
+    const totalWorkflows = clientMetrics.reduce((sum, client) => sum + client.workflows, 0);
+    const totalExceptions = clientMetrics.reduce((sum, client) => sum + client.exceptions, 0);
+    
+    // For string values, extract the numbers
+    const extractNumericValue = (str: string) => {
+      const matches = str.match(/(\d+)/);
+      return matches ? parseInt(matches[0], 10) : 0;
     };
     
-    fetchClients();
-  }, [refreshTrigger, toast]); // Added toast to dependency array
-  
-  // Fetch dashboard data
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        // In a real app, we'd fetch this data from Supabase
-        // For now, we'll just simulate the data loading
-        
-        // Set static data based on activeTab to simulate different time periods
-        let data = {
-          totalWorkflows: '2,847',
-          totalExceptions: '156',
-          timeSaved: '1,284h',
-          revenue: '$847K',
-          activeClients: '128'
-        };
-        
-        if (activeTab === '7d') {
-          data = {
-            totalWorkflows: '732',
-            totalExceptions: '42',
-            timeSaved: '312h',
-            revenue: '$198K',
-            activeClients: '115'
-          };
-        } else if (activeTab === '30d') {
-          data = {
-            totalWorkflows: '1,564',
-            totalExceptions: '87',
-            timeSaved: '724h',
-            revenue: '$412K',
-            activeClients: '122'
-          };
-        }
-        
-        setDashboardData(data);
-        
-        // Simulate loading delay
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        setLoading(false);
-      }
-    };
+    const totalTimeSavedHours = clientMetrics.reduce(
+      (sum, client) => sum + extractNumericValue(client.timeSaved), 
+      0
+    );
     
-    fetchDashboardData();
-  }, [activeTab]); // Refetch when tab changes
-  
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    // Extract revenue (remove $ and K)
+    const totalRevenue = clientMetrics.reduce(
+      (sum, client) => {
+        const revenue = client.revenue.replace('$', '').replace('K', '');
+        return sum + parseInt(revenue, 10);
+      },
+      0
+    );
+    
+    return {
+      totalWorkflows: totalWorkflows.toLocaleString(),
+      totalExceptions: totalExceptions.toLocaleString(),
+      timeSaved: `${totalTimeSavedHours}h`,
+      revenue: `$${totalRevenue}K`,
+      activeClients: `${clientMetrics.length}`
+    };
   };
+  
+  const dashboardData = calculateDashboardTotals();
   
   // Handle client added event
   const handleClientAdded = () => {
     console.log("Client added, refreshing dashboard...");
     setRefreshTrigger(prev => prev + 1);
+    
+    // Refetch client metrics
+    fetchClientMetrics();
     
     toast({
       title: "Success",
@@ -159,37 +101,37 @@ const Index = () => {
           <div className="mb-6 flex flex-wrap">
             <div className="flex space-x-2 overflow-x-auto pb-2">
               <button 
-                onClick={() => handleTabChange("7d")} 
+                onClick={() => setActiveTab("7d")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "7d" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 Last 7 days
               </button>
               <button 
-                onClick={() => handleTabChange("30d")} 
+                onClick={() => setActiveTab("30d")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "30d" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 Last 30 days
               </button>
               <button 
-                onClick={() => handleTabChange("mtd")} 
+                onClick={() => setActiveTab("mtd")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "mtd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 MTD
               </button>
               <button 
-                onClick={() => handleTabChange("qtd")} 
+                onClick={() => setActiveTab("qtd")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "qtd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 QTD
               </button>
               <button 
-                onClick={() => handleTabChange("ytd")} 
+                onClick={() => setActiveTab("ytd")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "ytd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 YTD
               </button>
               <button 
-                onClick={() => handleTabChange("itd")} 
+                onClick={() => setActiveTab("itd")} 
                 className={`px-4 py-2 text-sm rounded-md font-medium ${activeTab === "itd" ? "bg-black text-white" : "bg-white text-black border border-gray-200"}`}
               >
                 ITD
@@ -240,7 +182,7 @@ const Index = () => {
             {/* Clients Table */}
             <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
               <ClientsTableEnhanced 
-                clients={clients} 
+                clients={clientMetrics} 
                 isLoading={loading} 
               />
             </div>

@@ -1,27 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ArrowDown, ArrowUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-
-interface Client {
-  name: string;
-  contractStart: string;
-  workflows: number;
-  nodes: number;
-  executions: number;
-  exceptions: number;
-  revenue: string;
-  timeSaved: string;
-  moneySaved: string;
-}
+import { ClientMetrics } from "@/hooks/useWorkflows";
 
 interface ClientsTableEnhancedProps {
-  clients: Client[];
+  clients: ClientMetrics[];
   isLoading?: boolean;
 }
 
-type SortKey = keyof Client;
+type SortKey = keyof ClientMetrics;
 type SortDirection = 'asc' | 'desc';
 
 const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
@@ -155,7 +144,8 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedClients.map((client, index) => <TableRow key={index}>
+        {sortedClients.map((client, index) => (
+          <TableRow key={index}>
             <TableCell className="font-medium">{client.name}</TableCell>
             <TableCell>{client.contractStart}</TableCell>
             <TableCell>{client.workflows}</TableCell>
@@ -165,7 +155,8 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
             <TableCell>{client.revenue}</TableCell>
             <TableCell>{client.timeSaved}</TableCell>
             <TableCell>{client.moneySaved}</TableCell>
-          </TableRow>)}
+          </TableRow>
+        ))}
       </TableBody>
     </Table>;
 };
