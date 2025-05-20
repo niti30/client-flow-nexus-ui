@@ -1,10 +1,13 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle } from "lucide-react";
 import { useWorkflows } from "@/hooks/useWorkflows";
+
 interface DashboardMetricsProps {
   timeframe: string;
 }
+
 const DashboardMetrics = ({
   timeframe
 }: DashboardMetricsProps) => {
@@ -12,6 +15,7 @@ const DashboardMetrics = ({
     clientMetrics,
     loading
   } = useWorkflows(timeframe);
+
   const [metrics, setMetrics] = useState({
     totalSaved: {
       value: 0,
@@ -26,6 +30,7 @@ const DashboardMetrics = ({
       change: 0
     }
   });
+
   useEffect(() => {
     // Calculate metrics based on client data
     if (!loading && clientMetrics.length > 0) {
@@ -138,6 +143,79 @@ const DashboardMetrics = ({
       }
     }
   }, [timeframe, clientMetrics, loading]);
-  return;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      {/* Money Saved Metric */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium text-gray-500">Money Saved</p>
+              <h3 className="text-2xl font-bold mt-1">${metrics.totalSaved.value}K</h3>
+              <div className={`flex items-center mt-1 ${metrics.totalSaved.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {metrics.totalSaved.change >= 0 ? (
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 mr-1" />
+                )}
+                <span className="text-sm font-medium">{Math.abs(metrics.totalSaved.change)}%</span>
+              </div>
+            </div>
+            <div className="bg-green-100 p-3 rounded-full">
+              <TrendingUp className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cycle Time Metric */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium text-gray-500">Avg. Cycle Time</p>
+              <h3 className="text-2xl font-bold mt-1">{metrics.avgCycleTime.value} days</h3>
+              <div className={`flex items-center mt-1 ${metrics.avgCycleTime.change <= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {metrics.avgCycleTime.change <= 0 ? (
+                  <TrendingDown className="h-4 w-4 mr-1" />
+                ) : (
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                )}
+                <span className="text-sm font-medium">{Math.abs(metrics.avgCycleTime.change)}%</span>
+              </div>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-full">
+              <Clock className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Exceptions Metric */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium text-gray-500">Exceptions</p>
+              <h3 className="text-2xl font-bold mt-1">{metrics.exceptions.value}</h3>
+              <div className={`flex items-center mt-1 ${metrics.exceptions.change <= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {metrics.exceptions.change <= 0 ? (
+                  <TrendingDown className="h-4 w-4 mr-1" />
+                ) : (
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                )}
+                <span className="text-sm font-medium">{Math.abs(metrics.exceptions.change)}%</span>
+              </div>
+            </div>
+            <div className="bg-amber-100 p-3 rounded-full">
+              <AlertTriangle className="h-6 w-6 text-amber-600" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
+
 export default DashboardMetrics;
