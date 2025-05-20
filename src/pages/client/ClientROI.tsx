@@ -7,8 +7,10 @@ import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
 import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
 import { toast } from "sonner";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface WorkflowROI {
   id: string;
@@ -27,7 +29,21 @@ interface WorkflowROI {
 const ClientROI = () => {
   const [sortColumn, setSortColumn] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const { clientId } = useParams<{ clientId: string }>();
+  const params = useParams<{ clientId: string }>();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  // Try to get clientId from different sources
+  const clientIdFromParams = params.clientId;
+  const clientIdFromQuery = searchParams.get('clientId');
+  const clientId = clientIdFromParams || clientIdFromQuery || localStorage.getItem('selectedClientId');
+  
+  // Save clientId to localStorage if available
+  useEffect(() => {
+    if (clientId) {
+      localStorage.setItem('selectedClientId', clientId);
+    }
+  }, [clientId]);
   
   // Use react-query to fetch and cache the workflow data
   const { 
@@ -78,6 +94,7 @@ const ClientROI = () => {
       }
     },
     refetchOnWindowFocus: false,
+    enabled: !!clientId, // Only run the query if clientId exists
   });
   
   const handleAddWorkflow = (newWorkflow: Workflow) => {
@@ -101,15 +118,41 @@ const ClientROI = () => {
     return sortOrder === "asc" ? "↑" : "↓";
   };
 
-  // Check if clientId is available
-  useEffect(() => {
-    if (!clientId) {
-      console.error("No client ID available in params");
-      toast.error("Client ID is missing. Please return to the clients page.");
-    } else {
-      console.log("Client ID from params:", clientId);
-    }
-  }, [clientId]);
+  const handleReturnToClients = () => {
+    navigate('/clients');
+  };
+
+  // If clientId is missing, show an alert and a button to return to clients page
+  if (!clientId) {
+    return (
+      <div className="flex h-screen bg-background">
+        <ClientSidebar />
+        
+        <div className="flex-1 flex flex-col">
+          <ClientHeader />
+          
+          <main className="flex-1 overflow-y-auto p-6">
+            <div className="max-w-[1200px] mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">Workflow ROI</h1>
+              </div>
+              
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                <AlertDescription>
+                  Client ID is missing. Please return to the clients page.
+                </AlertDescription>
+              </Alert>
+              
+              <Button onClick={handleReturnToClients}>
+                Return to Clients
+              </Button>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-background">

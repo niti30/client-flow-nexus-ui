@@ -7,15 +7,16 @@ import WorkflowsTable from '@/components/workflows/WorkflowsTable';
 import WorkflowSearchBar from '@/components/workflows/WorkflowSearchBar';
 import { AddWorkflowDialog } from '@/components/dialogs/AddWorkflowDialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, FileSpreadsheet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const Workflows = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { workflows, loading } = useWorkflows();
-  // This is a placeholder - in a real app, you'd get the client ID from context or state
   const [selectedClientId, setSelectedClientId] = useState<string | undefined>(undefined);
+  const navigate = useNavigate();
 
   const handleSearch = (query: string) => {
     // Placeholder for search functionality
@@ -30,14 +31,13 @@ const Workflows = () => {
 
   // Handle ROI Report click
   const handleRoiReportClick = () => {
-    // In a real app, this would generate and download a report
-    // For now we'll simulate a file download
-    const dummyLink = document.createElement('a');
-    dummyLink.href = 'data:text/plain;charset=utf-8,ROI Report Data';
-    dummyLink.download = 'ROI_Report.csv';
-    document.body.appendChild(dummyLink);
-    dummyLink.click();
-    document.body.removeChild(dummyLink);
+    // Store the selected client ID for use in the ROI page
+    if (selectedClientId) {
+      localStorage.setItem('selectedClientId', selectedClientId);
+      navigate(`/client/roi?clientId=${selectedClientId}`);
+    } else {
+      toast.error("Please select a client first");
+    }
   };
 
   // For demonstration, let's fetch clients to get a default client ID
@@ -50,6 +50,8 @@ const Workflows = () => {
       
       if (data && data.length > 0) {
         setSelectedClientId(data[0].id);
+        // Also store in localStorage for persistence
+        localStorage.setItem('selectedClientId', data[0].id);
       }
     };
 
@@ -71,6 +73,14 @@ const Workflows = () => {
                 <WorkflowSearchBar 
                   onSearch={handleSearch} 
                 />
+                <Button
+                  variant="outline"
+                  className="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white"
+                  onClick={handleRoiReportClick}
+                >
+                  <FileSpreadsheet size={16} className="mr-2" />
+                  ROI Report
+                </Button>
                 <AddWorkflowDialog 
                   buttonClassName="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white" 
                   onWorkflowAdded={handleWorkflowAdded}

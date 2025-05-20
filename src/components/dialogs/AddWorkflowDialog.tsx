@@ -13,6 +13,7 @@ import { useState } from "react";
 import { AddWorkflowForm, WorkflowFormValues } from "../forms/AddWorkflowForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface Workflow {
   id: string;
@@ -43,19 +44,21 @@ export function AddWorkflowDialog({
 }: AddWorkflowDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   const handleSubmit = async (values: WorkflowFormValues) => {
+    // Validate client ID before proceeding
+    if (!clientId) {
+      console.error("Client ID is required to create a workflow");
+      toast.error("Client ID is missing. Please return to the clients page first.");
+      return;
+    }
+    
     setIsSubmitting(true);
     console.log("New workflow values:", values);
+    console.log("Inserting workflow with client ID:", clientId);
     
     try {
-      if (!clientId) {
-        console.error("Client ID is required to create a workflow");
-        throw new Error("Client ID is required to create a workflow");
-      }
-      
-      console.log("Inserting workflow with client ID:", clientId);
       const { data, error } = await supabase
         .from('workflows')
         .insert({
@@ -74,6 +77,7 @@ export function AddWorkflowDialog({
         
       if (error) {
         console.error("Error creating workflow:", error);
+        toast.error("Failed to create workflow. Please try again.");
         throw error;
       }
       
@@ -96,10 +100,12 @@ export function AddWorkflowDialog({
         status: data[0].status
       };
       
-      toast({
+      uiToast({
         title: "Workflow Created",
         description: `${values.name} workflow has been created successfully.`,
       });
+      
+      toast.success("Workflow added successfully");
       
       if (onWorkflowAdded) {
         onWorkflowAdded(newWorkflow);
@@ -109,7 +115,7 @@ export function AddWorkflowDialog({
       setOpen(false);
     } catch (error) {
       console.error("Error creating workflow:", error);
-      toast({
+      uiToast({
         title: "Error",
         description: "Failed to create workflow. Please try again.",
         variant: "destructive",
@@ -119,14 +125,23 @@ export function AddWorkflowDialog({
     }
   };
 
+  const handleOpen = (newOpen: boolean) => {
+    // If trying to open and client ID is missing, show an error
+    if (newOpen && !clientId) {
+      toast.error("Client ID is missing. Please return to the clients page first.");
+      return;
+    }
+    
+    // Only allow closing if not submitting
+    if (isSubmitting && newOpen === false) {
+      return; // Prevent closing while submitting
+    }
+    
+    setOpen(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      // Only allow closing if not submitting
-      if (isSubmitting && newOpen === false) {
-        return; // Prevent closing while submitting
-      }
-      setOpen(newOpen);
-    }}>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         {children || (
           <Button className={buttonClassName}>
