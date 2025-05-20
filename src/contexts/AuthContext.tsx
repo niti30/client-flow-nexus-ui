@@ -138,6 +138,16 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
       return;
     }
 
+    // If user is logged in and on the auth or root page, redirect to appropriate dashboard
+    if (user && (location.pathname === '/auth' || location.pathname === '/')) {
+      if (userRole === 'client') {
+        navigate('/client/dashboard');
+      } else if (userRole === 'admin' || userRole === 'se') {
+        navigate('/dashboard');
+      }
+      return;
+    }
+
     // If user is logged in, check route permissions based on role
     if (user && !isPathAllowed(location.pathname, userRole)) {
       console.log("Access denied to path:", location.pathname, "for role:", userRole);
