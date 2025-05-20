@@ -47,12 +47,9 @@ export function AddWorkflowDialog({
 
   const handleSubmit = async (values: WorkflowFormValues) => {
     setIsSubmitting(true);
-    console.log("New workflow:", values);
+    console.log("New workflow values:", values);
     
     try {
-      // In a real app, this would be an API call to create the workflow
-      // For now, we'll simulate the database insert
-      
       // Create a workflow object with default values for the fields
       const newWorkflow: Workflow = {
         id: Date.now().toString(), // In real app, this would come from DB
@@ -68,17 +65,35 @@ export function AddWorkflowDialog({
         status: 'active'
       };
       
-      // In a real app with Supabase, you would do:
-      // const { data, error } = await supabase
-      //   .from('workflows')
-      //   .insert({
-      //     name: values.name,
-      //     department: values.department,
-      //     description: values.description,
-      //     client_id: clientId || null
-      //   })
-      //   .select()
-      //   .single();
+      let data, error;
+      
+      // In a real app with Supabase, insert the workflow
+      if (clientId) {
+        console.log("Inserting workflow with client ID:", clientId);
+        const result = await supabase
+          .from('workflows')
+          .insert({
+            name: values.name,
+            department: values.department,
+            description: values.description,
+            client_id: clientId
+          })
+          .select();
+          
+        data = result.data;
+        error = result.error;
+        
+        if (error) {
+          console.error("Error creating workflow:", error);
+          throw error;
+        }
+        
+        // If we got data back from Supabase, update our newWorkflow object
+        if (data && data[0]) {
+          newWorkflow.id = data[0].id;
+          newWorkflow.created_at = data[0].created_at;
+        }
+      }
       
       toast({
         title: "Workflow Created",

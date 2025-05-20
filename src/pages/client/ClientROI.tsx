@@ -1,12 +1,14 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
-import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
+import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
 import { toast } from "sonner";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WorkflowROI {
   id: string;
@@ -26,12 +28,48 @@ const ClientROI = () => {
   const [sortColumn, setSortColumn] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [workflows, setWorkflows] = useState<WorkflowROI[]>([]);
+  const { clientId } = useParams<{ clientId: string }>();
   
   // Fetch workflow ROI data
   const { data: workflowsData, isLoading, refetch } = useQuery({
-    queryKey: ['workflow-roi', sortColumn, sortOrder],
+    queryKey: ['workflow-roi', clientId, sortColumn, sortOrder],
     queryFn: async () => {
-      // Mock data based on the UI in the image
+      // Try to fetch real data from Supabase if possible
+      if (clientId) {
+        try {
+          const { data, error } = await supabase
+            .from('workflows')
+            .select('*')
+            .eq('client_id', clientId)
+            .order(sortColumn, { ascending: sortOrder === 'asc' });
+            
+          if (error) {
+            console.error("Error fetching workflows:", error);
+            throw error;
+          }
+          
+          if (data && data.length > 0) {
+            // Format the data to match the WorkflowROI interface
+            return data.map(workflow => ({
+              id: workflow.id,
+              created_at: workflow.created_at,
+              department: workflow.department || '',
+              workflow_name: workflow.name,
+              description: workflow.description || '',
+              nodes: workflow.nodes || 0,
+              executions: workflow.executions || 0,
+              exceptions: workflow.exceptions || 0,
+              time_saved: workflow.time_saved || 0,
+              cost_saved: workflow.cost_saved || 0,
+              status: workflow.status === 'active'
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching workflow data:", error);
+        }
+      }
+      
+      // Mock data based on the UI in the image if no data from Supabase
       return [
         {
           id: "1",
@@ -64,15 +102,33 @@ const ClientROI = () => {
   });
   
   // Update workflows state when data changes
-  useState(() => {
+  useEffect(() => {
     if (workflowsData) {
       setWorkflows(workflowsData);
     }
-  });
+  }, [workflowsData]);
   
-  const handleAddWorkflow = (newWorkflow: any) => {
-    setWorkflows(prev => [newWorkflow, ...prev]);
+  const handleAddWorkflow = (newWorkflow: Workflow) => {
+    // Convert the Workflow format to WorkflowROI format
+    const newWorkflowROI: WorkflowROI = {
+      id: newWorkflow.id,
+      created_at: newWorkflow.created_at,
+      department: newWorkflow.department,
+      workflow_name: newWorkflow.name,
+      description: newWorkflow.description || '',
+      nodes: newWorkflow.nodes,
+      executions: newWorkflow.executions,
+      exceptions: newWorkflow.exceptions,
+      time_saved: parseFloat(newWorkflow.timeSaved) || 0,
+      cost_saved: parseFloat(newWorkflow.moneySaved) || 0,
+      status: newWorkflow.status === 'active'
+    };
+    
+    // Add the new workflow to the state
+    setWorkflows(prev => [newWorkflowROI, ...prev]);
     toast.success("Workflow added successfully");
+    
+    // Refetch the data to ensure we have the latest
     refetch();
   };
   
@@ -103,7 +159,7 @@ const ClientROI = () => {
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
               <AddWorkflowDialog
                 onWorkflowAdded={handleAddWorkflow}
-                clientId="client-id" // This would be the actual client ID in a real app
+                clientId={clientId}
               >
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
@@ -195,26 +251,39 @@ const ClientROI = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {workflows.map((workflow) => (
-                        <tr key={workflow.id} className="border-b border-border hover:bg-muted/50">
-                          <td className="px-4 py-3 text-sm">{workflow.created_at}</td>
-                          <td className="px-4 py-3 text-sm">{workflow.department}</td>
-                          <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
-                            {workflow.workflow_name}
-                          </td>
-                          <td className="px-4 py-3 text-sm">{workflow.description}</td>
-                          <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
-                          <td className="px-4 py-3 text-sm">{workflow.executions}</td>
-                          <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
-                          <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
-                          <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="w-10 h-6 rounded-full bg-muted flex items-center">
-                              <div className={`w-5 h-5 rounded-full transform transition-transform duration-200 ${workflow.status ? "translate-x-4 bg-green-500" : "translate-x-1 bg-gray-400"}`}></div>
-                            </div>
+                      {workflows.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="h-24 text-center text-gray-500">
+                            No workflows found. Click "New Workflow" to create one.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        workflows.map((workflow) => {
+                          // Format date for display
+                          const formattedDate = new Date(workflow.created_at).toLocaleString();
+                          
+                          return (
+                            <tr key={workflow.id} className="border-b border-border hover:bg-muted/50">
+                              <td className="px-4 py-3 text-sm">{formattedDate}</td>
+                              <td className="px-4 py-3 text-sm">{workflow.department}</td>
+                              <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
+                                {workflow.workflow_name}
+                              </td>
+                              <td className="px-4 py-3 text-sm">{workflow.description}</td>
+                              <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
+                              <td className="px-4 py-3 text-sm">{workflow.executions}</td>
+                              <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
+                              <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
+                              <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
+                              <td className="px-4 py-3 text-sm">
+                                <div className="w-10 h-6 rounded-full bg-muted flex items-center">
+                                  <div className={`w-5 h-5 rounded-full transform transition-transform duration-200 ${workflow.status ? "translate-x-4 bg-green-500" : "translate-x-1 bg-gray-400"}`}></div>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
