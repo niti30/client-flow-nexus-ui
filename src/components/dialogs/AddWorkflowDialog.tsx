@@ -76,7 +76,13 @@ export function AddWorkflowDialog({
             name: values.name,
             department: values.department,
             description: values.description,
-            client_id: clientId
+            client_id: clientId,
+            nodes: 0,
+            executions: 0,
+            exceptions: 0,
+            time_saved: 0,
+            cost_saved: 0,
+            status: 'active'
           })
           .select();
           
@@ -92,6 +98,11 @@ export function AddWorkflowDialog({
         if (data && data[0]) {
           newWorkflow.id = data[0].id;
           newWorkflow.created_at = data[0].created_at;
+          newWorkflow.nodes = data[0].nodes || 0;
+          newWorkflow.executions = data[0].executions || 0;
+          newWorkflow.exceptions = data[0].exceptions || 0;
+          newWorkflow.timeSaved = data[0].time_saved?.toString() || '0';
+          newWorkflow.moneySaved = data[0].cost_saved?.toString() || '0';
         }
       }
       

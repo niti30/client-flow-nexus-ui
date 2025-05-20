@@ -64,8 +64,12 @@ const ClientROI = () => {
               status: workflow.status === 'active'
             }));
           }
+          
+          return []; // Return empty array if no workflows found
         } catch (error) {
           console.error("Error fetching workflow data:", error);
+          toast.error("Failed to fetch workflows");
+          return [];
         }
       }
       

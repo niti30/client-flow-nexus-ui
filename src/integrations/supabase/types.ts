@@ -294,29 +294,50 @@ export type Database = {
         Row: {
           client_id: string
           completed_at: string | null
+          cost_saved: number | null
           created_at: string | null
+          department: string | null
+          description: string | null
+          exceptions: number | null
+          executions: number | null
           id: string
           name: string
+          nodes: number | null
           progress: number | null
           status: string | null
+          time_saved: number | null
         }
         Insert: {
           client_id: string
           completed_at?: string | null
+          cost_saved?: number | null
           created_at?: string | null
+          department?: string | null
+          description?: string | null
+          exceptions?: number | null
+          executions?: number | null
           id?: string
           name: string
+          nodes?: number | null
           progress?: number | null
           status?: string | null
+          time_saved?: number | null
         }
         Update: {
           client_id?: string
           completed_at?: string | null
+          cost_saved?: number | null
           created_at?: string | null
+          department?: string | null
+          description?: string | null
+          exceptions?: number | null
+          executions?: number | null
           id?: string
           name?: string
+          nodes?: number | null
           progress?: number | null
           status?: string | null
+          time_saved?: number | null
         }
         Relationships: [
           {
