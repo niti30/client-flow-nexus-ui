@@ -1,17 +1,14 @@
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface AddClientDialogProps {
   buttonClassName?: string;
@@ -61,7 +58,6 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         .insert([{ 
           name: companyName,
           status: 'active',
-          // You could save other fields as well
         }])
         .select();
 
@@ -74,10 +70,6 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         });
         return;
       }
-
-      const clientId = data?.[0]?.id;
-      
-      // Save departments, users, engineers, etc. in real implementation
       
       toast({
         title: "Client added successfully",
@@ -139,6 +131,12 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
     }]);
   };
 
+  const removeUser = (index: number) => {
+    const newUsers = [...users];
+    newUsers.splice(index, 1);
+    setUsers(newUsers);
+  };
+
   const updateUser = (index: number, field: string, value: any) => {
     const newUsers = [...users];
     if (field.includes('.')) {
@@ -167,23 +165,23 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
         {children || (
           <Button className={buttonClassName || className}>
             <Plus size={16} className="mr-2" />
             Add Client
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] p-0 bg-white">
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full sm:w-full md:w-full lg:w-full xl:w-full p-0" onOpenChange={setOpen}>
         <div className="p-6">
-          <h2 className="text-xl font-semibold">Add New Client</h2>
-          <p className="text-gray-500 mt-1">
+          <h2 className="text-xl font-semibold mb-2">Add New Client</h2>
+          <p className="text-gray-500 mb-6">
             Enter the details for the new client. Click Create Client when you're done.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Left Column */}
             <div>
               {/* Company Information */}
@@ -216,50 +214,58 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               </div>
               
               {/* Users Section */}
-              <div className="mt-6">
-                <h3 className="text-sm font-medium mb-4">Users</h3>
+              <div className="mt-8">
+                <h3 className="text-base font-medium mb-4">Users</h3>
                 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-5 gap-4 text-xs font-medium text-gray-500 mb-1">
+                <div className="rounded-md border overflow-hidden">
+                  <div className="grid grid-cols-6 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Phone</div>
                     <div>Department</div>
-                    <div className="col-span-1">Exceptions</div>
+                    <div className="col-span-2">Exceptions</div>
                   </div>
                   
                   {users.map((user, index) => (
-                    <div key={index} className="grid grid-cols-5 gap-4">
-                      <Input 
-                        placeholder="Full name" 
-                        value={user.name}
-                        onChange={(e) => updateUser(index, 'name', e.target.value)}
-                        className="h-9 text-sm"
-                      />
-                      <Input 
-                        placeholder="Email" 
-                        value={user.email}
-                        onChange={(e) => updateUser(index, 'email', e.target.value)}
-                        className="h-9 text-sm"
-                      />
-                      <Input 
-                        placeholder="Phone" 
-                        value={user.phone}
-                        onChange={(e) => updateUser(index, 'phone', e.target.value)}
-                        className="h-9 text-sm"
-                      />
-                      <select 
-                        className="border rounded p-2 w-full bg-white h-9 text-sm"
-                        value={user.department}
-                        onChange={(e) => updateUser(index, 'department', e.target.value)}
-                      >
-                        <option value="">Select Department</option>
-                        {departments.filter(d => d).map((dept, i) => (
-                          <option key={i} value={dept}>{dept}</option>
-                        ))}
-                      </select>
-                      <div className="flex items-center space-x-2">
-                        <div className="flex items-center space-x-1">
+                    <div key={index} className="grid grid-cols-6 gap-2 px-4 py-3 border-t">
+                      <div>
+                        <Input 
+                          placeholder="Full name" 
+                          value={user.name}
+                          onChange={(e) => updateUser(index, 'name', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Input 
+                          placeholder="Email" 
+                          value={user.email}
+                          onChange={(e) => updateUser(index, 'email', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Input 
+                          placeholder="Phone" 
+                          value={user.phone}
+                          onChange={(e) => updateUser(index, 'phone', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <select 
+                          className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
+                          value={user.department}
+                          onChange={(e) => updateUser(index, 'department', e.target.value)}
+                        >
+                          <option value="">Select Department</option>
+                          {departments.filter(d => d).map((dept, i) => (
+                            <option key={i} value={dept}>{dept}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-span-2 flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
                           <Checkbox 
                             id={`email-${index}`} 
                             checked={user.notifications.email}
@@ -267,10 +273,10 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                               updateUser(index, 'notifications.email', checked === true)
                             }
                           />
-                          <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
+                          <Label htmlFor={`email-${index}`} className="text-sm">Email</Label>
                         </div>
                         
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-2">
                           <Checkbox 
                             id={`sms-${index}`} 
                             checked={user.notifications.sms}
@@ -278,26 +284,22 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                               updateUser(index, 'notifications.sms', checked === true)
                             }
                           />
-                          <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
+                          <Label htmlFor={`sms-${index}`} className="text-sm">SMS</Label>
                         </div>
                       </div>
                     </div>
                   ))}
-                  
-                  <div className="grid grid-cols-5 gap-4 text-xs font-medium text-gray-500">
-                    <div className="col-span-5 grid grid-cols-1">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        className="w-[125px] h-9" 
-                        onClick={addUser}
-                      >
-                        <Plus size={14} className="mr-2" />
-                        Add User
-                      </Button>
-                    </div>
-                  </div>
                 </div>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="mt-4" 
+                  onClick={addUser}
+                >
+                  <Plus size={14} className="mr-2" />
+                  Add User
+                </Button>
               </div>
             </div>
             
@@ -305,7 +307,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
             <div>
               {/* Departments Section */}
               <div>
-                <h3 className="text-sm font-medium mb-4">Manage Departments</h3>
+                <h3 className="text-base font-medium mb-4">Manage Departments</h3>
                 
                 <div className="space-y-3">
                   {departments.map((dept, index) => (
@@ -345,66 +347,72 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               </div>
               
               {/* Solutions Engineers Section */}
-              <div className="mt-10">
-                <h3 className="text-sm font-medium mb-4">Assign Solutions Engineers</h3>
+              <div className="mt-8">
+                <h3 className="text-base font-medium mb-4">Assign Solutions Engineers</h3>
                 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-[1fr_1fr_auto] gap-4 text-xs font-medium text-gray-500 mb-1">
+                <div className="rounded-md border overflow-hidden">
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Actions</div>
                   </div>
                   
                   {engineers.map((engineer, index) => (
-                    <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-4">
-                      <select 
-                        className="border rounded p-2 w-full bg-white h-9 text-sm"
-                        value={engineer.name}
-                        onChange={(e) => updateEngineer(index, 'name', e.target.value)}
-                      >
-                        <option value="">Select SE</option>
-                        <option value="John Doe">John Doe</option>
-                        <option value="Jane Smith">Jane Smith</option>
-                        <option value="Robert Johnson">Robert Johnson</option>
-                      </select>
-                      <Input 
-                        value={engineer.email || 'email@example.com'} 
-                        disabled
-                        className="bg-gray-50 h-9 text-sm"
-                      />
-                      <Button 
-                        type="button" 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => removeEngineer(index)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
-                      >
-                        <Trash2 size={14} />
-                      </Button>
+                    <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 px-4 py-3 border-t">
+                      <div>
+                        <select 
+                          className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
+                          value={engineer.name}
+                          onChange={(e) => updateEngineer(index, 'name', e.target.value)}
+                        >
+                          <option value="">Select SE</option>
+                          <option value="John Doe">John Doe</option>
+                          <option value="Jane Smith">Jane Smith</option>
+                          <option value="Robert Johnson">Robert Johnson</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Input 
+                          value={engineer.email || 'email@example.com'} 
+                          disabled
+                          className="bg-gray-50 h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Button 
+                          type="button" 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={() => removeEngineer(index)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
                     </div>
                   ))}
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-9" 
-                    onClick={addEngineer}
-                  >
-                    <Plus size={14} className="mr-2" />
-                    Add Solutions Engineer
-                  </Button>
                 </div>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full mt-4" 
+                  onClick={addEngineer}
+                >
+                  <Plus size={14} className="mr-2" />
+                  Add Solutions Engineer
+                </Button>
               </div>
             </div>
           </div>
           
-          {/* Users Access Section */}
-          <div className="mt-6">
-            <h3 className="text-sm font-medium mb-4">Access</h3>
-            <div className="space-y-2">
+          {/* User Access Section */}
+          <div className="mt-8">
+            <h3 className="text-base font-medium mb-4">Access</h3>
+            <div className="space-y-3">
               {users.map((user, index) => (
-                <div key={index} className="flex items-start space-x-4">
-                  <div className="font-medium">{user.name || `User ${index + 1}`}</div>
+                <div key={index} className="flex items-center space-x-6">
+                  <div className="font-medium w-40 truncate">{user.name || `User ${index + 1}`}</div>
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id={`billing-access-${index}`} 
@@ -440,7 +448,6 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                 resetForm();
               }}
               disabled={isSubmitting}
-              className="h-9"
             >
               Cancel
             </Button>
@@ -448,13 +455,13 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-black hover:bg-gray-800 h-9"
+              className="bg-black hover:bg-gray-800"
             >
               {isSubmitting ? "Creating..." : "Create Client"}
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
