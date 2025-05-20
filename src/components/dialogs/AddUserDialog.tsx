@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { User, Plus, Loader2, Check } from "lucide-react";
+import { User, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,36 +16,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { UserInfoFields } from "./user/UserInfoFields";
+import { SESpecificFields } from "./user/SESpecificFields";
 
 interface AddUserDialogProps {
   userRole: "admin" | "se";
@@ -193,21 +165,6 @@ export function AddUserDialog({
     }
   };
 
-  // Safely handle client selection and deselection
-  const handleClientSelection = (clientId: string) => {
-    setSelectedClients((prev) => {
-      const isSelected = prev.includes(clientId);
-      const updatedSelection = isSelected
-        ? prev.filter((id) => id !== clientId)
-        : [...prev, clientId];
-      
-      // Update the form value
-      form.setValue("assigned_clients", updatedSelection);
-      
-      return updatedSelection;
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -224,182 +181,19 @@ export function AddUserDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="john@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1 234 567 8900" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="hidden">
-                  <FormControl>
-                    <Input type="hidden" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <UserInfoFields />
 
             {userRole === "se" && (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="cost_rate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cost Rate ($/hr)</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="75" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="bill_rate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bill Rate ($/hr)</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="150" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="assigned_clients"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Assigned Clients</FormLabel>
-                      <FormControl>
-                        <Popover 
-                          open={popoverOpen} 
-                          onOpenChange={setPopoverOpen}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left"
-                              disabled={clientsLoading}
-                            >
-                              {clientsLoading ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : selectedClients.length > 0 ? (
-                                `${selectedClients.length} client${selectedClients.length > 1 ? "s" : ""} selected`
-                              ) : (
-                                "Select clients..."
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[300px] p-0" align="start">
-                            {clientsLoading ? (
-                              <div className="p-4 text-center">
-                                <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
-                                <p className="mt-2 text-sm text-muted-foreground">Loading clients...</p>
-                              </div>
-                            ) : clients.length > 0 ? (
-                              <Command>
-                                <CommandInput placeholder="Search clients..." />
-                                <CommandEmpty>No clients found.</CommandEmpty>
-                                <CommandGroup>
-                                  <ScrollArea className="h-52">
-                                    {clients.map((client) => (
-                                      <CommandItem
-                                        key={client.id}
-                                        onSelect={() => handleClientSelection(client.id)}
-                                        className="flex items-center px-2 py-1"
-                                      >
-                                        <div className="flex items-center space-x-2 flex-1">
-                                          <Checkbox
-                                            checked={selectedClients.includes(client.id)}
-                                            onCheckedChange={() => handleClientSelection(client.id)}
-                                            className="mr-2"
-                                            aria-label={`Select ${client.name}`}
-                                          />
-                                          <span>{client.name}</span>
-                                        </div>
-                                        {selectedClients.includes(client.id) && (
-                                          <Check className="h-4 w-4 text-primary" />
-                                        )}
-                                      </CommandItem>
-                                    ))}
-                                  </ScrollArea>
-                                </CommandGroup>
-                              </Command>
-                            ) : (
-                              <div className="p-4 text-center text-sm">
-                                No clients available to assign.
-                              </div>
-                            )}
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
+              <SESpecificFields 
+                clients={clients} 
+                selectedClients={selectedClients}
+                setSelectedClients={setSelectedClients}
+                clientsLoading={clientsLoading}
+                popoverOpen={popoverOpen}
+                setPopoverOpen={setPopoverOpen}
+              />
             )}
 
             <DialogFooter>
@@ -419,7 +213,7 @@ export function AddUserDialog({
               </Button>
             </DialogFooter>
           </form>
-        </Form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );
