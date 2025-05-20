@@ -27,113 +27,64 @@ interface WorkflowROI {
 const ClientROI = () => {
   const [sortColumn, setSortColumn] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [workflows, setWorkflows] = useState<WorkflowROI[]>([]);
   const { clientId } = useParams<{ clientId: string }>();
   
-  // Fetch workflow ROI data
-  const { data: workflowsData, isLoading, refetch } = useQuery({
+  // Use react-query to fetch and cache the workflow data
+  const { 
+    data: workflows = [], 
+    isLoading, 
+    refetch 
+  } = useQuery({
     queryKey: ['workflow-roi', clientId, sortColumn, sortOrder],
     queryFn: async () => {
-      // Try to fetch real data from Supabase if possible
-      if (clientId) {
-        try {
-          const { data, error } = await supabase
-            .from('workflows')
-            .select('*')
-            .eq('client_id', clientId)
-            .order(sortColumn, { ascending: sortOrder === 'asc' });
-            
-          if (error) {
-            console.error("Error fetching workflows:", error);
-            throw error;
-          }
-          
-          if (data && data.length > 0) {
-            // Format the data to match the WorkflowROI interface
-            return data.map(workflow => ({
-              id: workflow.id,
-              created_at: workflow.created_at || '',
-              department: workflow.department || '',
-              workflow_name: workflow.name,
-              description: workflow.description || '',
-              nodes: workflow.nodes || 0,
-              executions: workflow.executions || 0,
-              exceptions: workflow.exceptions || 0,
-              time_saved: workflow.time_saved || 0,
-              cost_saved: workflow.cost_saved || 0,
-              status: workflow.status === 'active'
-            }));
-          }
-          
-          return []; // Return empty array if no workflows found
-        } catch (error) {
-          console.error("Error fetching workflow data:", error);
-          toast.error("Failed to fetch workflows");
-          return [];
-        }
+      if (!clientId) {
+        console.error("No client ID provided");
+        return [];
       }
       
-      // Mock data based on the UI in the image if no data from Supabase
-      return [
-        {
-          id: "1",
-          created_at: "2025-05-14 09:30",
-          department: "Finance",
-          workflow_name: "Invoice Processing",
-          description: "Automated invoice processing workflow",
-          nodes: 12,
-          executions: 1234,
-          exceptions: 23,
-          time_saved: 156.5,
-          cost_saved: 15650,
-          status: true
-        },
-        {
-          id: "2",
-          created_at: "2025-05-13 14:15",
-          department: "HR",
-          workflow_name: "Employee Onboarding",
-          description: "New employee onboarding automation",
-          nodes: 8,
-          executions: 456,
-          exceptions: 5,
-          time_saved: 89.2,
-          cost_saved: 8920,
-          status: true
+      try {
+        console.log(`Fetching workflows for client ${clientId} ordered by ${sortColumn} ${sortOrder}`);
+        const { data, error } = await supabase
+          .from('workflows')
+          .select('*')
+          .eq('client_id', clientId)
+          .order(sortColumn, { ascending: sortOrder === 'asc' });
+          
+        if (error) {
+          console.error("Error fetching workflows:", error);
+          throw error;
         }
-      ] as WorkflowROI[];
-    }
+        
+        console.log("Fetched workflows:", data);
+        
+        // Map the database data to our WorkflowROI format
+        return data.map(workflow => ({
+          id: workflow.id,
+          created_at: workflow.created_at || '',
+          department: workflow.department || '',
+          workflow_name: workflow.name,
+          description: workflow.description || '',
+          nodes: workflow.nodes || 0,
+          executions: workflow.executions || 0,
+          exceptions: workflow.exceptions || 0,
+          time_saved: workflow.time_saved || 0,
+          cost_saved: workflow.cost_saved || 0,
+          status: workflow.status === 'active'
+        }));
+      } catch (error) {
+        console.error("Error fetching workflow data:", error);
+        toast.error("Failed to fetch workflows");
+        return [];
+      }
+    },
+    refetchOnWindowFocus: false,
   });
   
-  // Update workflows state when data changes
-  useEffect(() => {
-    if (workflowsData) {
-      setWorkflows(workflowsData);
-    }
-  }, [workflowsData]);
-  
   const handleAddWorkflow = (newWorkflow: Workflow) => {
-    // Convert the Workflow format to WorkflowROI format
-    const newWorkflowROI: WorkflowROI = {
-      id: newWorkflow.id,
-      created_at: newWorkflow.created_at,
-      department: newWorkflow.department,
-      workflow_name: newWorkflow.name,
-      description: newWorkflow.description || '',
-      nodes: newWorkflow.nodes,
-      executions: newWorkflow.executions,
-      exceptions: newWorkflow.exceptions,
-      time_saved: parseFloat(newWorkflow.timeSaved) || 0,
-      cost_saved: parseFloat(newWorkflow.moneySaved) || 0,
-      status: newWorkflow.status === 'active'
-    };
-    
-    // Add the new workflow to the state
-    setWorkflows(prev => [newWorkflowROI, ...prev]);
-    toast.success("Workflow added successfully");
-    
-    // Refetch the data to ensure we have the latest
+    console.log("New workflow added:", newWorkflow);
+    // Trigger a refetch to get the latest data from the database
     refetch();
+    toast.success("Workflow added successfully");
   };
   
   const handleSort = (column: string) => {
@@ -200,10 +151,10 @@ const ClientROI = () => {
                         </th>
                         <th 
                           className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
-                          onClick={() => handleSort("workflow_name")}
+                          onClick={() => handleSort("name")}
                         >
                           <div className="flex items-center">
-                            Workflow Name {renderSortIndicator("workflow_name")}
+                            Workflow Name {renderSortIndicator("name")}
                           </div>
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
