@@ -16,14 +16,15 @@ import {
 } from "@/components/ui/form";
 import { DialogFooter } from "@/components/ui/dialog";
 
-// Update the schema to be more explicit about the type transformations
+// Update the schema to handle string inputs for numeric fields
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   department: z.string().min(2, { message: "Department is required." }),
   description: z.string().optional(),
-  nodes: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
-  executions: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
-  exceptions: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
+  // Change these to accept strings, but transform them to numbers
+  nodes: z.string().regex(/^\d*$/, { message: "Must be a number" }).transform(val => val ? parseInt(val, 10) : 0),
+  executions: z.string().regex(/^\d*$/, { message: "Must be a number" }).transform(val => val ? parseInt(val, 10) : 0),
+  exceptions: z.string().regex(/^\d*$/, { message: "Must be a number" }).transform(val => val ? parseInt(val, 10) : 0),
 });
 
 export type WorkflowFormValues = z.infer<typeof formSchema>;
