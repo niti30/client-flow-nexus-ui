@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface AddClientDialogProps {
   buttonClassName?: string;
@@ -21,7 +20,6 @@ interface AddClientDialogProps {
 export function AddClientDialog({ buttonClassName, className, onClientAdded, children }: AddClientDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { userRole } = useAuth();
   
   // Form state
   const [companyName, setCompanyName] = useState('');
@@ -54,51 +52,17 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
     try {
       setIsSubmitting(true);
       
-      console.log("Current user role:", userRole);
-      
       // Save the client to Supabase
-      let insertData;
-      
-      if (userRole === 'admin') {
-        // For admin users, use service role if available, or try direct insert
-        // This approach bypasses RLS for admin users
-        insertData = await supabase
-          .from('clients')
-          .insert([{ 
-            name: companyName,
-            status: 'active',
-          }])
-          .select();
-      } else {
-        // For non-admin users, use normal insert (subject to RLS)
-        insertData = await supabase
-          .from('clients')
-          .insert([{ 
-            name: companyName,
-            status: 'active',
-          }])
-          .select();
-      }
-
-      const { data, error } = insertData;
+      const { data, error } = await supabase
+        .from('clients')
+        .insert([{ 
+          name: companyName,
+          status: 'active',
+        }])
+        .select();
 
       if (error) {
         console.error("Error adding client:", error);
-        
-        // Special handling for admin users encountering RLS issues
-        if (userRole === 'admin' && error.code === '42501') {
-          console.log("Admin user hit RLS policy, attempting alternative insert");
-          
-          // Since we can't use service role in client-side code, 
-          // we'll at least provide a helpful error message to explain the situation
-          toast({
-            title: "Permission Issue",
-            description: "Admin role detected but database permissions are preventing client creation. Please review your Supabase RLS policies.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
         toast({
           title: "Error adding client",
           description: error.message,
@@ -210,7 +174,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent side="right" className="w-full max-w-4xl bg-white overflow-y-auto p-0" onOpenChange={setOpen}>
+      <SheetContent side="right" className="w-full sm:w-full md:w-full lg:w-full xl:w-full p-0" onOpenChange={setOpen}>
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-2">Add New Client</h2>
           <p className="text-gray-500 mb-6">
@@ -262,87 +226,75 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                     <div className="col-span-2">Exceptions</div>
                   </div>
                   
-                  <div className="max-h-64 overflow-y-auto">
-                    {users.map((user, index) => (
-                      <div key={index} className="grid grid-cols-6 gap-2 px-4 py-3 border-t">
-                        <div>
-                          <Input 
-                            placeholder="Full name" 
-                            value={user.name}
-                            onChange={(e) => updateUser(index, 'name', e.target.value)}
-                            className="h-9 text-sm"
+                  {users.map((user, index) => (
+                    <div key={index} className="grid grid-cols-6 gap-2 px-4 py-3 border-t">
+                      <div>
+                        <Input 
+                          placeholder="Full name" 
+                          value={user.name}
+                          onChange={(e) => updateUser(index, 'name', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Input 
+                          placeholder="Email" 
+                          value={user.email}
+                          onChange={(e) => updateUser(index, 'email', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Input 
+                          placeholder="Phone" 
+                          value={user.phone}
+                          onChange={(e) => updateUser(index, 'phone', e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <select 
+                          className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
+                          value={user.department}
+                          onChange={(e) => updateUser(index, 'department', e.target.value)}
+                        >
+                          <option value="">Select Department</option>
+                          {departments.filter(d => d).map((dept, i) => (
+                            <option key={i} value={dept}>{dept}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-span-2 flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`email-${index}`} 
+                            checked={user.notifications.email}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'notifications.email', checked === true)
+                            }
                           />
+                          <Label htmlFor={`email-${index}`} className="text-sm">Email</Label>
                         </div>
-                        <div>
-                          <Input 
-                            placeholder="Email" 
-                            value={user.email}
-                            onChange={(e) => updateUser(index, 'email', e.target.value)}
-                            className="h-9 text-sm"
+                        
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`sms-${index}`} 
+                            checked={user.notifications.sms}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'notifications.sms', checked === true)
+                            }
                           />
-                        </div>
-                        <div>
-                          <Input 
-                            placeholder="Phone" 
-                            value={user.phone}
-                            onChange={(e) => updateUser(index, 'phone', e.target.value)}
-                            className="h-9 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <select 
-                            className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
-                            value={user.department}
-                            onChange={(e) => updateUser(index, 'department', e.target.value)}
-                          >
-                            <option value="">Select Department</option>
-                            {departments.filter(d => d).map((dept, i) => (
-                              <option key={i} value={dept}>{dept}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-span-2 flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id={`email-${index}`} 
-                              checked={user.notifications.email}
-                              onCheckedChange={(checked) => 
-                                updateUser(index, 'notifications.email', checked === true)
-                              }
-                            />
-                            <Label htmlFor={`email-${index}`} className="text-sm">Email</Label>
-                          </div>
-                          
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id={`sms-${index}`} 
-                              checked={user.notifications.sms}
-                              onCheckedChange={(checked) => 
-                                updateUser(index, 'notifications.sms', checked === true)
-                              }
-                            />
-                            <Label htmlFor={`sms-${index}`} className="text-sm">SMS</Label>
-                          </div>
-                          
-                          <Button 
-                            type="button" 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => removeUser(index)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9 ml-auto"
-                          >
-                            <Trash2 size={14} />
-                          </Button>
+                          <Label htmlFor={`sms-${index}`} className="text-sm">SMS</Label>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
                 
                 <Button 
                   type="button" 
                   variant="outline" 
-                  className="mt-4 bg-white" 
+                  className="mt-4" 
                   onClick={addUser}
                 >
                   <Plus size={14} className="mr-2" />
@@ -357,7 +309,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               <div>
                 <h3 className="text-base font-medium mb-4">Manage Departments</h3>
                 
-                <div className="space-y-3 max-h-64 overflow-y-auto">
+                <div className="space-y-3">
                   {departments.map((dept, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <Input 
@@ -381,17 +333,17 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                       </Button>
                     </div>
                   ))}
-                </div>
                   
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full h-9 mt-4 bg-white" 
-                  onClick={addDepartment}
-                >
-                  <Plus size={14} className="mr-2" />
-                  Add Department
-                </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-9" 
+                    onClick={addDepartment}
+                  >
+                    <Plus size={14} className="mr-2" />
+                    Add Department
+                  </Button>
+                </div>
               </div>
               
               {/* Solutions Engineers Section */}
@@ -405,48 +357,46 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                     <div>Actions</div>
                   </div>
                   
-                  <div className="max-h-64 overflow-y-auto">
-                    {engineers.map((engineer, index) => (
-                      <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 px-4 py-3 border-t">
-                        <div>
-                          <select 
-                            className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
-                            value={engineer.name}
-                            onChange={(e) => updateEngineer(index, 'name', e.target.value)}
-                          >
-                            <option value="">Select SE</option>
-                            <option value="John Doe">John Doe</option>
-                            <option value="Jane Smith">Jane Smith</option>
-                            <option value="Robert Johnson">Robert Johnson</option>
-                          </select>
-                        </div>
-                        <div>
-                          <Input 
-                            value={engineer.email || 'email@example.com'} 
-                            disabled
-                            className="bg-gray-50 h-9 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <Button 
-                            type="button" 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => removeEngineer(index)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </div>
+                  {engineers.map((engineer, index) => (
+                    <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 px-4 py-3 border-t">
+                      <div>
+                        <select 
+                          className="h-9 w-full text-sm rounded-md border border-input bg-white px-3 py-1"
+                          value={engineer.name}
+                          onChange={(e) => updateEngineer(index, 'name', e.target.value)}
+                        >
+                          <option value="">Select SE</option>
+                          <option value="John Doe">John Doe</option>
+                          <option value="Jane Smith">Jane Smith</option>
+                          <option value="Robert Johnson">Robert Johnson</option>
+                        </select>
                       </div>
-                    ))}
-                  </div>
+                      <div>
+                        <Input 
+                          value={engineer.email || 'email@example.com'} 
+                          disabled
+                          className="bg-gray-50 h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Button 
+                          type="button" 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={() => removeEngineer(index)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 
                 <Button 
                   type="button" 
                   variant="outline" 
-                  className="w-full mt-4 bg-white" 
+                  className="w-full mt-4" 
                   onClick={addEngineer}
                 >
                   <Plus size={14} className="mr-2" />
@@ -459,7 +409,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
           {/* User Access Section */}
           <div className="mt-8">
             <h3 className="text-base font-medium mb-4">Access</h3>
-            <div className="space-y-3 max-h-64 overflow-y-auto">
+            <div className="space-y-3">
               {users.map((user, index) => (
                 <div key={index} className="flex items-center space-x-6">
                   <div className="font-medium w-40 truncate">{user.name || `User ${index + 1}`}</div>
@@ -498,7 +448,6 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                 resetForm();
               }}
               disabled={isSubmitting}
-              className="bg-white"
             >
               Cancel
             </Button>
@@ -506,7 +455,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-black hover:bg-gray-800 text-white"
+              className="bg-black hover:bg-gray-800"
             >
               {isSubmitting ? "Creating..." : "Create Client"}
             </Button>
