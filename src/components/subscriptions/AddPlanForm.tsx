@@ -50,12 +50,12 @@ const AddPlanForm = ({
   return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] border-gray-700 text-white bg-slate-50">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add New Plan</DialogTitle>
+          <DialogTitle className="text-xl font-normal text-slate-950">Add New Plan</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-4">
-            <Input placeholder="Enter plan name" value={planName} onChange={e => setPlanName(e.target.value)} required className="bg-[#1D2130] border-gray-700 focus:border-gray-500 text-white" />
+            <Input placeholder="Enter plan name" value={planName} onChange={e => setPlanName(e.target.value)} required className="border-gray-700 focus:border-gray-500 text-white bg-slate-50" />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select value={pricingModel} onValueChange={setPricingModel}>
