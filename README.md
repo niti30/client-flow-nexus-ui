@@ -16,7 +16,7 @@ This application provides a robust platform for managing client relationships, w
 
 ## Live Demo
 
-You can access the deployed application at: [https://client-flow-nexus-ui.lovable.app/auth](https://client-flow-nexus-ui.lovable.app/auth)
+You can access the deployed application at: [https://client-flow-nexus-ui.lovable.app/auth]
 
 ## Local Setup Instructions
 
