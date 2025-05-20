@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 import { useToast } from "@/components/ui/use-toast";
-import { useWorkflows } from "@/hooks/useWorkflows";
 
 const Index = () => {
   const { toast } = useToast();
@@ -33,11 +32,9 @@ const Index = () => {
     clients: { value: 5, positive: true }
   });
   
-  const { fetchClientWorkflowStats } = useWorkflows();
-  
-  // Fetch clients for dashboard with workflow stats
+  // Fetch clients for dashboard
   useEffect(() => {
-    const fetchClientsWithStats = async () => {
+    const fetchClients = async () => {
       try {
         setLoading(true);
         
@@ -58,35 +55,20 @@ const Index = () => {
         
         console.log("Fetched clients for dashboard:", data);
         
-        // Get workflow statistics for all clients
-        const clientStats = await fetchClientWorkflowStats();
-        console.log("Client workflow stats:", clientStats);
-        
         // Process clients to match the expected format for ClientsTableEnhanced
-        const formattedClients = data.map(client => {
-          // Find stats for this client
-          const stats = clientStats.find(stat => stat.clientId === client.id) || {
-            totalWorkflows: 0,
-            exceptions: 0,
-            timeSaved: '0h',
-            revenue: '$0',
-            moneySaved: '$0'
-          };
-          
-          return {
-            name: client.name,
-            contractStart: client.created_at ? new Date(client.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-',
-            workflows: stats.totalWorkflows,
-            nodes: Math.round(stats.totalWorkflows * 1.8), // Approximate nodes based on workflows
-            executions: Math.round(stats.totalWorkflows * 4.2), // Approximate executions based on workflows
-            exceptions: stats.exceptions,
-            revenue: stats.revenue,
-            timeSaved: stats.timeSaved,
-            moneySaved: stats.moneySaved,
-            id: client.id,
-            status: client.status
-          };
-        });
+        const formattedClients = data.map(client => ({
+          name: client.name,
+          contractStart: client.created_at ? new Date(client.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-',
+          workflows: 0, // You could fetch this from workflows table
+          nodes: 0,
+          executions: 0,
+          exceptions: 0,
+          revenue: '-',
+          timeSaved: '-',
+          moneySaved: '-',
+          id: client.id,
+          status: client.status
+        }));
         
         setClients(formattedClients);
         
@@ -102,8 +84,8 @@ const Index = () => {
       }
     };
     
-    fetchClientsWithStats();
-  }, [refreshTrigger, toast, fetchClientWorkflowStats]); 
+    fetchClients();
+  }, [refreshTrigger, toast]); 
   
   // Fetch dashboard data
   useEffect(() => {
