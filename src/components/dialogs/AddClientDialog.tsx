@@ -2,9 +2,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -181,12 +178,10 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] p-0 bg-white">
         <div className="p-6">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Add New Client</DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Enter the details for the new client. Click Create Client when you're done.
-            </DialogDescription>
-          </DialogHeader>
+          <h2 className="text-xl font-semibold">Add New Client</h2>
+          <p className="text-gray-500 mt-1">
+            Enter the details for the new client. Click Create Client when you're done.
+          </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
             {/* Left Column */}
@@ -225,37 +220,36 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                 <h3 className="text-sm font-medium mb-4">Users</h3>
                 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-1">
-                    <div className="col-span-1">Name</div>
-                    <div className="col-span-1">Email</div>
-                    <div className="col-span-1">Phone</div>
-                    <div className="col-span-1">Department</div>
+                  <div className="grid grid-cols-5 gap-4 text-xs font-medium text-gray-500 mb-1">
+                    <div>Name</div>
+                    <div>Email</div>
+                    <div>Phone</div>
+                    <div>Department</div>
                     <div className="col-span-1">Exceptions</div>
-                    <div className="col-span-1">Access</div>
                   </div>
                   
                   {users.map((user, index) => (
-                    <div key={index} className="grid grid-cols-6 gap-2">
+                    <div key={index} className="grid grid-cols-5 gap-4">
                       <Input 
                         placeholder="Full name" 
                         value={user.name}
                         onChange={(e) => updateUser(index, 'name', e.target.value)}
-                        className="col-span-1 h-9 text-sm"
+                        className="h-9 text-sm"
                       />
                       <Input 
                         placeholder="Email" 
                         value={user.email}
                         onChange={(e) => updateUser(index, 'email', e.target.value)}
-                        className="col-span-1 h-9 text-sm"
+                        className="h-9 text-sm"
                       />
                       <Input 
                         placeholder="Phone" 
                         value={user.phone}
                         onChange={(e) => updateUser(index, 'phone', e.target.value)}
-                        className="col-span-1 h-9 text-sm"
+                        className="h-9 text-sm"
                       />
                       <select 
-                        className="border rounded p-2 w-full bg-white col-span-1 h-9 text-sm"
+                        className="border rounded p-2 w-full bg-white h-9 text-sm"
                         value={user.department}
                         onChange={(e) => updateUser(index, 'department', e.target.value)}
                       >
@@ -264,69 +258,45 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                           <option key={i} value={dept}>{dept}</option>
                         ))}
                       </select>
-                      <div className="col-span-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center space-x-1">
-                            <Checkbox 
-                              id={`email-${index}`} 
-                              checked={user.notifications.email}
-                              onCheckedChange={(checked) => 
-                                updateUser(index, 'notifications.email', checked === true)
-                              }
-                              className="h-3 w-3"
-                            />
-                            <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
-                          </div>
-                          
-                          <div className="flex items-center space-x-1">
-                            <Checkbox 
-                              id={`sms-${index}`} 
-                              checked={user.notifications.sms}
-                              onCheckedChange={(checked) => 
-                                updateUser(index, 'notifications.sms', checked === true)
-                              }
-                              className="h-3 w-3"
-                            />
-                            <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-span-1">
+                      <div className="flex items-center space-x-2">
                         <div className="flex items-center space-x-1">
                           <Checkbox 
-                            id={`billing-${index}`} 
-                            checked={user.access.billing}
+                            id={`email-${index}`} 
+                            checked={user.notifications.email}
                             onCheckedChange={(checked) => 
-                              updateUser(index, 'access.billing', checked === true)
+                              updateUser(index, 'notifications.email', checked === true)
                             }
-                            className="h-3 w-3"
                           />
-                          <Label htmlFor={`billing-${index}`} className="text-xs">Billing Access</Label>
+                          <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
                         </div>
-                        <div className="flex items-center space-x-1 mt-1">
+                        
+                        <div className="flex items-center space-x-1">
                           <Checkbox 
-                            id={`admin-${index}`} 
-                            checked={user.access.admin}
+                            id={`sms-${index}`} 
+                            checked={user.notifications.sms}
                             onCheckedChange={(checked) => 
-                              updateUser(index, 'access.admin', checked === true)
+                              updateUser(index, 'notifications.sms', checked === true)
                             }
-                            className="h-3 w-3"
                           />
-                          <Label htmlFor={`admin-${index}`} className="text-xs">Admin Access</Label>
+                          <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
                         </div>
                       </div>
                     </div>
                   ))}
                   
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-9" 
-                    onClick={addUser}
-                  >
-                    <Plus size={14} className="mr-2" />
-                    Add User
-                  </Button>
+                  <div className="grid grid-cols-5 gap-4 text-xs font-medium text-gray-500">
+                    <div className="col-span-5 grid grid-cols-1">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-[125px] h-9" 
+                        onClick={addUser}
+                      >
+                        <Plus size={14} className="mr-2" />
+                        Add User
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -425,6 +395,38 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                   </Button>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* Users Access Section */}
+          <div className="mt-6">
+            <h3 className="text-sm font-medium mb-4">Access</h3>
+            <div className="space-y-2">
+              {users.map((user, index) => (
+                <div key={index} className="flex items-start space-x-4">
+                  <div className="font-medium">{user.name || `User ${index + 1}`}</div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`billing-access-${index}`} 
+                      checked={user.access.billing}
+                      onCheckedChange={(checked) => 
+                        updateUser(index, 'access.billing', checked === true)
+                      }
+                    />
+                    <Label htmlFor={`billing-access-${index}`} className="text-sm">Billing Access</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`admin-access-${index}`} 
+                      checked={user.access.admin}
+                      onCheckedChange={(checked) => 
+                        updateUser(index, 'access.admin', checked === true)
+                      }
+                    />
+                    <Label htmlFor={`admin-access-${index}`} className="text-sm">Admin Access</Label>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           
