@@ -94,7 +94,7 @@ const Subscriptions = () => {
           <div className="max-w-full mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-semibold text-gray-900">Plan Manager</h1>
-              <Button onClick={handleAddPlan} className="bg-[#141417] hover:bg-black">
+              <Button onClick={handleAddPlan} className="bg-black hover:bg-gray-800">
                 <Plus size={16} className="mr-2" />
                 Add Plan
               </Button>

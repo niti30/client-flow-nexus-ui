@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -131,7 +130,7 @@ const Billing = () => {
                 />
               </div>
               
-              <Button onClick={() => setShowAddPlan(true)} className="bg-white hover:bg-gray-100 text-gray-800 border border-gray-300">
+              <Button onClick={() => setShowAddPlan(true)} className="bg-black hover:bg-gray-800">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Plan
               </Button>

@@ -199,17 +199,23 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="Enter company name" 
+                  className="mt-1"
                 />
               </div>
               
               <div>
                 <Label htmlFor="companyUrl">Company URL*</Label>
-                <Input 
-                  id="companyUrl" 
-                  value={companyUrl}
-                  onChange={(e) => setCompanyUrl(e.target.value)}
-                  placeholder="https://" 
-                />
+                <div className="mt-1 flex items-center">
+                  <span className="bg-background border border-input border-r-0 rounded-l-md px-3 py-2 text-sm text-muted-foreground">
+                    https://
+                  </span>
+                  <Input 
+                    id="companyUrl" 
+                    value={companyUrl}
+                    onChange={(e) => setCompanyUrl(e.target.value)}
+                    className="rounded-l-none"
+                  />
+                </div>
               </div>
             </div>
             
@@ -218,36 +224,37 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
               <h3 className="text-sm font-medium mb-4">Users</h3>
               
               <div className="space-y-6">
-                <div className="grid grid-cols-5 gap-2 text-sm font-medium text-gray-500">
-                  <div>Name</div>
-                  <div>Email</div>
-                  <div>Phone</div>
-                  <div>Department</div>
-                  <div className="flex justify-between">
-                    <div>Exceptions</div>
-                    <div>Access</div>
-                  </div>
+                <div className="grid grid-cols-6 gap-2 text-sm font-medium text-gray-500">
+                  <div className="col-span-1">Name</div>
+                  <div className="col-span-1">Email</div>
+                  <div className="col-span-1">Phone</div>
+                  <div className="col-span-1">Department</div>
+                  <div className="col-span-1">Exceptions</div>
+                  <div className="col-span-1">Access</div>
                 </div>
                 
                 {users.map((user, index) => (
-                  <div key={index} className="grid grid-cols-5 gap-2">
+                  <div key={index} className="grid grid-cols-6 gap-2">
                     <Input 
                       placeholder="Full name" 
                       value={user.name}
                       onChange={(e) => updateUser(index, 'name', e.target.value)}
+                      className="col-span-1"
                     />
                     <Input 
                       placeholder="Email" 
                       value={user.email}
                       onChange={(e) => updateUser(index, 'email', e.target.value)}
+                      className="col-span-1"
                     />
                     <Input 
                       placeholder="Phone" 
                       value={user.phone}
                       onChange={(e) => updateUser(index, 'phone', e.target.value)}
+                      className="col-span-1"
                     />
                     <select 
-                      className="border rounded p-2 w-full bg-white"
+                      className="border rounded p-2 w-full bg-white col-span-1"
                       value={user.department}
                       onChange={(e) => updateUser(index, 'department', e.target.value)}
                     >
@@ -256,27 +263,33 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                         <option key={i} value={dept}>{dept}</option>
                       ))}
                     </select>
-                    <div>
+                    <div className="col-span-1">
                       <div className="flex items-center gap-2">
-                        <Checkbox 
-                          id={`email-${index}`} 
-                          checked={user.notifications.email}
-                          onCheckedChange={(checked) => 
-                            updateUser(index, 'notifications.email', checked === true)
-                          }
-                        />
-                        <Label htmlFor={`email-${index}`}>Email</Label>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`email-${index}`} 
+                            checked={user.notifications.email}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'notifications.email', checked === true)
+                            }
+                          />
+                          <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
+                        </div>
                         
-                        <Checkbox 
-                          id={`sms-${index}`} 
-                          checked={user.notifications.sms}
-                          onCheckedChange={(checked) => 
-                            updateUser(index, 'notifications.sms', checked === true)
-                          }
-                        />
-                        <Label htmlFor={`sms-${index}`}>SMS</Label>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`sms-${index}`} 
+                            checked={user.notifications.sms}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'notifications.sms', checked === true)
+                            }
+                          />
+                          <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 mt-2">
+                    </div>
+                    <div className="col-span-1">
+                      <div className="flex items-center space-x-2">
                         <Checkbox 
                           id={`billing-${index}`} 
                           checked={user.access.billing}
@@ -284,9 +297,9 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                             updateUser(index, 'access.billing', checked === true)
                           }
                         />
-                        <Label htmlFor={`billing-${index}`}>Billing Access</Label>
+                        <Label htmlFor={`billing-${index}`} className="text-xs">Billing Access</Label>
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center space-x-2 mt-1">
                         <Checkbox 
                           id={`admin-${index}`} 
                           checked={user.access.admin}
@@ -294,7 +307,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                             updateUser(index, 'access.admin', checked === true)
                           }
                         />
-                        <Label htmlFor={`admin-${index}`}>Admin Access</Label>
+                        <Label htmlFor={`admin-${index}`} className="text-xs">Admin Access</Label>
                       </div>
                     </div>
                   </div>
@@ -337,8 +350,9 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                       size="icon" 
                       variant="ghost" 
                       onClick={() => removeDepartment(index)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
-                      <Trash2 size={16} className="text-red-500" />
+                      <Trash2 size={16} />
                     </Button>
                   </div>
                 ))}
@@ -381,14 +395,16 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
                     <Input 
                       value={engineer.email || 'email@example.com'} 
                       disabled
+                      className="bg-gray-100"
                     />
                     <Button 
                       type="button" 
                       size="icon" 
                       variant="ghost" 
                       onClick={() => removeEngineer(index)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
-                      <Trash2 size={16} className="text-red-500" />
+                      <Trash2 size={16} />
                     </Button>
                   </div>
                 ))}
