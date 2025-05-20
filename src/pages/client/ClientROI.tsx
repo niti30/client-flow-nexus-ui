@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
@@ -9,11 +8,11 @@ import MissingClientIdAlert from "@/components/client-roi/MissingClientIdAlert";
 import WorkflowROIHeader from "@/components/client-roi/WorkflowROIHeader";
 import WorkflowROITable from "@/components/client-roi/WorkflowROITable";
 import { useClientWorkflows } from "@/hooks/useClientWorkflows";
+import { useEffect } from "react";
 
 const ClientROI = () => {
   const params = useParams<{ clientId: string }>();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   
   // Try to get clientId from different sources
   const clientIdFromParams = params.clientId;
