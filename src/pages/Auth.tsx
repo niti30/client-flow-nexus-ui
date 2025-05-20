@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,8 +27,6 @@ const Auth = () => {
       // For the demo, we'll use some test credentials
       if (loginAs === 'client') {
         await signIn('client1@example-domain.com', 'password123');
-      } else if (loginAs === 'se') {
-        await signIn('se1@example-domain.com', 'password123');
       } else {
         await signIn(email, password);
       }
@@ -72,9 +71,8 @@ const Auth = () => {
               
               <Button
                 type="button"
-                variant={loginAs === 'se' ? 'default' : 'outline'}
+                variant="outline"
                 className="w-full filter blur-sm opacity-50 pointer-events-none"
-                onClick={() => setLoginAs('se')}
                 disabled={true}
               >
                 Login as SE
