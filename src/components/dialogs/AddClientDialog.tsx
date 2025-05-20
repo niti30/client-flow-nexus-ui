@@ -69,11 +69,20 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         // Try the RPC function method as a fallback for admin users
         if (userRole === 'admin') {
           console.log("Attempting direct insert via function call for admin");
+          // Define the types for the admin_insert_client RPC function parameters
+          type AdminInsertClientParams = {
+            client_name: string;
+            client_status?: string;
+          };
+          
           // Direct insert bypassing RLS
-          const { data: rpcData, error: rpcError } = await supabase.rpc('admin_insert_client', { 
-            client_name: companyName,
-            client_status: 'active'
-          });
+          const { data: rpcData, error: rpcError } = await supabase.rpc<string>(
+            'admin_insert_client', 
+            { 
+              client_name: companyName,
+              client_status: 'active'
+            } as AdminInsertClientParams
+          );
           
           if (rpcError) {
             console.error("Error in RPC fallback:", rpcError);
