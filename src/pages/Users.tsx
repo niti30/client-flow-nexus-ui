@@ -8,6 +8,7 @@ import { useUsers } from "@/hooks/useUsers";
 import { UserHeader } from "@/components/users/UserHeader";
 import { UserFilters } from "@/components/users/UserFilters";
 import { UserTable } from "@/components/users/UserTable";
+import { supabase } from "@/integrations/supabase/client";
 
 const Users = () => {
   const [activeTab, setActiveTab] = useState<"admin" | "se">("admin");
@@ -100,12 +101,28 @@ const Users = () => {
 
   const handleDeleteUser = async (userId: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      // TODO: Implement user deletion logic with Supabase
-      toast({
-        title: "User deleted",
-        description: "The user has been successfully deleted.",
-      });
-      refreshUsers();
+      try {
+        const { error } = await supabase
+          .from("users")
+          .delete()
+          .eq("id", userId);
+
+        if (error) throw error;
+
+        toast({
+          title: "User deleted",
+          description: "The user has been successfully deleted.",
+        });
+        
+        refreshUsers();
+      } catch (error: any) {
+        console.error("Error deleting user:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to delete user. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
