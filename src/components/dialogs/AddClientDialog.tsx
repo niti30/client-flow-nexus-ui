@@ -179,271 +179,278 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px]">
-        <DialogHeader>
-          <DialogTitle>Add New Client</DialogTitle>
-          <DialogDescription>
-            Enter the details for the new client. Click Create Client when you're done.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-          {/* Left Column */}
-          <div>
-            {/* Company Information */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="companyName">Company Name*</Label>
-                <Input 
-                  id="companyName" 
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Enter company name" 
-                  className="mt-1"
-                />
+      <DialogContent className="sm:max-w-[800px] p-0 bg-white">
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Add New Client</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Enter the details for the new client. Click Create Client when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+            {/* Left Column */}
+            <div>
+              {/* Company Information */}
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="companyName">Company Name*</Label>
+                  <Input 
+                    id="companyName" 
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Enter company name" 
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="companyUrl">Company URL*</Label>
+                  <div className="mt-1 flex items-center">
+                    <span className="bg-gray-50 border border-input border-r-0 rounded-l-md px-3 py-2 text-sm text-muted-foreground">
+                      https://
+                    </span>
+                    <Input 
+                      id="companyUrl" 
+                      value={companyUrl}
+                      onChange={(e) => setCompanyUrl(e.target.value)}
+                      className="rounded-l-none"
+                    />
+                  </div>
+                </div>
               </div>
               
-              <div>
-                <Label htmlFor="companyUrl">Company URL*</Label>
-                <div className="mt-1 flex items-center">
-                  <span className="bg-background border border-input border-r-0 rounded-l-md px-3 py-2 text-sm text-muted-foreground">
-                    https://
-                  </span>
-                  <Input 
-                    id="companyUrl" 
-                    value={companyUrl}
-                    onChange={(e) => setCompanyUrl(e.target.value)}
-                    className="rounded-l-none"
-                  />
+              {/* Users Section */}
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-4">Users</h3>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-1">
+                    <div className="col-span-1">Name</div>
+                    <div className="col-span-1">Email</div>
+                    <div className="col-span-1">Phone</div>
+                    <div className="col-span-1">Department</div>
+                    <div className="col-span-1">Exceptions</div>
+                    <div className="col-span-1">Access</div>
+                  </div>
+                  
+                  {users.map((user, index) => (
+                    <div key={index} className="grid grid-cols-6 gap-2">
+                      <Input 
+                        placeholder="Full name" 
+                        value={user.name}
+                        onChange={(e) => updateUser(index, 'name', e.target.value)}
+                        className="col-span-1 h-9 text-sm"
+                      />
+                      <Input 
+                        placeholder="Email" 
+                        value={user.email}
+                        onChange={(e) => updateUser(index, 'email', e.target.value)}
+                        className="col-span-1 h-9 text-sm"
+                      />
+                      <Input 
+                        placeholder="Phone" 
+                        value={user.phone}
+                        onChange={(e) => updateUser(index, 'phone', e.target.value)}
+                        className="col-span-1 h-9 text-sm"
+                      />
+                      <select 
+                        className="border rounded p-2 w-full bg-white col-span-1 h-9 text-sm"
+                        value={user.department}
+                        onChange={(e) => updateUser(index, 'department', e.target.value)}
+                      >
+                        <option value="">Select Department</option>
+                        {departments.filter(d => d).map((dept, i) => (
+                          <option key={i} value={dept}>{dept}</option>
+                        ))}
+                      </select>
+                      <div className="col-span-1">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center space-x-1">
+                            <Checkbox 
+                              id={`email-${index}`} 
+                              checked={user.notifications.email}
+                              onCheckedChange={(checked) => 
+                                updateUser(index, 'notifications.email', checked === true)
+                              }
+                              className="h-3 w-3"
+                            />
+                            <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
+                          </div>
+                          
+                          <div className="flex items-center space-x-1">
+                            <Checkbox 
+                              id={`sms-${index}`} 
+                              checked={user.notifications.sms}
+                              onCheckedChange={(checked) => 
+                                updateUser(index, 'notifications.sms', checked === true)
+                              }
+                              className="h-3 w-3"
+                            />
+                            <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-span-1">
+                        <div className="flex items-center space-x-1">
+                          <Checkbox 
+                            id={`billing-${index}`} 
+                            checked={user.access.billing}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'access.billing', checked === true)
+                            }
+                            className="h-3 w-3"
+                          />
+                          <Label htmlFor={`billing-${index}`} className="text-xs">Billing Access</Label>
+                        </div>
+                        <div className="flex items-center space-x-1 mt-1">
+                          <Checkbox 
+                            id={`admin-${index}`} 
+                            checked={user.access.admin}
+                            onCheckedChange={(checked) => 
+                              updateUser(index, 'access.admin', checked === true)
+                            }
+                            className="h-3 w-3"
+                          />
+                          <Label htmlFor={`admin-${index}`} className="text-xs">Admin Access</Label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-9" 
+                    onClick={addUser}
+                  >
+                    <Plus size={14} className="mr-2" />
+                    Add User
+                  </Button>
                 </div>
               </div>
             </div>
             
-            {/* Users Section */}
-            <div className="mt-6">
-              <h3 className="text-sm font-medium mb-4">Users</h3>
-              
-              <div className="space-y-6">
-                <div className="grid grid-cols-6 gap-2 text-sm font-medium text-gray-500">
-                  <div className="col-span-1">Name</div>
-                  <div className="col-span-1">Email</div>
-                  <div className="col-span-1">Phone</div>
-                  <div className="col-span-1">Department</div>
-                  <div className="col-span-1">Exceptions</div>
-                  <div className="col-span-1">Access</div>
+            {/* Right Column */}
+            <div>
+              {/* Departments Section */}
+              <div>
+                <h3 className="text-sm font-medium mb-4">Manage Departments</h3>
+                
+                <div className="space-y-3">
+                  {departments.map((dept, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        placeholder="Department name" 
+                        value={dept}
+                        onChange={(e) => {
+                          const newDepartments = [...departments];
+                          newDepartments[index] = e.target.value;
+                          setDepartments(newDepartments);
+                        }}
+                        className="flex-1 h-9 text-sm"
+                      />
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => removeDepartment(index)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-9" 
+                    onClick={addDepartment}
+                  >
+                    <Plus size={14} className="mr-2" />
+                    Add Department
+                  </Button>
                 </div>
+              </div>
+              
+              {/* Solutions Engineers Section */}
+              <div className="mt-10">
+                <h3 className="text-sm font-medium mb-4">Assign Solutions Engineers</h3>
                 
-                {users.map((user, index) => (
-                  <div key={index} className="grid grid-cols-6 gap-2">
-                    <Input 
-                      placeholder="Full name" 
-                      value={user.name}
-                      onChange={(e) => updateUser(index, 'name', e.target.value)}
-                      className="col-span-1"
-                    />
-                    <Input 
-                      placeholder="Email" 
-                      value={user.email}
-                      onChange={(e) => updateUser(index, 'email', e.target.value)}
-                      className="col-span-1"
-                    />
-                    <Input 
-                      placeholder="Phone" 
-                      value={user.phone}
-                      onChange={(e) => updateUser(index, 'phone', e.target.value)}
-                      className="col-span-1"
-                    />
-                    <select 
-                      className="border rounded p-2 w-full bg-white col-span-1"
-                      value={user.department}
-                      onChange={(e) => updateUser(index, 'department', e.target.value)}
-                    >
-                      <option value="">Select Department</option>
-                      {departments.filter(d => d).map((dept, i) => (
-                        <option key={i} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                    <div className="col-span-1">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`email-${index}`} 
-                            checked={user.notifications.email}
-                            onCheckedChange={(checked) => 
-                              updateUser(index, 'notifications.email', checked === true)
-                            }
-                          />
-                          <Label htmlFor={`email-${index}`} className="text-xs">Email</Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`sms-${index}`} 
-                            checked={user.notifications.sms}
-                            onCheckedChange={(checked) => 
-                              updateUser(index, 'notifications.sms', checked === true)
-                            }
-                          />
-                          <Label htmlFor={`sms-${index}`} className="text-xs">SMS</Label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-span-1">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`billing-${index}`} 
-                          checked={user.access.billing}
-                          onCheckedChange={(checked) => 
-                            updateUser(index, 'access.billing', checked === true)
-                          }
-                        />
-                        <Label htmlFor={`billing-${index}`} className="text-xs">Billing Access</Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Checkbox 
-                          id={`admin-${index}`} 
-                          checked={user.access.admin}
-                          onCheckedChange={(checked) => 
-                            updateUser(index, 'access.admin', checked === true)
-                          }
-                        />
-                        <Label htmlFor={`admin-${index}`} className="text-xs">Admin Access</Label>
-                      </div>
-                    </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-4 text-xs font-medium text-gray-500 mb-1">
+                    <div>Name</div>
+                    <div>Email</div>
+                    <div>Actions</div>
                   </div>
-                ))}
-                
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={addUser}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Add User
-                </Button>
+                  
+                  {engineers.map((engineer, index) => (
+                    <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-4">
+                      <select 
+                        className="border rounded p-2 w-full bg-white h-9 text-sm"
+                        value={engineer.name}
+                        onChange={(e) => updateEngineer(index, 'name', e.target.value)}
+                      >
+                        <option value="">Select SE</option>
+                        <option value="John Doe">John Doe</option>
+                        <option value="Jane Smith">Jane Smith</option>
+                        <option value="Robert Johnson">Robert Johnson</option>
+                      </select>
+                      <Input 
+                        value={engineer.email || 'email@example.com'} 
+                        disabled
+                        className="bg-gray-50 h-9 text-sm"
+                      />
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => removeEngineer(index)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 h-9 w-9"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-9" 
+                    onClick={addEngineer}
+                  >
+                    <Plus size={14} className="mr-2" />
+                    Add Solutions Engineer
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Right Column */}
-          <div>
-            {/* Departments Section */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">Manage Departments</h3>
-              
-              <div className="space-y-3">
-                {departments.map((dept, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input 
-                      placeholder="Department name" 
-                      value={dept}
-                      onChange={(e) => {
-                        const newDepartments = [...departments];
-                        newDepartments[index] = e.target.value;
-                        setDepartments(newDepartments);
-                      }}
-                      className="flex-1"
-                    />
-                    <Button 
-                      type="button" 
-                      size="icon" 
-                      variant="ghost" 
-                      onClick={() => removeDepartment(index)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                ))}
-                
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={addDepartment}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Add Department
-                </Button>
-              </div>
-            </div>
-            
-            {/* Solutions Engineers Section */}
-            <div className="mt-10">
-              <h3 className="text-sm font-medium mb-4">Assign Solutions Engineers</h3>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-500">
-                  <div>Name</div>
-                  <div>Email</div>
-                  <div>Actions</div>
-                </div>
-                
-                {engineers.map((engineer, index) => (
-                  <div key={index} className="grid grid-cols-3 gap-4">
-                    <select 
-                      className="border rounded p-2 w-full bg-white"
-                      value={engineer.name}
-                      onChange={(e) => updateEngineer(index, 'name', e.target.value)}
-                    >
-                      <option value="">Select SE</option>
-                      <option value="John Doe">John Doe</option>
-                      <option value="Jane Smith">Jane Smith</option>
-                      <option value="Robert Johnson">Robert Johnson</option>
-                    </select>
-                    <Input 
-                      value={engineer.email || 'email@example.com'} 
-                      disabled
-                      className="bg-gray-100"
-                    />
-                    <Button 
-                      type="button" 
-                      size="icon" 
-                      variant="ghost" 
-                      onClick={() => removeEngineer(index)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                ))}
-                
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={addEngineer}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Add Solutions Engineer
-                </Button>
-              </div>
-            </div>
+          {/* Footer */}
+          <div className="flex justify-end gap-4 mt-8">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setOpen(false);
+                resetForm();
+              }}
+              disabled={isSubmitting}
+              className="h-9"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="bg-black hover:bg-gray-800 h-9"
+            >
+              {isSubmitting ? "Creating..." : "Create Client"}
+            </Button>
           </div>
-        </div>
-        
-        {/* Footer */}
-        <div className="flex justify-end gap-4 mt-6">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => {
-              setOpen(false);
-              resetForm();
-            }}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="bg-black hover:bg-gray-800"
-          >
-            {isSubmitting ? "Creating..." : "Create Client"}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
