@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { MessageSquare, Send } from "lucide-react";
 
 interface ChatMessage {
@@ -19,7 +19,6 @@ interface ChatMessage {
 
 const ClientSupport = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [messageInput, setMessageInput] = useState("");
   
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -97,6 +96,8 @@ const ClientSupport = () => {
         <ClientHeader />
         
         <main className="flex-1 overflow-y-auto p-6">
+          <h1 className="text-2xl font-bold mb-6">Messaging</h1>
+          
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-1">
               <Card>

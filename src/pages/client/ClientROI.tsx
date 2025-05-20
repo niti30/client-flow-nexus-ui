@@ -5,6 +5,8 @@ import { Plus } from "lucide-react";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
+import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
+import { toast } from "sonner";
 
 interface WorkflowROI {
   id: string;
@@ -23,9 +25,10 @@ interface WorkflowROI {
 const ClientROI = () => {
   const [sortColumn, setSortColumn] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [workflows, setWorkflows] = useState<WorkflowROI[]>([]);
   
   // Fetch workflow ROI data
-  const { data: workflowsData, isLoading } = useQuery({
+  const { data: workflowsData, isLoading, refetch } = useQuery({
     queryKey: ['workflow-roi', sortColumn, sortOrder],
     queryFn: async () => {
       // Mock data based on the UI in the image
@@ -60,6 +63,19 @@ const ClientROI = () => {
     }
   });
   
+  // Update workflows state when data changes
+  useState(() => {
+    if (workflowsData) {
+      setWorkflows(workflowsData);
+    }
+  });
+  
+  const handleAddWorkflow = (newWorkflow: any) => {
+    setWorkflows(prev => [newWorkflow, ...prev]);
+    toast.success("Workflow added successfully");
+    refetch();
+  };
+  
   const handleSort = (column: string) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -85,10 +101,15 @@ const ClientROI = () => {
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Workflow
-              </Button>
+              <AddWorkflowDialog
+                onWorkflowAdded={handleAddWorkflow}
+                clientId="client-id" // This would be the actual client ID in a real app
+              >
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Workflow
+                </Button>
+              </AddWorkflowDialog>
             </div>
             
             {isLoading ? (
@@ -174,7 +195,7 @@ const ClientROI = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {workflowsData && workflowsData.map((workflow) => (
+                      {workflows.map((workflow) => (
                         <tr key={workflow.id} className="border-b border-border hover:bg-muted/50">
                           <td className="px-4 py-3 text-sm">{workflow.created_at}</td>
                           <td className="px-4 py-3 text-sm">{workflow.department}</td>

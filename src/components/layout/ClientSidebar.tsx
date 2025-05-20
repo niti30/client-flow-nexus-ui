@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const ClientSidebar = () => {
@@ -63,8 +63,7 @@ const ClientSidebar = () => {
     { icon: AlertTriangle, label: "Exceptions", path: "/client/exceptions" },
     { icon: Users, label: "Users", path: "/client/users" },
     { icon: CreditCard, label: "Billing", path: "/client/billing" },
-    { icon: MessageSquare, label: "Support", path: "/client/support" },
-    { icon: MessageCircle, label: "Messaging", path: "/client/messaging" },
+    { icon: MessageCircle, label: "Messaging", path: "/client/support" }, // Changed label from "Support" to "Messaging"
   ];
 
   const isActive = (path: string) => {

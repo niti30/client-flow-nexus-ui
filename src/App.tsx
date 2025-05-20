@@ -77,6 +77,9 @@ function App() {
             <Route path="/admin" element={<Navigate to="/dashboard" />} />
             <Route path="/admin/dashboard" element={<Navigate to="/dashboard" />} />
 
+            {/* For backward compatibility, redirect /client/messaging to /client/support */}
+            <Route path="/client/messaging" element={<Navigate to="/client/support" />} />
+
             {/* 404 route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
