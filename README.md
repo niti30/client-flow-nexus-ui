@@ -1,119 +1,73 @@
+# Welcome to your Lovable project
 
-# Braintrust Nexus - Client Workflow Management Platform
+## Project info
 
-## Project Overview
+**URL**: https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc
 
-Braintrust Nexus is a comprehensive workflow management platform designed for managed service providers to track client automation workflows, exceptions, and ROI metrics. The platform supports role-based access with different views for administrators, support engineers, and clients.
+## How can I edit this code?
 
-## Features
+There are several ways of editing your application.
 
-- **Role-based access control**: Admin, Support Engineer, and Client portals
-- **Client management**: Add, view, and manage client accounts
-- **Workflow tracking**: Monitor automation workflow status, exceptions, and progress
-- **ROI metrics**: Track time saved and cost savings from automation
-- **Responsive design**: Works on desktop and mobile devices
+**Use Lovable**
 
-## Live Demo
+Simply visit the [Lovable Project](https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc) and start prompting.
 
-The application is deployed at: https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc
+Changes made via Lovable will be committed automatically to this repo.
 
-## Technology Stack
+**Use your preferred IDE**
 
-- **Frontend**: React with TypeScript, Vite
-- **UI Components**: Tailwind CSS, shadcn/ui
-- **State Management**: React Query
-- **Backend**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-## Database Schema
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-The application uses the following tables in Supabase:
+Follow these steps:
 
-- **clients**: Stores client organization details
-- **users**: Stores user information with role-based access
-- **workflows**: Tracks automation workflows and their metrics
-- **exceptions**: Records issues that occur during workflow executions
-- **user_client_assignments**: Maps support engineers to clients they manage
-- **plans & subscriptions**: Manages subscription plans and client subscriptions
-- **invoices**: Tracks billing information
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-## Local Development Setup
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-### Prerequisites
+# Step 3: Install the necessary dependencies.
+npm i
 
-- Node.js (v16 or later)
-- npm (v7 or later)
-- Supabase account
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
 
-### Installation
+**Edit a file directly in GitHub**
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd braintrust-nexus
-   ```
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+**Use GitHub Codespaces**
 
-3. Set up Supabase:
-   - Create a new Supabase project
-   - Run the SQL commands from the `supabase/config.toml` file to set up the database schema
-   - Update the Supabase URL and key in `src/integrations/supabase/client.ts`
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-4. Start the development server:
-   ```
-   npm run dev
-   ```
+## What technologies are used for this project?
 
-5. Open your browser and navigate to `http://localhost:5173`
+This project is built with:
 
-## Authentication
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-### Test Credentials
+## How can I deploy this project?
 
-For demo purposes, you can use the following credentials:
+Simply open [Lovable](https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc) and click on Share -> Publish.
 
-- **Client User**:
-  - Email: client1@example-domain.com
-  - Password: password123
+## Can I connect a custom domain to my Lovable project?
 
-### Signup Process
+Yes, you can!
 
-1. Navigate to the auth page (`/auth`)
-2. Use the "Login as Client" option
-3. Enter the test credentials above
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-## Features Implementation
-
-### Client Workflows
-
-- Workflows are stored in the database and associated with a specific client
-- The workflow status toggle (active/inactive) is fully functional
-- Data for nodes, executions, exceptions, time saved, and money saved is stored and displayed
-- New workflows can be added through the "Add Workflow" button
-
-## Deployment
-
-The application is configured for easy deployment on platforms that support Node.js applications:
-
-1. Build the production version:
-   ```
-   npm run build
-   ```
-
-2. The built files will be in the `dist` directory and can be deployed to any static hosting service
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

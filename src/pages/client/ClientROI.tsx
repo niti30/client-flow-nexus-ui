@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -23,7 +22,7 @@ interface WorkflowROI {
   exceptions: number;
   time_saved: number;
   cost_saved: number;
-  status: string;
+  status: boolean;
 }
 
 const ClientROI = () => {
@@ -63,7 +62,7 @@ const ClientROI = () => {
               exceptions: workflow.exceptions || 0,
               time_saved: workflow.time_saved || 0,
               cost_saved: workflow.cost_saved || 0,
-              status: workflow.status
+              status: workflow.status === 'active'
             }));
           }
           
@@ -88,7 +87,7 @@ const ClientROI = () => {
           exceptions: 23,
           time_saved: 156.5,
           cost_saved: 15650,
-          status: "active"
+          status: true
         },
         {
           id: "2",
@@ -101,7 +100,7 @@ const ClientROI = () => {
           exceptions: 5,
           time_saved: 89.2,
           cost_saved: 8920,
-          status: "active"
+          status: true
         }
       ] as WorkflowROI[];
     }
@@ -127,9 +126,9 @@ const ClientROI = () => {
       nodes: newWorkflow.nodes,
       executions: newWorkflow.executions,
       exceptions: newWorkflow.exceptions,
-      time_saved: newWorkflow.time_saved || 0,
-      cost_saved: newWorkflow.cost_saved || 0,
-      status: newWorkflow.status
+      time_saved: parseFloat(newWorkflow.timeSaved || '0'),
+      cost_saved: parseFloat(newWorkflow.moneySaved || '0'),
+      status: newWorkflow.status === 'active'
     };
     
     // Add the new workflow to the state
@@ -138,17 +137,6 @@ const ClientROI = () => {
     
     // Refetch the data to ensure we have the latest
     refetch();
-  };
-  
-  const handleStatusChange = (workflowId: string, newStatus: string) => {
-    // Update the workflow status in the state
-    setWorkflows(prev => 
-      prev.map(workflow => 
-        workflow.id === workflowId 
-          ? { ...workflow, status: newStatus } 
-          : workflow
-      )
-    );
   };
   
   const handleSort = (column: string) => {
@@ -178,8 +166,8 @@ const ClientROI = () => {
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
               {clientId && (
                 <AddWorkflowDialog
-                  clientId={clientId}
                   onWorkflowAdded={handleAddWorkflow}
+                  clientId={clientId}
                 >
                   <Button>
                     <Plus className="mr-2 h-4 w-4" />
@@ -299,8 +287,7 @@ const ClientROI = () => {
                               <td className="px-4 py-3 text-sm">
                                 <WorkflowStatusToggle 
                                   workflowId={workflow.id} 
-                                  initialStatus={workflow.status} 
-                                  onStatusChange={(newStatus) => handleStatusChange(workflow.id, newStatus)}
+                                  initialStatus={workflow.status ? 'active' : 'inactive'} 
                                 />
                               </td>
                             </tr>

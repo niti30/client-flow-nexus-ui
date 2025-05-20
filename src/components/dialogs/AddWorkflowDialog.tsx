@@ -13,6 +13,8 @@ import { PlusCircle } from "lucide-react";
 import { useWorkflowActions } from "@/hooks/useWorkflowActions";
 import { Workflow } from "@/types/workflow";
 
+export type { Workflow };
+
 interface AddWorkflowDialogProps {
   clientId: string;
   onWorkflowAdded?: (workflow?: Workflow) => void;
@@ -36,7 +38,7 @@ export function AddWorkflowDialog({
   const handleSubmit = async (values: WorkflowFormValues) => {
     const result = await addWorkflow(values, clientId, (workflow) => {
       setOpen(false);
-      if (onWorkflowAdded && workflow) {
+      if (onWorkflowAdded) {
         onWorkflowAdded(workflow);
       }
     });
