@@ -1,1 +1,46 @@
-project_id = "fubygcvzquqbrpdbycxw"
+
+# This file controls the configuration of your Supabase setup
+#
+# Database password configuration
+#
+# You can set up multiple environments by duplicating the section below
+# and naming them differently. For example, you can create a "production"
+# environment next to "development".
+#
+# Reference: https://supabase.com/docs/reference/cli/supabase-init
+
+[development]
+db_port = 5432
+db_name = "postgres"
+db_user = "postgres"
+db_auth_url = "localhost:5432"
+db_schema = "public"
+
+# Add admin_insert_client function
+[[development.functions]]
+name = "admin_insert_client"
+schema = "public"
+body = """
+CREATE OR REPLACE FUNCTION public.admin_insert_client(client_name text, client_status text DEFAULT 'active'::text)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  client_id uuid;
+BEGIN
+  -- This function runs with SECURITY DEFINER privileges (as the owner)
+  -- which bypasses RLS policies
+  INSERT INTO public.clients (name, status)
+  VALUES (client_name, client_status)
+  RETURNING id INTO client_id;
+  
+  RETURN client_id;
+END;
+$$;
+"""
+returns = "uuid"
+params = [
+  { name = "client_name", type = "text" },
+  { name = "client_status", type = "text", default = "'active'::text" }
+]

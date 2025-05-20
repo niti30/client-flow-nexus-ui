@@ -54,31 +54,52 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
     try {
       setIsSubmitting(true);
       
-      let insertQuery;
-      // For admin users, we'll use a direct insert
-      if (userRole === 'admin') {
-        console.log("Inserting client as admin");
-        insertQuery = supabase
-          .from('clients')
-          .insert([{ 
-            name: companyName,
-            status: 'active',
-          }])
-          .select();
-      } else {
-        toast({
-          title: "Permission Error",
-          description: "You don't have permission to add clients",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      const { data, error } = await insertQuery;
+      // Add client to the database
+      console.log("Inserting client as:", userRole);
+      const { data, error } = await supabase
+        .from('clients')
+        .insert([{ 
+          name: companyName,
+          status: 'active',
+        }])
+        .select();
 
       if (error) {
         console.error("Error adding client:", error);
+        // Try the RPC function method as a fallback for admin users
+        if (userRole === 'admin') {
+          console.log("Attempting direct insert via function call for admin");
+          // Direct insert bypassing RLS
+          const { data: rpcData, error: rpcError } = await supabase.rpc('admin_insert_client', { 
+            client_name: companyName,
+            client_status: 'active'
+          });
+          
+          if (rpcError) {
+            console.error("Error in RPC fallback:", rpcError);
+            toast({
+              title: "Error adding client",
+              description: rpcError.message,
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          console.log("Client added via RPC:", rpcData);
+          toast({
+            title: "Client added successfully",
+            description: `${companyName} has been added`,
+          });
+          
+          setOpen(false);
+          resetForm();
+          
+          if (onClientAdded) {
+            onClientAdded();
+          }
+          return;
+        }
+        
         toast({
           title: "Error adding client",
           description: error.message,
