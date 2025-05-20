@@ -1,5 +1,5 @@
 
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
@@ -8,23 +8,39 @@ import MissingClientIdAlert from "@/components/client-roi/MissingClientIdAlert";
 import WorkflowROIHeader from "@/components/client-roi/WorkflowROIHeader";
 import WorkflowROITable from "@/components/client-roi/WorkflowROITable";
 import { useClientWorkflows } from "@/hooks/useClientWorkflows";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const ClientROI = () => {
+  const navigate = useNavigate();
   const params = useParams<{ clientId: string }>();
   const [searchParams] = useSearchParams();
+  const [clientId, setClientId] = useState<string | null>(null);
   
-  // Try to get clientId from different sources
-  const clientIdFromParams = params.clientId;
-  const clientIdFromQuery = searchParams.get('clientId');
-  const clientId = clientIdFromParams || clientIdFromQuery || localStorage.getItem('selectedClientId');
-  
-  // Save clientId to localStorage if available
+  // Try to get clientId from different sources and save it
   useEffect(() => {
-    if (clientId) {
-      localStorage.setItem('selectedClientId', clientId);
+    // Check all possible sources for clientId
+    const clientIdFromParams = params.clientId;
+    const clientIdFromQuery = searchParams.get('clientId');
+    const clientIdFromStorage = localStorage.getItem('selectedClientId');
+    
+    console.log("ClientROI - Attempting to get client ID from:", {
+      fromParams: clientIdFromParams,
+      fromQuery: clientIdFromQuery,
+      fromStorage: clientIdFromStorage
+    });
+
+    // Use the first available source in order of precedence
+    const resolvedClientId = clientIdFromParams || clientIdFromQuery || clientIdFromStorage;
+    
+    if (resolvedClientId) {
+      console.log("ClientROI - Setting client ID to:", resolvedClientId);
+      setClientId(resolvedClientId);
+      localStorage.setItem('selectedClientId', resolvedClientId);
+    } else {
+      console.log("ClientROI - No client ID found");
+      toast.error("Client ID is missing. Please select a client first.");
     }
-  }, [clientId]);
+  }, [params.clientId, searchParams]);
 
   // Use our custom hook to manage workflows
   const { 
@@ -43,6 +59,10 @@ const ClientROI = () => {
     toast.success("Workflow added successfully");
   };
 
+  const handleReturnToClients = () => {
+    navigate('/clients');
+  };
+
   // If clientId is missing, show an alert and a button to return to clients page
   if (!clientId) {
     return (
@@ -58,7 +78,7 @@ const ClientROI = () => {
                 <h1 className="text-2xl font-bold">Workflow ROI</h1>
               </div>
               
-              <MissingClientIdAlert />
+              <MissingClientIdAlert onReturnToClients={handleReturnToClients} />
             </div>
           </main>
         </div>
