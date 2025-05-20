@@ -97,20 +97,31 @@ export function AddUserDialog({
   useEffect(() => {
     if (userRole === "se" && open) {
       const fetchClients = async () => {
-        const { data, error } = await supabase
-          .from("clients")
-          .select("id, name")
-          .order("name");
+        try {
+          const { data, error } = await supabase
+            .from("clients")
+            .select("id, name")
+            .order("name");
 
-        if (error) {
-          console.error("Error fetching clients:", error);
+          if (error) {
+            console.error("Error fetching clients:", error);
+            toast({
+              title: "Error",
+              description: "Failed to load clients. Please try again.",
+              variant: "destructive",
+            });
+            setClients([]);
+          } else {
+            setClients(data || []);
+          }
+        } catch (err) {
+          console.error("Error in fetchClients:", err);
+          setClients([]);
           toast({
             title: "Error",
             description: "Failed to load clients. Please try again.",
             variant: "destructive",
           });
-        } else {
-          setClients(data || []);
         }
       };
 
@@ -139,7 +150,7 @@ export function AddUserDialog({
       if (userError) throw userError;
 
       // If SE user, add client assignments
-      if (values.role === "se" && selectedClients.length > 0) {
+      if (values.role === "se" && selectedClients.length > 0 && userData) {
         const clientAssignments = selectedClients.map(clientId => ({
           user_id: userData.id,
           client_id: clientId
@@ -176,6 +187,21 @@ export function AddUserDialog({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Safely handle client selection and deselection
+  const handleClientSelection = (clientId: string) => {
+    setSelectedClients((prev) => {
+      const isSelected = prev.includes(clientId);
+      const updatedSelection = isSelected
+        ? prev.filter((id) => id !== clientId)
+        : [...prev, clientId];
+      
+      // Update the form value
+      form.setValue("assigned_clients", updatedSelection);
+      
+      return updatedSelection;
+    });
   };
 
   return (
@@ -325,43 +351,12 @@ export function AddUserDialog({
                                     {clients.map((client) => (
                                       <CommandItem
                                         key={client.id}
-                                        onSelect={() => {
-                                          setSelectedClients((prev) => {
-                                            const isSelected = prev.includes(client.id);
-                                            if (isSelected) {
-                                              return prev.filter((id) => id !== client.id);
-                                            } else {
-                                              return [...prev, client.id];
-                                            }
-                                          });
-                                          form.setValue(
-                                            "assigned_clients",
-                                            selectedClients.includes(client.id)
-                                              ? selectedClients.filter((id) => id !== client.id)
-                                              : [...selectedClients, client.id]
-                                          );
-                                        }}
+                                        onSelect={() => handleClientSelection(client.id)}
                                       >
                                         <div className="flex items-center space-x-2">
                                           <Checkbox
                                             checked={selectedClients.includes(client.id)}
-                                            onCheckedChange={(checked) => {
-                                              if (checked) {
-                                                setSelectedClients((prev) => [...prev, client.id]);
-                                                form.setValue(
-                                                  "assigned_clients",
-                                                  [...selectedClients, client.id]
-                                                );
-                                              } else {
-                                                setSelectedClients((prev) =>
-                                                  prev.filter((id) => id !== client.id)
-                                                );
-                                                form.setValue(
-                                                  "assigned_clients",
-                                                  selectedClients.filter((id) => id !== client.id)
-                                                );
-                                              }
-                                            }}
+                                            onCheckedChange={() => handleClientSelection(client.id)}
                                           />
                                           <span>{client.name}</span>
                                         </div>
