@@ -2,7 +2,11 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc
+**URL**: [https://client-flow-nexus-ui.lovable.app/auth]
+
+Client
+Email : nkp0044@gmail.com
+Password : 1029384756
 
 ## How can I edit this code?
 
