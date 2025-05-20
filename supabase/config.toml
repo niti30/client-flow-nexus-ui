@@ -1,5 +1,4 @@
 
-
 # This file controls the configuration of your Supabase setup
 #
 # Database password configuration
@@ -60,4 +59,3 @@ schema = "public"
 table = "clients"
 operation = "insert"
 definition = "(auth.role() = 'authenticated')"
-
