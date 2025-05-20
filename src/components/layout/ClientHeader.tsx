@@ -9,14 +9,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, LogOut, User, Menu } from "lucide-react";
+import { Settings, LogOut, User, Menu, Bell } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const ClientHeader = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme } = useTheme();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   
   const handleSignOut = async () => {
     try {
@@ -75,28 +79,71 @@ const ClientHeader = () => {
     navigate('/settings');
   };
 
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!user) return "U";
+    
+    const name = user.user_metadata?.full_name || 
+                user.user_metadata?.name || 
+                user.email || 
+                "";
+                
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
     <header className="bg-card border-b border-border p-4 flex justify-between items-center relative z-10">
       <div className="flex items-center">
         <h1 className="text-xl font-semibold ml-12 md:ml-0 truncate">Acme Corporation</h1>
       </div>
       <div className="flex items-center space-x-4">
-        <button className="p-1 rounded-full hover:bg-muted">
-          <span className="sr-only">Notifications</span>
-          <svg className="h-6 w-6 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        </button>
+        {/* Notification bell */}
+        <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="p-2 rounded-full hover:bg-muted transition-colors relative" aria-label="Notifications">
+              <Bell className="h-5 w-5 text-foreground" />
+              <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-72 p-4 bg-card border-border">
+            <h3 className="font-medium mb-2">Notifications</h3>
+            <div className="space-y-2">
+              <div className="text-sm p-2 hover:bg-muted rounded-md">
+                <p className="font-medium">Workflow Completed</p>
+                <p className="text-muted-foreground text-xs">Invoice #1234 was processed successfully</p>
+              </div>
+              <div className="text-sm p-2 hover:bg-muted rounded-md">
+                <p className="font-medium">New Exception</p>
+                <p className="text-muted-foreground text-xs">Exception in Employee Onboarding workflow</p>
+              </div>
+            </div>
+            <DropdownMenuSeparator className="my-2" />
+            <button 
+              className="text-xs text-primary w-full text-center hover:underline" 
+              onClick={() => setNotificationsOpen(false)}
+            >
+              View all notifications
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
         
+        {/* User avatar and menu */}
         <DropdownMenu>
           <DropdownMenuTrigger className="focus:outline-none">
-            <div className="h-8 w-8 rounded-full bg-muted overflow-hidden">
-              <img 
+            <Avatar className="h-8 w-8 border border-border">
+              <AvatarImage 
                 src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
                 alt="User avatar" 
-                className="h-full w-full object-cover"
               />
-            </div>
+              <AvatarFallback className="bg-muted text-foreground">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 bg-card border-border text-card-foreground">
             <DropdownMenuItem onClick={navigateToProfile} className="cursor-pointer">
