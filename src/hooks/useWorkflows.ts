@@ -120,54 +120,43 @@ export const useWorkflows = (options?: UseWorkflowsOptions) => {
         return generateMockClientStats();
       }
       
-      // Get workflow counts for all clients in a single query
-      const { data: workflowStats, error: workflowError } = await supabase
-        .from('workflows')
-        .select('client_id, count')
-        .group('client_id')
-        .count();
-      
-      if (workflowError) {
-        console.error('Error fetching workflow stats:', workflowError);
-        return generateMockClientStats();
-      }
-      
-      // Get exception counts for all clients in a single query
-      const { data: exceptionStats, error: exceptionError } = await supabase
-        .from('exceptions')
-        .select('client_id, count')
-        .group('client_id')
-        .count();
-      
-      if (exceptionError) {
-        console.error('Error fetching exception stats:', exceptionError);
-      }
-      
-      // Map the clients with their respective stats
-      const clientStats = clients.map(client => {
-        // Find this client's workflow count
-        const clientWorkflows = workflowStats?.find(
-          stat => stat.client_id === client.id
-        );
-        
-        // Find this client's exception count
-        const clientExceptions = exceptionStats?.find(
-          stat => stat.client_id === client.id
-        );
-        
-        const workflowCount = clientWorkflows?.count || 0;
-        
-        // Return client stats with calculated metrics
-        return {
-          clientId: client.id,
-          clientName: client.name,
-          totalWorkflows: workflowCount,
-          exceptions: clientExceptions?.count || 0,
-          timeSaved: `${Math.round(workflowCount * 0.45)}h`,
-          revenue: `$${Math.round(workflowCount * 297)}`,
-          moneySaved: `$${Math.round(workflowCount * 142)}`
-        };
-      });
+      // Get workflow counts for each client individually
+      const clientStats = await Promise.all(
+        clients.map(async (client) => {
+          // Count workflows for this client
+          const { count: workflowCount, error: workflowError } = await supabase
+            .from('workflows')
+            .select('*', { count: 'exact', head: true })
+            .eq('client_id', client.id);
+          
+          if (workflowError) {
+            console.error(`Error counting workflows for client ${client.id}:`, workflowError);
+          }
+          
+          // Count exceptions for this client
+          const { count: exceptionCount, error: exceptionError } = await supabase
+            .from('exceptions')
+            .select('*', { count: 'exact', head: true })
+            .eq('client_id', client.id);
+          
+          if (exceptionError) {
+            console.error(`Error counting exceptions for client ${client.id}:`, exceptionError);
+          }
+          
+          const totalWorkflows = workflowCount || 0;
+          
+          // Return client stats with calculated metrics
+          return {
+            clientId: client.id,
+            clientName: client.name,
+            totalWorkflows,
+            exceptions: exceptionCount || 0,
+            timeSaved: `${Math.round(totalWorkflows * 0.45)}h`,
+            revenue: `$${Math.round(totalWorkflows * 297)}`,
+            moneySaved: `$${Math.round(totalWorkflows * 142)}`
+          };
+        })
+      );
       
       return clientStats;
     } catch (error) {
