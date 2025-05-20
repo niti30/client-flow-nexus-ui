@@ -52,7 +52,7 @@ const ClientROI = () => {
             // Format the data to match the WorkflowROI interface
             return data.map(workflow => ({
               id: workflow.id,
-              created_at: workflow.created_at,
+              created_at: workflow.created_at || '',
               department: workflow.department || '',
               workflow_name: workflow.name,
               description: workflow.description || '',
