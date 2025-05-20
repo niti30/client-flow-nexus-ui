@@ -75,13 +75,13 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
             client_status?: string;
           };
           
-          // Direct insert bypassing RLS
-          const { data: rpcData, error: rpcError } = await supabase.rpc<string>(
+          // Direct insert bypassing RLS - Fix: provide both input and output type parameters
+          const { data: rpcData, error: rpcError } = await supabase.rpc<string, AdminInsertClientParams>(
             'admin_insert_client', 
             { 
               client_name: companyName,
               client_status: 'active'
-            } as AdminInsertClientParams
+            }
           );
           
           if (rpcError) {
