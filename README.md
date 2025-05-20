@@ -1,5 +1,5 @@
 
-# Client Flow Nexus UI
+# BrainTrust Nexus UI
 
 A comprehensive client management system with role-based access control, workflow management, and reporting functionalities.
 
