@@ -1,16 +1,7 @@
-
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { 
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell
-} from "@/components/ui/table";
-
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 interface Client {
   name: string;
   contractStart: string;
@@ -22,36 +13,30 @@ interface Client {
   timeSaved: string;
   moneySaved: string;
 }
-
 interface ClientsTableEnhancedProps {
   clients: Client[];
   isLoading?: boolean;
 }
-
-const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({ clients, isLoading = false }) => {
+const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
+  clients,
+  isLoading = false
+}) => {
   if (isLoading) {
-    return (
-      <div className="p-6 text-center">
+    return <div className="p-6 text-center">
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-1/4 mx-auto mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
         </div>
-      </div>
-    );
+      </div>;
   }
-  
   if (!clients.length) {
-    return (
-      <div className="p-6 text-center text-gray-500">
+    return <div className="p-6 text-center text-gray-500">
         No clients found. Add your first client to get started.
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Table>
+  return <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="font-medium">Client Name</TableHead>
@@ -67,8 +52,7 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({ clients, is
         </TableRow>
       </TableHeader>
       <TableBody>
-        {clients.map((client, index) => (
-          <TableRow key={index}>
+        {clients.map((client, index) => <TableRow key={index}>
             <TableCell className="font-medium">{client.name}</TableCell>
             <TableCell>{client.contractStart}</TableCell>
             <TableCell>{client.workflows}</TableCell>
@@ -78,16 +62,9 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({ clients, is
             <TableCell>{client.revenue}</TableCell>
             <TableCell>{client.timeSaved}</TableCell>
             <TableCell>{client.moneySaved}</TableCell>
-            <TableCell>
-              <Link to={`/clients/${index}`} className="text-blue-600 hover:text-blue-800 flex items-center">
-                <ChevronRight size={16} />
-              </Link>
-            </TableCell>
-          </TableRow>
-        ))}
+            
+          </TableRow>)}
       </TableBody>
-    </Table>
-  );
+    </Table>;
 };
-
 export default ClientsTableEnhanced;
