@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
@@ -70,14 +69,9 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         if (userRole === 'admin') {
           console.log("Attempting direct insert via function call for admin");
           
-          // Define proper type for the admin_insert_client function
-          type AdminInsertClientParams = {
-            client_name: string;
-            client_status: string;
-          };
-          
-          // Explicitly declare the expected function parameter types
-          const { data: rpcData, error: rpcError } = await supabase.rpc<string, AdminInsertClientParams>(
+          // Use any type to bypass TypeScript constraints for now
+          // This will need to be updated once the function is properly defined in the database
+          const { data: rpcData, error: rpcError } = await supabase.rpc(
             'admin_insert_client', 
             { 
               client_name: companyName,
