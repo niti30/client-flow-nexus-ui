@@ -38,8 +38,14 @@ const Clients = () => {
 
   // Function to trigger a refresh of the clients list
   const handleClientAdded = () => {
+    console.log("Client added, refreshing client list...");
     setRefreshTrigger(prev => prev + 1);
   };
+  
+  // Log user role for debugging
+  useEffect(() => {
+    console.log("Current user role in Clients page:", userRole);
+  }, [userRole]);
   
   return <div className="flex h-screen bg-[#f5f5f7]">
       {/* Sidebar */}
@@ -59,7 +65,10 @@ const Clients = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <Input placeholder="Search clients..." className="pl-9 w-full" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                   </div>
-                  <AddClientDialog buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap" onClientAdded={handleClientAdded} />
+                  <AddClientDialog 
+                    buttonClassName="bg-black hover:bg-gray-800 whitespace-nowrap text-white" 
+                    onClientAdded={handleClientAdded} 
+                  />
                 </div>}
             </div>
             
@@ -81,7 +90,7 @@ const Clients = () => {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>Client Users</CardTitle>
-                      <Button onClick={() => setShowUserDialog(true)}>
+                      <Button onClick={() => setShowUserDialog(true)} className="bg-white text-black border border-gray-200 hover:bg-gray-100">
                         <Plus size={16} className="mr-2" />
                         Add User
                       </Button>
@@ -96,7 +105,7 @@ const Clients = () => {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>Document Links</CardTitle>
-                      <Button onClick={() => setShowDocumentDialog(true)}>
+                      <Button onClick={() => setShowDocumentDialog(true)} className="bg-white text-black border border-gray-200 hover:bg-gray-100">
                         <Plus size={16} className="mr-2" />
                         Add Document
                       </Button>
