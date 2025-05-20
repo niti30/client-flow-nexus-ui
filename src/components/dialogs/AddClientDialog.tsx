@@ -69,13 +69,7 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
         if (userRole === 'admin') {
           console.log("Attempting direct insert via function call for admin");
           
-          // Define proper type for the admin_insert_client function
-          type AdminInsertClientParams = {
-            client_name: string;
-            client_status?: string;
-          };
-          
-          // Use proper typing for the RPC call without generic constraints
+          // Use proper typing for the RPC call
           const { data: rpcData, error: rpcError } = await supabase.rpc(
             'admin_insert_client', 
             { 

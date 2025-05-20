@@ -288,7 +288,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_insert_client: {
+        Args: { client_name: string; client_status?: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
