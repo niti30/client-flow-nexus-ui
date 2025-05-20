@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Settings,
@@ -14,7 +14,8 @@ import {
   CreditCard,
   MessageCircle,
   Sun,
-  Moon
+  Moon,
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -29,6 +30,7 @@ const ClientSidebar = () => {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Close sidebar on mobile view for route change
   useEffect(() => {
@@ -38,6 +40,20 @@ const ClientSidebar = () => {
       setIsOpen(true);
     }
   }, [location.pathname, isMobile]);
+
+  // Add click outside handler to close sidebar on mobile
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (isMobile && isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobile, isOpen]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -51,6 +67,7 @@ const ClientSidebar = () => {
     { icon: AlertTriangle, label: "Exceptions", path: "/client/exceptions" },
     { icon: Users, label: "Users", path: "/client/users" },
     { icon: CreditCard, label: "Billing", path: "/client/billing" },
+    { icon: MessageSquare, label: "Support", path: "/client/support" },
     { icon: MessageCircle, label: "Messaging", path: "/client/messaging" },
   ];
 
@@ -75,6 +92,7 @@ const ClientSidebar = () => {
 
       {/* Sidebar */}
       <aside 
+        ref={sidebarRef}
         className={`bg-card text-card-foreground w-[210px] min-h-screen fixed inset-y-0 left-0 z-40 transition-transform duration-300 md:translate-x-0 border-r border-border ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="p-5 flex items-center justify-between">

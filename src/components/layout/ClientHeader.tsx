@@ -14,12 +14,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Settings, LogOut, User, Menu, Bell } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ClientHeader = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   
   const handleSignOut = async () => {
@@ -99,13 +101,16 @@ const ClientHeader = () => {
   return (
     <header className="bg-card border-b border-border p-4 flex justify-between items-center relative z-10">
       <div className="flex items-center">
-        <h1 className="text-xl font-semibold ml-12 md:ml-0 truncate">Acme Corporation</h1>
+        <h1 className={`text-xl font-semibold truncate ${isMobile ? 'ml-12' : 'ml-0'}`}>Acme Corporation</h1>
       </div>
       <div className="flex items-center space-x-4">
         {/* Notification bell */}
         <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="p-2 rounded-full hover:bg-muted transition-colors relative" aria-label="Notifications">
+            <button 
+              className="p-2 rounded-full hover:bg-muted transition-colors relative" 
+              aria-label="Notifications"
+            >
               <Bell className="h-5 w-5 text-foreground" />
               <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
             </button>

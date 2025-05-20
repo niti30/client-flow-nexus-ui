@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 import ClientSidebar from "@/components/layout/ClientSidebar";
+import ClientHeader from "@/components/layout/ClientHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Send, User, ArrowRight } from "lucide-react";
+import { MessageSquare, Send } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -89,22 +90,11 @@ const ClientSupport = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#faf9f8]">
+    <div className="flex h-screen bg-background">
       <ClientSidebar />
       
       <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Support</h1>
-          <div className="flex items-center space-x-4">
-            <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
-              <img 
-                src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=12"} 
-                alt="User avatar" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </header>
+        <ClientHeader />
         
         <main className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -115,18 +105,18 @@ const ClientSupport = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {supportEngineers.map((engineer) => (
-                    <div key={engineer.name} className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div key={engineer.name} className="flex items-center p-2 rounded-lg hover:bg-muted cursor-pointer">
                       <div className="relative">
                         <div className="h-12 w-12 rounded-full overflow-hidden">
                           <img src={engineer.avatar} alt={engineer.name} className="h-full w-full object-cover" />
                         </div>
-                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
+                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card ${
                           engineer.status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
                         }`}></div>
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium">{engineer.name}</p>
-                        <p className="text-xs text-gray-500">{engineer.role}</p>
+                        <p className="text-xs text-muted-foreground">{engineer.role}</p>
                       </div>
                     </div>
                   ))}
@@ -136,9 +126,9 @@ const ClientSupport = () => {
             
             <div className="lg:col-span-3">
               <Card className="h-full flex flex-col">
-                <CardHeader className="border-b bg-gray-50">
+                <CardHeader className="border-b bg-muted/50">
                   <div className="flex items-center">
-                    <MessageSquare className="h-5 w-5 mr-2 text-gray-600" />
+                    <MessageSquare className="h-5 w-5 mr-2 text-foreground" />
                     <CardTitle>Chat with Support</CardTitle>
                   </div>
                 </CardHeader>
@@ -152,8 +142,8 @@ const ClientSupport = () => {
                         <div 
                           className={`max-w-[70%] rounded-lg px-4 py-2 ${
                             message.role === 'user' 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted text-foreground'
                           }`}
                         >
                           {message.content}
