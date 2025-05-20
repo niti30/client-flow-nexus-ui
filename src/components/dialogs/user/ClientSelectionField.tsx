@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface ClientSelectionFieldProps {
   clients: { id: string; name: string }[];
@@ -38,6 +39,13 @@ export function ClientSelectionField({
     // Update the form value and state
     form.setValue("assigned_clients", updatedSelection);
     setSelectedClients(updatedSelection);
+  };
+
+  // Get client names for selected clients to display in the trigger button
+  const getSelectedClientNames = () => {
+    return clients
+      .filter(client => selectedClients.includes(client.id))
+      .map(client => client.name);
   };
 
   return (

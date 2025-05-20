@@ -3,7 +3,6 @@ import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AddUserDialog } from "@/components/dialogs/AddUserDialog";
 
 interface UserFiltersProps {
   activeTab: "admin" | "se";
@@ -20,24 +19,34 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
   setSearchQuery,
   refreshUsers,
 }) => {
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    if (value === "admin" || value === "se") {
+      setActiveTab(value);
+      // Clear search when switching tabs
+      setSearchQuery("");
+    }
+  };
+
   return (
     <div className="flex justify-between items-center flex-wrap gap-4">
       <ToggleGroup
         type="single"
         value={activeTab}
-        onValueChange={(value) => value && setActiveTab(value as "admin" | "se")}
+        onValueChange={(value) => value && handleTabChange(value)}
+        className="border rounded-lg"
       >
         <ToggleGroupItem
           value="admin"
           aria-label="Admin Users"
-          className={activeTab === "admin" ? "bg-black text-white" : ""}
+          className={`${activeTab === "admin" ? "bg-black text-white" : "bg-white"} rounded-l-lg`}
         >
           Admin Users
         </ToggleGroupItem>
         <ToggleGroupItem
           value="se"
           aria-label="SE Users"
-          className={activeTab === "se" ? "bg-black text-white" : ""}
+          className={`${activeTab === "se" ? "bg-black text-white" : "bg-white"} rounded-r-lg`}
         >
           SE Users
         </ToggleGroupItem>
@@ -52,7 +61,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
           placeholder="Search users..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 pr-4 py-2 w-full"
+          className="pl-9 pr-4 py-2 w-full bg-white"
         />
       </div>
     </div>

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
@@ -14,17 +14,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { UserInfoFields } from "./user/UserInfoFields";
 import { SESpecificFields } from "./user/SESpecificFields";
+import { User } from "@/hooks/useUsers";
 
-interface AddUserDialogProps {
-  userRole: "admin" | "se";
-  onUserAdded?: () => void;
-  buttonVariant?: "default" | "outline" | "secondary";
-  buttonClassName?: string;
-  children?: ReactNode;
+interface EditUserDialogProps {
+  user: User;
+  isOpen: boolean;
+  onClose: () => void;
+  onUserUpdated?: () => void;
 }
 
 const formSchema = z.object({
@@ -38,14 +37,12 @@ const formSchema = z.object({
   assigned_clients: z.array(z.string()).default([]),
 });
 
-export function AddUserDialog({ 
-  userRole, 
-  onUserAdded, 
-  buttonVariant = "default", 
-  buttonClassName = "",
-  children
-}: AddUserDialogProps) {
-  const [open, setOpen] = useState(false);
+export function EditUserDialog({ 
+  user, 
+  isOpen, 
+  onClose, 
+  onUserUpdated 
+}: EditUserDialogProps) {
   const [loading, setLoading] = useState(false);
   const [clientsLoading, setClientsLoading] = useState(false);
   const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
@@ -53,24 +50,31 @@ export function AddUserDialog({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const { toast } = useToast();
 
-  // Set up form with validation
+  // Set up form with validation and default values from the user
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone: "",
-      cost_rate: undefined,
-      bill_rate: undefined,
-      role: userRole,
-      assigned_clients: [],
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      email: user.email,
+      phone: user.phone || "",
+      cost_rate: user.cost_rate,
+      bill_rate: user.bill_rate,
+      role: user.role,
+      assigned_clients: user.assigned_clients?.map(client => client.client_id) || [],
     },
   });
 
+  // Set selected clients when user data is loaded
+  useEffect(() => {
+    if (user.assigned_clients && user.assigned_clients.length > 0) {
+      setSelectedClients(user.assigned_clients.map(client => client.client_id));
+    }
+  }, [user]);
+
   // Fetch clients for SE user role
   useEffect(() => {
-    if (userRole === "se" && open) {
+    if (user.role === "se" && isOpen) {
       const fetchClients = async () => {
         try {
           setClientsLoading(true);
@@ -93,11 +97,6 @@ export function AddUserDialog({
         } catch (err) {
           console.error("Error in fetchClients:", err);
           setClients([]);
-          toast({
-            title: "Error",
-            description: "Failed to load clients. Please try again.",
-            variant: "destructive",
-          });
         } finally {
           setClientsLoading(false);
         }
@@ -105,15 +104,15 @@ export function AddUserDialog({
 
       fetchClients();
     }
-  }, [userRole, open, toast]);
+  }, [user.role, isOpen, toast]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      // Add user to the database
+      // Update user in the database
       const { data: userData, error: userError } = await supabase
         .from("users")
-        .insert({
+        .update({
           first_name: values.first_name,
           last_name: values.last_name,
           email: values.email,
@@ -122,44 +121,54 @@ export function AddUserDialog({
           cost_rate: values.role === "se" ? values.cost_rate : null,
           bill_rate: values.role === "se" ? values.bill_rate : null,
         })
+        .eq("id", user.id)
         .select()
         .single();
 
       if (userError) throw userError;
 
-      // If SE user, add client assignments
-      if (values.role === "se" && selectedClients.length > 0 && userData) {
-        const clientAssignments = selectedClients.map(clientId => ({
-          user_id: userData.id,
-          client_id: clientId
-        }));
-
-        const { error: assignmentError } = await supabase
+      // If SE user, update client assignments
+      if (values.role === "se") {
+        // First delete all existing assignments
+        const { error: deleteError } = await supabase
           .from("user_client_assignments")
-          .insert(clientAssignments);
+          .delete()
+          .eq("user_id", user.id);
 
-        if (assignmentError) throw assignmentError;
+        if (deleteError) throw deleteError;
+
+        // Then add new assignments if any selected
+        if (selectedClients.length > 0) {
+          const clientAssignments = selectedClients.map(clientId => ({
+            user_id: user.id,
+            client_id: clientId
+          }));
+
+          const { error: assignmentError } = await supabase
+            .from("user_client_assignments")
+            .insert(clientAssignments);
+
+          if (assignmentError) throw assignmentError;
+        }
       }
 
       toast({
         title: "Success",
-        description: "User added successfully",
+        description: "User updated successfully",
       });
 
-      // Reset form and close dialog
-      form.reset();
-      setSelectedClients([]);
-      setOpen(false);
+      // Close dialog
+      onClose();
       
       // Trigger refresh of user list
-      if (onUserAdded) {
-        onUserAdded();
+      if (onUserUpdated) {
+        onUserUpdated();
       }
     } catch (error: any) {
-      console.error("Error adding user:", error);
+      console.error("Error updating user:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add user. Please try again.",
+        description: error.message || "Failed to update user. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -168,17 +177,12 @@ export function AddUserDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={buttonVariant} className={buttonClassName}>
-          {children || "Add New User"}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New {userRole === "admin" ? "Admin" : "SE"} User</DialogTitle>
+          <DialogTitle>Edit User</DialogTitle>
           <DialogDescription>
-            Fill in the details to add a new {userRole === "admin" ? "admin" : "solutions engineer"} user.
+            Update the details for this user.
           </DialogDescription>
         </DialogHeader>
 
@@ -186,9 +190,9 @@ export function AddUserDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <UserInfoFields />
 
-            {userRole === "se" && (
+            {user.role === "se" && (
               <SESpecificFields 
-                clients={clients} 
+                clients={clients}
                 selectedClients={selectedClients}
                 setSelectedClients={setSelectedClients}
                 clientsLoading={clientsLoading}
@@ -199,6 +203,14 @@ export function AddUserDialog({
 
             <DialogFooter>
               <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onClose}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button 
                 type="submit" 
                 disabled={loading}
                 className="w-full sm:w-auto"
@@ -206,10 +218,10 @@ export function AddUserDialog({
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Adding...
+                    Updating...
                   </>
                 ) : (
-                  "Add User"
+                  "Update User"
                 )}
               </Button>
             </DialogFooter>

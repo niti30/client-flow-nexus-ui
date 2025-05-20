@@ -1,6 +1,7 @@
 
 import React from "react";
 import { AddUserDialog } from "@/components/dialogs/AddUserDialog";
+import { Plus } from "lucide-react";
 
 interface UserHeaderProps {
   activeTab: "admin" | "se";
@@ -17,9 +18,12 @@ export const UserHeader: React.FC<UserHeaderProps> = ({
       <AddUserDialog
         userRole={activeTab}
         onUserAdded={refreshUsers}
-        buttonVariant="outline"
-        buttonClassName="bg-white hover:bg-gray-100"
-      />
+        buttonVariant="default"
+        buttonClassName="bg-black hover:bg-gray-800"
+      >
+        <Plus size={16} className="mr-2" />
+        Add New User
+      </AddUserDialog>
     </div>
   );
 };

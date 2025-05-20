@@ -9,6 +9,18 @@ import { UserHeader } from "@/components/users/UserHeader";
 import { UserFilters } from "@/components/users/UserFilters";
 import { UserTable } from "@/components/users/UserTable";
 import { supabase } from "@/integrations/supabase/client";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { EditUserDialog } from "@/components/dialogs/EditUserDialog";
+import { User } from "@/hooks/useUsers";
 
 const Users = () => {
   const [activeTab, setActiveTab] = useState<"admin" | "se">("admin");
@@ -21,6 +33,10 @@ const Users = () => {
     key: "",
     direction: null,
   });
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
   // Use the hook to fetch users based on active tab
   const { users, loading, refreshUsers } = useUsers(activeTab);
@@ -83,6 +99,10 @@ const Users = () => {
   const sortedUsers = getSortedData();
 
   const filteredUsers = sortedUsers.filter((user) => {
+    // Filter by active tab to ensure users are in the correct tab
+    if (user.role !== activeTab) return false;
+    
+    // Filter by search query
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
 
@@ -100,30 +120,58 @@ const Users = () => {
   });
 
   const handleDeleteUser = async (userId: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      try {
-        const { error } = await supabase
-          .from("users")
-          .delete()
-          .eq("id", userId);
+    setUserToDelete(userId);
+    setIsDeleteDialogOpen(true);
+  };
 
-        if (error) throw error;
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    try {
+      // First delete client assignments for the user
+      const { error: assignmentError } = await supabase
+        .from("user_client_assignments")
+        .delete()
+        .eq("user_id", userToDelete);
 
-        toast({
-          title: "User deleted",
-          description: "The user has been successfully deleted.",
-        });
-        
-        refreshUsers();
-      } catch (error: any) {
-        console.error("Error deleting user:", error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to delete user. Please try again.",
-          variant: "destructive",
-        });
-      }
+      if (assignmentError) throw assignmentError;
+
+      // Then delete the user
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", userToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "User deleted",
+        description: "The user has been successfully deleted.",
+      });
+      
+      // Refresh users list after deletion
+      refreshUsers();
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
+  };
+
+  const handleEditUser = (user: User) => {
+    setUserToEdit(user);
+    setIsEditDialogOpen(true);
+  };
+
+  const closeEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setUserToEdit(null);
   };
 
   return (
@@ -147,7 +195,7 @@ const Users = () => {
               />
             </div>
 
-            <Card className="shadow-sm">
+            <Card className="shadow-sm overflow-hidden rounded-lg">
               <UserTable
                 users={users}
                 filteredUsers={filteredUsers}
@@ -156,11 +204,46 @@ const Users = () => {
                 sortConfig={sortConfig}
                 requestSort={requestSort}
                 handleDeleteUser={handleDeleteUser}
+                handleEditUser={handleEditUser}
               />
             </Card>
           </div>
         </main>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog 
+        open={isDeleteDialogOpen} 
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user
+              and remove their data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setUserToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteUser} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit User Dialog */}
+      {userToEdit && (
+        <EditUserDialog 
+          user={userToEdit} 
+          isOpen={isEditDialogOpen} 
+          onClose={closeEditDialog} 
+          onUserUpdated={refreshUsers}
+        />
+      )}
     </div>
   );
 };

@@ -22,6 +22,7 @@ interface UserTableProps {
   };
   requestSort: (key: string) => void;
   handleDeleteUser: (userId: string) => void;
+  handleEditUser: (user: User) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({ 
@@ -30,7 +31,8 @@ export const UserTable: React.FC<UserTableProps> = ({
   activeTab, 
   sortConfig, 
   requestSort,
-  handleDeleteUser
+  handleDeleteUser,
+  handleEditUser
 }) => {
   if (loading) {
     return (
@@ -63,7 +65,8 @@ export const UserTable: React.FC<UserTableProps> = ({
               key={user.id} 
               user={user} 
               activeTab={activeTab} 
-              onDelete={handleDeleteUser} 
+              onDelete={handleDeleteUser}
+              onEdit={handleEditUser}
             />
           ))
         )}
