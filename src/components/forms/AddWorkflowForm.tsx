@@ -35,7 +35,6 @@ interface AddWorkflowFormProps {
 }
 
 export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: AddWorkflowFormProps) {
-  // Fix the types in the defaultValues to match what the input fields expect (strings)
   const form = useForm<WorkflowFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
