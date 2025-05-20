@@ -25,6 +25,8 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
       setActiveTab(value);
       // Clear search when switching tabs
       setSearchQuery("");
+      // Refresh users when changing tabs to ensure we get the latest data
+      refreshUsers();
     }
   };
 

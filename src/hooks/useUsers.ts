@@ -55,6 +55,11 @@ export function useUsers(role: "admin" | "se" | null = null) {
 
         if (fetchError) throw fetchError;
 
+        if (!data) {
+          setUsers([]);
+          return;
+        }
+
         // Transform data into expected format
         const formattedUsers = data.map((user): User => {
           // Extract assigned clients into a simpler format

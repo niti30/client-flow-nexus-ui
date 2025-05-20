@@ -98,17 +98,16 @@ const Users = () => {
 
   const sortedUsers = getSortedData();
 
+  // Filter users by role and search query
   const filteredUsers = sortedUsers.filter((user) => {
-    // Filter by active tab to ensure users are in the correct tab
+    // First, ensure we only show users with the matching role
     if (user.role !== activeTab) return false;
     
-    // Filter by search query
+    // Then filter by search query if one exists
     if (!searchQuery) return true;
+    
     const query = searchQuery.toLowerCase();
-
-    const fullName = `${user.first_name || ""} ${
-      user.last_name || ""
-    }`.toLowerCase();
+    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
 
     return (
       fullName.includes(query) ||
