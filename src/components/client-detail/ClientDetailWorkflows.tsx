@@ -19,38 +19,57 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  useEffect(() => {
-    // In a real app, we would fetch this data from the database
-    // For now, let's use mock data matching the image
-    const mockWorkflows: Workflow[] = [
-      {
-        id: '1',
-        name: 'Lead Processing',
-        department: 'Sales',
-        created_at: '2025-01-15T12:00:00Z',
-        nodes: 12,
-        executions: 234,
-        exceptions: 2,
-        timeSaved: '30',
-        moneySaved: '75',
-        status: 'active'
-      },
-      {
-        id: '2',
-        name: 'Onboarding',
-        department: 'HR',
-        created_at: '2025-01-10T12:00:00Z',
-        nodes: 8,
-        executions: 45,
-        exceptions: 0,
-        timeSaved: '120',
-        moneySaved: '180',
-        status: 'active'
+  const fetchWorkflows = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('workflows')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching workflows:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load workflows. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
-    ];
-    
-    setWorkflows(mockWorkflows);
-    setLoading(false);
+      
+      // Convert database data to Workflow format
+      const formattedWorkflows: Workflow[] = data.map(workflow => ({
+        id: workflow.id,
+        name: workflow.name,
+        department: workflow.department,
+        description: workflow.description,
+        created_at: workflow.created_at,
+        nodes: workflow.nodes || 0,
+        executions: workflow.executions || 0,
+        exceptions: workflow.exceptions || 0,
+        timeSaved: workflow.time_saved ? workflow.time_saved.toString() : '0',
+        moneySaved: workflow.cost_saved ? workflow.cost_saved.toString() : '0',
+        status: workflow.status || 'active',
+        progress: workflow.progress || 0,
+        client_id: workflow.client_id,
+        time_saved: workflow.time_saved,
+        cost_saved: workflow.cost_saved,
+        completed_at: workflow.completed_at
+      }));
+      
+      setWorkflows(formattedWorkflows);
+    } catch (err) {
+      console.error("Unexpected error fetching workflows:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (clientId) {
+      fetchWorkflows();
+    }
   }, [clientId]);
 
   // Function to handle workflow added

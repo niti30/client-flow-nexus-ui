@@ -1,26 +1,28 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useWorkflowActions } from "@/hooks/useWorkflowActions";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface WorkflowStatusToggleProps {
   workflowId: string;
   initialStatus: string;
   onStatusChange?: (newStatus: string) => void;
-  className?: string;
 }
 
 const WorkflowStatusToggle = ({ 
   workflowId, 
   initialStatus, 
-  onStatusChange,
-  className
+  onStatusChange 
 }: WorkflowStatusToggleProps) => {
   const [status, setStatus] = useState(initialStatus === 'active');
   const [isUpdating, setIsUpdating] = useState(false);
   const { updateWorkflowStatus } = useWorkflowActions();
-  const { toast } = useToast();
+
+  // Synchronize status if initialStatus changes
+  useEffect(() => {
+    setStatus(initialStatus === 'active');
+  }, [initialStatus]);
 
   const handleToggle = async (checked: boolean) => {
     setIsUpdating(true);
@@ -30,28 +32,28 @@ const WorkflowStatusToggle = ({
     if (success) {
       setStatus(checked);
       
-      toast({
-        title: "Status updated",
-        description: `Workflow is now ${checked ? 'active' : 'inactive'}.`,
-      });
-      
       if (onStatusChange) {
         onStatusChange(checked ? 'active' : 'inactive');
       }
+      
+      toast(
+        checked ? "Workflow activated" : "Workflow deactivated",
+        { description: checked ? "Workflow is now active" : "Workflow is now inactive" }
+      );
     }
     
     setIsUpdating(false);
   };
 
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className="flex items-center">
       <Switch 
         checked={status} 
         onCheckedChange={handleToggle}
         disabled={isUpdating}
-        className={`${status ? 'bg-green-500' : 'bg-gray-300'} data-[state=checked]:bg-green-500`}
+        className="data-[state=checked]:bg-green-500"
       />
-      <span className={`ml-2 text-sm ${status ? 'text-green-600' : 'text-gray-500'}`}>
+      <span className={`ml-2 ${status ? 'text-green-600' : 'text-gray-500'}`}>
         {status ? 'Active' : 'Inactive'}
       </span>
     </div>

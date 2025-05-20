@@ -45,10 +45,8 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            {/* Redirect root to auth page */}
-            <Route path="/" element={<Navigate to="/auth" replace />} />
-            
             {/* Public routes */}
+            <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
 
             {/* Protected admin routes */}

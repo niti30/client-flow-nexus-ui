@@ -10,6 +10,7 @@ interface AuthContextType {
   userRole: string;
   loading: boolean;
   signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -135,16 +136,6 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     // If user is not logged in and trying to access protected page, redirect to auth
     if (!user && location.pathname !== '/auth' && location.pathname !== '/') {
       navigate('/auth');
-      return;
-    }
-
-    // If user is logged in and on the auth or root page, redirect to appropriate dashboard
-    if (user && (location.pathname === '/auth' || location.pathname === '/')) {
-      if (userRole === 'client') {
-        navigate('/client/dashboard');
-      } else if (userRole === 'admin' || userRole === 'se') {
-        navigate('/dashboard');
-      }
       return;
     }
 
@@ -283,8 +274,48 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     }
   };
 
+  const signIn = async (email: string, password: string) => {
+    try {
+      console.log("Signing in user:", email);
+      
+      // Clean up auth state before signing in
+      cleanupAuthState();
+      
+      // Attempt to sign in
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Sign in successful, user:", data.user);
+      setUser(data.user);
+      setSession(data.session);
+      
+      // Get role from user metadata as a fallback
+      const metadataRole = data.user?.user_metadata?.role;
+      if (metadataRole) {
+        console.log("Role from metadata after signin:", metadataRole);
+        setUserRole(metadataRole);
+      }
+      
+      // Then try to get from database
+      if (data.user) {
+        setTimeout(() => {
+          fetchUserRole(data.user.id);
+        }, 0);
+      }
+    } catch (error: any) {
+      console.error('Error signing in:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, userRole, loading, signOut }}>
+    <AuthContext.Provider value={{ session, user, userRole, loading, signOut, signIn }}>
       {children}
     </AuthContext.Provider>
   );

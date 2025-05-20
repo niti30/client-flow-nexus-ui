@@ -13,4 +13,7 @@ export interface Workflow {
   status: string;
   progress?: number;
   client_id?: string;
+  time_saved?: number;
+  cost_saved?: number;
+  completed_at?: string;
 }
