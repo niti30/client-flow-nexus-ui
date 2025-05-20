@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WorkflowFormValues } from "@/components/forms/AddWorkflowForm";
 import { useAuth } from "@/contexts/AuthContext";
+import { Workflow } from "@/types/workflow";
 
 export const useWorkflowActions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const addWorkflow = async (values: WorkflowFormValues, clientId: string, onSuccess?: () => void) => {
+  const addWorkflow = async (values: WorkflowFormValues, clientId: string, onSuccess?: (workflow?: Workflow) => void) => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -24,8 +25,10 @@ export const useWorkflowActions = () => {
 
     try {
       const workflowData = {
-        ...values,
         client_id: clientId,
+        name: values.name, // Ensure name is present and not optional
+        department: values.department || '',
+        description: values.description || '',
         nodes: values.nodes || 0,
         executions: values.executions || 0, 
         exceptions: values.exceptions || 0,
@@ -49,8 +52,25 @@ export const useWorkflowActions = () => {
         description: `${values.name} has been successfully added.`,
       });
 
+      // Convert DB data to Workflow interface format for the callback
+      const newWorkflow: Workflow = {
+        id: data.id,
+        name: data.name,
+        department: data.department,
+        description: data.description,
+        nodes: data.nodes || 0,
+        executions: data.executions || 0,
+        exceptions: data.exceptions || 0,
+        status: data.status,
+        created_at: data.created_at,
+        progress: data.progress || 0,
+        timeSaved: data.time_saved ? data.time_saved.toString() : '0',
+        moneySaved: data.cost_saved ? data.cost_saved.toString() : '0',
+        client_id: data.client_id
+      };
+
       if (onSuccess) {
-        onSuccess();
+        onSuccess(newWorkflow);
       }
 
       return data;

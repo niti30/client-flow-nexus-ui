@@ -1,14 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
-import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
+import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Workflow } from "@/types/workflow";
+import WorkflowStatusToggle from "@/components/workflows/WorkflowStatusToggle";
 
 interface WorkflowROI {
   id: string;
@@ -112,19 +113,21 @@ const ClientROI = () => {
     }
   }, [workflowsData]);
   
-  const handleAddWorkflow = (newWorkflow: Workflow) => {
+  const handleAddWorkflow = (newWorkflow?: Workflow) => {
+    if (!newWorkflow) return;
+    
     // Convert the Workflow format to WorkflowROI format
     const newWorkflowROI: WorkflowROI = {
       id: newWorkflow.id,
       created_at: newWorkflow.created_at,
-      department: newWorkflow.department,
+      department: newWorkflow.department || '',
       workflow_name: newWorkflow.name,
       description: newWorkflow.description || '',
       nodes: newWorkflow.nodes,
       executions: newWorkflow.executions,
       exceptions: newWorkflow.exceptions,
-      time_saved: parseFloat(newWorkflow.timeSaved) || 0,
-      cost_saved: parseFloat(newWorkflow.moneySaved) || 0,
+      time_saved: parseFloat(newWorkflow.timeSaved || '0'),
+      cost_saved: parseFloat(newWorkflow.moneySaved || '0'),
       status: newWorkflow.status === 'active'
     };
     
@@ -161,15 +164,17 @@ const ClientROI = () => {
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
-              <AddWorkflowDialog
-                onWorkflowAdded={handleAddWorkflow}
-                clientId={clientId}
-              >
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Workflow
-                </Button>
-              </AddWorkflowDialog>
+              {clientId && (
+                <AddWorkflowDialog
+                  onWorkflowAdded={handleAddWorkflow}
+                  clientId={clientId}
+                >
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Workflow
+                  </Button>
+                </AddWorkflowDialog>
+              )}
             </div>
             
             {isLoading ? (
@@ -280,9 +285,10 @@ const ClientROI = () => {
                               <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
                               <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
                               <td className="px-4 py-3 text-sm">
-                                <div className="w-10 h-6 rounded-full bg-muted flex items-center">
-                                  <div className={`w-5 h-5 rounded-full transform transition-transform duration-200 ${workflow.status ? "translate-x-4 bg-green-500" : "translate-x-1 bg-gray-400"}`}></div>
-                                </div>
+                                <WorkflowStatusToggle 
+                                  workflowId={workflow.id} 
+                                  initialStatus={workflow.status ? 'active' : 'inactive'} 
+                                />
                               </td>
                             </tr>
                           );

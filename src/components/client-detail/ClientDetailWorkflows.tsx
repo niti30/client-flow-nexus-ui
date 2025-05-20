@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
+import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Workflow } from "@/types/workflow";
+import WorkflowStatusToggle from '@/components/workflows/WorkflowStatusToggle';
 
 interface ClientDetailWorkflowsProps {
   clientId: string;
@@ -52,14 +54,16 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   }, [clientId]);
 
   // Function to handle workflow added
-  const handleWorkflowAdded = (workflow: Workflow) => {
-    // Add the new workflow to the beginning of the array
-    setWorkflows(prevWorkflows => [workflow, ...prevWorkflows]);
-    
-    toast({
-      title: "Workflow Added",
-      description: `${workflow.name} workflow has been added.`,
-    });
+  const handleWorkflowAdded = (workflow?: Workflow) => {
+    if (workflow) {
+      // Add the new workflow to the beginning of the array
+      setWorkflows(prevWorkflows => [workflow, ...prevWorkflows]);
+      
+      toast({
+        title: "Workflow Added",
+        description: `${workflow.name} workflow has been added.`,
+      });
+    }
   };
 
   // Handle ROI Report download
@@ -93,7 +97,7 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">Workflows</h2>
         <AddWorkflowDialog 
-          buttonClassName="bg-black text-white" 
+          className="bg-black text-white" 
           onWorkflowAdded={handleWorkflowAdded}
           clientId={clientId}
         />
@@ -154,7 +158,10 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-black"></div>
+                        <WorkflowStatusToggle 
+                          workflowId={workflow.id} 
+                          initialStatus={workflow.status} 
+                        />
                         <Button 
                           variant="link" 
                           className="p-0 h-auto text-blue-500"

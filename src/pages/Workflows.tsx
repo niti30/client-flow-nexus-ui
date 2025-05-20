@@ -7,9 +7,12 @@ import WorkflowSearchBar from '@/components/workflows/WorkflowSearchBar';
 import { AddWorkflowDialog } from '@/components/dialogs/AddWorkflowDialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Workflow } from '@/types/workflow';
 
 const Workflows = () => {
   const { workflows, loading } = useWorkflows();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSearch = (query: string) => {
     // Placeholder for search functionality
@@ -28,6 +31,14 @@ const Workflows = () => {
     document.body.removeChild(dummyLink);
   };
 
+  const handleWorkflowAdded = (workflow?: Workflow) => {
+    if (workflow) {
+      console.log('New workflow added:', workflow);
+      // Trigger a refresh of the workflows table
+      setRefreshKey(prev => prev + 1);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#121212] text-white">
       <Sidebar />
@@ -43,7 +54,11 @@ const Workflows = () => {
                 <WorkflowSearchBar 
                   onSearch={handleSearch} 
                 />
-                <AddWorkflowDialog buttonClassName="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white" />
+                <AddWorkflowDialog 
+                  className="bg-[#2a2a2d] hover:bg-[#3a3a3d] text-white"
+                  onWorkflowAdded={handleWorkflowAdded}
+                  clientId="default-client" // Replace with actual client id in production
+                />
               </div>
             </div>
             

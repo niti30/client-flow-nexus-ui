@@ -11,28 +11,35 @@ import { Button } from "@/components/ui/button";
 import { AddWorkflowForm, WorkflowFormValues } from "@/components/forms/AddWorkflowForm";
 import { PlusCircle } from "lucide-react";
 import { useWorkflowActions } from "@/hooks/useWorkflowActions";
+import { Workflow } from "@/types/workflow";
+
+export type { Workflow };
 
 interface AddWorkflowDialogProps {
   clientId: string;
-  onWorkflowAdded?: () => void;
+  onWorkflowAdded?: (workflow?: Workflow) => void;
   buttonText?: string;
   buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
+  className?: string;
+  children?: React.ReactNode;
 }
 
 export function AddWorkflowDialog({ 
   clientId, 
   onWorkflowAdded,
   buttonText = "Add Workflow", 
-  buttonVariant = "default"
+  buttonVariant = "default",
+  className,
+  children
 }: AddWorkflowDialogProps) {
   const [open, setOpen] = useState(false);
   const { addWorkflow, isSubmitting } = useWorkflowActions();
 
   const handleSubmit = async (values: WorkflowFormValues) => {
-    const result = await addWorkflow(values, clientId, () => {
+    const result = await addWorkflow(values, clientId, (workflow) => {
       setOpen(false);
       if (onWorkflowAdded) {
-        onWorkflowAdded();
+        onWorkflowAdded(workflow);
       }
     });
     
@@ -47,10 +54,12 @@ export function AddWorkflowDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={buttonVariant}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          {buttonText}
-        </Button>
+        {children || (
+          <Button variant={buttonVariant} className={className}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {buttonText}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
