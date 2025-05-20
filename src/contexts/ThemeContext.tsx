@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 
 type Theme = "light" | "dark";
 
@@ -18,27 +17,14 @@ export const useTheme = () => {
   return context;
 };
 
+// We're keeping this provider but making it always return light theme
+// This ensures that components depending on this context will still work
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check if theme was previously saved in localStorage
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    return savedTheme || "light";
-  });
-
-  useEffect(() => {
-    // Save theme to localStorage when it changes
-    localStorage.setItem("theme", theme);
-    
-    // Apply dark mode class to document
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
-
+  // Always light theme, toggle does nothing
+  const theme: Theme = "light";
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    // No-op function - theme toggle disabled
+    console.log("Theme toggle disabled");
   };
 
   return (

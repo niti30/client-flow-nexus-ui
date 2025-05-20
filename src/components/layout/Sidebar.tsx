@@ -11,19 +11,15 @@ import {
   PieChart, 
   OctagonAlert, 
   Menu, 
-  X, 
-  Sun,
-  Moon
+  X
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTheme } from "@/contexts/ThemeContext";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { theme, toggleTheme } = useTheme();
 
   // Close sidebar on mobile view for route change
   useEffect(() => {
@@ -109,25 +105,10 @@ const Sidebar = () => {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-5 flex items-center justify-between">
+        <div className="p-5">
           <div className="flex items-center">
-            {theme === 'dark' ? (
-              <Sun className="h-6 w-6 text-foreground" />
-            ) : (
-              <Sun className="h-6 w-6 text-foreground" />
-            )}
+            <span className="text-xl font-semibold">Admin Dashboard</span>
           </div>
-          <button
-            onClick={toggleTheme}
-            className="p-1 rounded-md hover:bg-muted transition-colors"
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? (
-              <Moon className="h-5 w-5 text-foreground" />
-            ) : (
-              <Moon className="h-5 w-5 text-foreground" />
-            )}
-          </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
