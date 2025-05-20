@@ -104,6 +104,7 @@ export function AddWorkflowDialog({
         onWorkflowAdded(newWorkflow);
       }
       
+      // Close the modal after successful submission
       setOpen(false);
     } catch (error) {
       console.error("Error creating workflow:", error);
@@ -118,7 +119,13 @@ export function AddWorkflowDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      // Only allow closing if not submitting
+      if (isSubmitting && newOpen === false) {
+        return; // Prevent closing while submitting
+      }
+      setOpen(newOpen);
+    }}>
       <DialogTrigger asChild>
         {children || (
           <Button className={buttonClassName}>
