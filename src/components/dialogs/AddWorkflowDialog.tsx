@@ -36,7 +36,7 @@ export function AddWorkflowDialog({
   const handleSubmit = async (values: WorkflowFormValues) => {
     const result = await addWorkflow(values, clientId, (workflow) => {
       setOpen(false);
-      if (onWorkflowAdded) {
+      if (onWorkflowAdded && workflow) {
         onWorkflowAdded(workflow);
       }
     });

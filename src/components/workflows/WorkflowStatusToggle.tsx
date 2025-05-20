@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useWorkflowActions } from "@/hooks/useWorkflowActions";
+import { toast } from "sonner";
 
 interface WorkflowStatusToggleProps {
   workflowId: string;
@@ -18,6 +19,11 @@ const WorkflowStatusToggle = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const { updateWorkflowStatus } = useWorkflowActions();
 
+  // Synchronize status if initialStatus changes
+  useEffect(() => {
+    setStatus(initialStatus === 'active');
+  }, [initialStatus]);
+
   const handleToggle = async (checked: boolean) => {
     setIsUpdating(true);
     
@@ -29,6 +35,11 @@ const WorkflowStatusToggle = ({
       if (onStatusChange) {
         onStatusChange(checked ? 'active' : 'inactive');
       }
+      
+      toast(
+        checked ? "Workflow activated" : "Workflow deactivated",
+        { description: checked ? "Workflow is now active" : "Workflow is now inactive" }
+      );
     }
     
     setIsUpdating(false);
