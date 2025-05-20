@@ -20,7 +20,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useWorkflows } from "@/hooks/useWorkflows";
-import { useToast } from "@/components/ui/use-toast";
 
 // Helper function to determine badge variant based on status
 const getStatusBadgeVariant = (status: string) => {
@@ -55,11 +54,6 @@ interface WorkflowsTableProps {
 }
 
 const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refreshTrigger }: WorkflowsTableProps) => {
-  const { toast } = useToast();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10;
-  
   // Use the hook if workflows aren't passed as props
   const { workflows: hookWorkflows, loading: hookLoading, fetchWorkflows } = useWorkflows();
   
@@ -73,27 +67,6 @@ const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refres
       fetchWorkflows();
     }
   }, [refreshTrigger, propWorkflows, fetchWorkflows]);
-  
-  // Calculate total pages
-  useEffect(() => {
-    if (workflows?.length) {
-      setTotalPages(Math.ceil(workflows.length / pageSize));
-    }
-  }, [workflows]);
-  
-  // Get current page of workflows
-  const getCurrentPageWorkflows = () => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return workflows?.slice(startIndex, endIndex) || [];
-  };
-  
-  // Handle page changes
-  const handlePageChange = (page: number) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   return (
     <div className="bg-white rounded-md border overflow-hidden">
@@ -124,7 +97,7 @@ const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refres
                 </TableCell>
               </TableRow>
             ) : (
-              getCurrentPageWorkflows().map((workflow) => (
+              workflows.map((workflow) => (
                 <TableRow key={workflow.id}>
                   <TableCell className="font-medium">{workflow.name}</TableCell>
                   <TableCell>{workflow.clients?.name || "—"}</TableCell>
@@ -174,37 +147,19 @@ const WorkflowsTable = ({ workflows: propWorkflows, loading: propLoading, refres
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => handlePageChange(currentPage - 1)}
-                className={currentPage === 1 ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-              />
+              <PaginationPrevious href="#" />
             </PaginationItem>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              // Show up to 5 pages around current page
-              let pageNumber = i + 1;
-              if (totalPages > 5 && currentPage > 3) {
-                pageNumber = i + currentPage - 2;
-                if (pageNumber > totalPages) {
-                  pageNumber = totalPages - 4 + i;
-                }
-              }
-              
-              return (
-                <PaginationItem key={i}>
-                  <PaginationLink 
-                    onClick={() => handlePageChange(pageNumber)}
-                    isActive={currentPage === pageNumber}
-                  >
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
             <PaginationItem>
-              <PaginationNext 
-                onClick={() => handlePageChange(currentPage + 1)}
-                className={currentPage === totalPages ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-              />
+              <PaginationLink href="#" isActive>1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">3</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

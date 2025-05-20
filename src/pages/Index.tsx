@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus } from "lucide-react";
 import Sidebar from "@/components/layout/Sidebar";
@@ -15,22 +14,15 @@ const Index = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("itd");
   const [dashboardData, setDashboardData] = useState({
-    totalWorkflows: '0',
-    totalExceptions: '0',
-    timeSaved: '0h',
-    revenue: '$0',
-    activeClients: '0'
+    totalWorkflows: '2,847',
+    totalExceptions: '156',
+    timeSaved: '1,284h',
+    revenue: '$847K',
+    activeClients: '128'
   });
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [trendData, setTrendData] = useState({
-    workflows: { value: 12, positive: true },
-    exceptions: { value: 8, positive: false },
-    timeSaved: { value: 24, positive: true },
-    revenue: { value: 16, positive: true },
-    clients: { value: 5, positive: true }
-  });
   
   // Fetch clients for dashboard
   useEffect(() => {
@@ -85,72 +77,57 @@ const Index = () => {
     };
     
     fetchClients();
-  }, [refreshTrigger, toast]); 
+  }, [refreshTrigger, toast]); // Added toast to dependency array
   
   // Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        // In a real app, we'd fetch this data from Supabase
+        // For now, we'll just simulate the data loading
         
-        // Fetch real dashboard metrics from Supabase using the RPC function
-        const { data, error } = await supabase.rpc('get_dashboard_metrics', {
-          time_period: activeTab
-        });
+        // Set static data based on activeTab to simulate different time periods
+        let data = {
+          totalWorkflows: '2,847',
+          totalExceptions: '156',
+          timeSaved: '1,284h',
+          revenue: '$847K',
+          activeClients: '128'
+        };
         
-        if (error) {
-          console.error("Error fetching dashboard data:", error);
-          toast({
-            title: "Error fetching dashboard data",
-            description: error.message,
-            variant: "destructive"
-          });
-          return;
+        if (activeTab === '7d') {
+          data = {
+            totalWorkflows: '732',
+            totalExceptions: '42',
+            timeSaved: '312h',
+            revenue: '$198K',
+            activeClients: '115'
+          };
+        } else if (activeTab === '30d') {
+          data = {
+            totalWorkflows: '1,564',
+            totalExceptions: '87',
+            timeSaved: '724h',
+            revenue: '$412K',
+            activeClients: '122'
+          };
         }
         
-        console.log("Fetched dashboard data:", data);
+        setDashboardData(data);
         
-        // Format the data for display
-        const formattedData = {
-          totalWorkflows: data.totalWorkflows.toLocaleString(),
-          totalExceptions: data.totalExceptions.toLocaleString(),
-          timeSaved: `${data.timeSaved.toLocaleString()}h`,
-          revenue: `$${(data.revenue/1000).toLocaleString()}K`,
-          activeClients: data.activeClients.toLocaleString()
-        };
-        
-        setDashboardData(formattedData);
-        
-        // Generate some random trend data based on timeframe
-        // In a real app, this would be calculated from historical data
-        const randomizeTrend = (base, range) => {
-          const value = Math.round(base + (Math.random() * range));
-          const positive = Math.random() > 0.3; // 70% chance of positive trend
-          return { value, positive };
-        };
-        
-        setTrendData({
-          workflows: randomizeTrend(10, 8),
-          exceptions: { value: Math.round(Math.random() * 15), positive: false },
-          timeSaved: randomizeTrend(20, 10),
-          revenue: randomizeTrend(15, 10),
-          clients: randomizeTrend(4, 5)
-        });
-        
+        // Simulate loading delay
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        toast({
-          title: "Unexpected error",
-          description: "Failed to fetch dashboard data. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
         setLoading(false);
       }
     };
     
     fetchDashboardData();
-  }, [activeTab, toast]); 
+  }, [activeTab]); // Refetch when tab changes
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -225,32 +202,29 @@ const Index = () => {
             <MetricsCard 
               title="Total Workflows" 
               value={loading ? "Loading..." : dashboardData.totalWorkflows} 
-              trend={trendData.workflows}
+              trend={{ value: 12, positive: true }}
             />
             <MetricsCard 
               title="Total Exceptions" 
               value={loading ? "Loading..." : dashboardData.totalExceptions} 
-              trend={trendData.exceptions}
+              trend={{ value: 8, positive: false }}
             />
             <MetricsCard 
               title="Time Saved" 
               value={loading ? "Loading..." : dashboardData.timeSaved} 
-              trend={trendData.timeSaved}
+              trend={{ value: 24, positive: true }}
             />
             <MetricsCard 
               title="Revenue" 
               value={loading ? "Loading..." : dashboardData.revenue} 
-              trend={trendData.revenue}
+              trend={{ value: 16, positive: true }}
             />
             <MetricsCard 
               title="Active Clients" 
               value={loading ? "Loading..." : dashboardData.activeClients} 
-              trend={trendData.clients}
+              trend={{ value: 5, positive: true }}
             />
           </div>
-          
-          {/* Additional metrics component */}
-          <DashboardMetrics timeframe={activeTab} />
           
           {/* Clients Section */}
           <div className="mt-6">
