@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
@@ -75,8 +74,9 @@ export function AddClientDialog({ buttonClassName, className, onClientAdded, chi
             client_status?: string;
           };
           
-          // Direct insert bypassing RLS - Fix: provide both input and output type parameters
-          const { data: rpcData, error: rpcError } = await supabase.rpc<string, AdminInsertClientParams>(
+          // Fix: Update the generic type parameters for supabase.rpc
+          // The function should return any type (not string) and accept AdminInsertClientParams
+          const { data: rpcData, error: rpcError } = await supabase.rpc<any, AdminInsertClientParams>(
             'admin_insert_client', 
             { 
               client_name: companyName,
