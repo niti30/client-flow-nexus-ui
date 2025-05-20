@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -153,6 +154,22 @@ const ClientROI = () => {
     return sortOrder === "asc" ? "↑" : "↓";
   };
 
+  // Format date for cleaner display - extract day, month, year
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return {
+        day: date.getDate(),
+        month: date.toLocaleDateString('en-US', { month: 'short' }),
+        year: date.getFullYear(),
+        formattedTime: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      };
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return { day: 1, month: 'Jan', year: 2025, formattedTime: '00:00' };
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background">
       <ClientSidebar />
@@ -164,17 +181,17 @@ const ClientROI = () => {
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
-              {clientId && (
-                <AddWorkflowDialog
-                  onWorkflowAdded={handleAddWorkflow}
-                  clientId={clientId}
-                >
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Workflow
-                  </Button>
-                </AddWorkflowDialog>
-              )}
+              
+              <AddWorkflowDialog
+                buttonText="New Workflow"
+                clientId={clientId || 'default-client'}
+                onWorkflowAdded={handleAddWorkflow}
+              >
+                <Button className="bg-black text-white hover:bg-gray-800">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Workflow
+                </Button>
+              </AddWorkflowDialog>
             </div>
             
             {isLoading ? (
@@ -182,13 +199,13 @@ const ClientROI = () => {
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
               </div>
             ) : (
-              <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-muted/50 border-b border-border">
+                      <tr className="bg-gray-50 border-b">
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("created_at")}
                         >
                           <div className="flex items-center">
@@ -196,7 +213,7 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("department")}
                         >
                           <div className="flex items-center">
@@ -204,18 +221,18 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("workflow_name")}
                         >
                           <div className="flex items-center">
                             Workflow Name {renderSortIndicator("workflow_name")}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium">
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                           Description
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("nodes")}
                         >
                           <div className="flex items-center">
@@ -223,7 +240,7 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("executions")}
                         >
                           <div className="flex items-center">
@@ -231,7 +248,7 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("exceptions")}
                         >
                           <div className="flex items-center">
@@ -239,7 +256,7 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("time_saved")}
                         >
                           <div className="flex items-center">
@@ -247,14 +264,14 @@ const ClientROI = () => {
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium"
+                          className="px-4 py-3 text-left cursor-pointer text-sm font-medium text-gray-600"
                           onClick={() => handleSort("cost_saved")}
                         >
                           <div className="flex items-center">
                             Cost Saved {renderSortIndicator("cost_saved")}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium">
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                           Status
                         </th>
                       </tr>
@@ -269,22 +286,32 @@ const ClientROI = () => {
                       ) : (
                         workflows.map((workflow) => {
                           // Format date for display
-                          const formattedDate = new Date(workflow.created_at).toLocaleString();
+                          const date = formatDate(workflow.created_at);
                           
                           return (
-                            <tr key={workflow.id} className="border-b border-border hover:bg-muted/50">
-                              <td className="px-4 py-3 text-sm">{formattedDate}</td>
-                              <td className="px-4 py-3 text-sm">{workflow.department}</td>
-                              <td className="px-4 py-3 text-sm text-blue-500 hover:underline cursor-pointer">
+                            <tr key={workflow.id} className="border-b hover:bg-gray-50">
+                              <td className="px-4 py-3">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{date.month}</span>
+                                  <span className="font-medium">{date.day},</span>
+                                  <span className="font-medium">{date.year}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">{workflow.department}</td>
+                              <td className="px-4 py-3 text-blue-500 hover:underline cursor-pointer">
                                 {workflow.workflow_name}
                               </td>
-                              <td className="px-4 py-3 text-sm">{workflow.description}</td>
-                              <td className="px-4 py-3 text-sm">{workflow.nodes}</td>
-                              <td className="px-4 py-3 text-sm">{workflow.executions}</td>
-                              <td className="px-4 py-3 text-sm">{workflow.exceptions}</td>
-                              <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
-                              <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
-                              <td className="px-4 py-3 text-sm">
+                              <td className="px-4 py-3">{workflow.description}</td>
+                              <td className="px-4 py-3">{workflow.nodes}</td>
+                              <td className="px-4 py-3 text-blue-500">{workflow.executions}</td>
+                              <td className="px-4 py-3 text-blue-500">{workflow.exceptions}</td>
+                              <td className="px-4 py-3">
+                                {workflow.time_saved} hrs
+                              </td>
+                              <td className="px-4 py-3">
+                                ${workflow.cost_saved.toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3">
                                 <WorkflowStatusToggle 
                                   workflowId={workflow.id} 
                                   initialStatus={workflow.status ? 'active' : 'inactive'} 
