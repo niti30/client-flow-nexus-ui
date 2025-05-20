@@ -34,6 +34,7 @@ import ClientUsers from './pages/client/ClientUsers';
 // Auth Context Provider
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import AuthRoute from './components/auth/AuthRoute';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -48,30 +49,30 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
 
-            {/* Admin routes */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/billing" element={<Billing />} />
-            <Route path="/clients" element={<Clients />} />
-            <Route path="/client-detail/:id" element={<ClientDetail />} />
-            <Route path="/exceptions" element={<Exceptions />} />
-            <Route path="/messaging" element={<Messaging />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/reporting" element={<Reporting />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/workflows" element={<Workflows />} />
+            {/* Protected admin routes */}
+            <Route path="/dashboard" element={<AuthRoute allowedRoles={['admin', 'se']}><Dashboard /></AuthRoute>} />
+            <Route path="/billing" element={<AuthRoute allowedRoles={['admin', 'se']}><Billing /></AuthRoute>} />
+            <Route path="/clients" element={<AuthRoute allowedRoles={['admin', 'se']}><Clients /></AuthRoute>} />
+            <Route path="/client-detail/:id" element={<AuthRoute allowedRoles={['admin', 'se']}><ClientDetail /></AuthRoute>} />
+            <Route path="/exceptions" element={<AuthRoute allowedRoles={['admin', 'se']}><Exceptions /></AuthRoute>} />
+            <Route path="/messaging" element={<AuthRoute allowedRoles={['admin', 'se']}><Messaging /></AuthRoute>} />
+            <Route path="/profile" element={<AuthRoute allowedRoles={['admin', 'se', 'client']}><Profile /></AuthRoute>} />
+            <Route path="/reporting" element={<AuthRoute allowedRoles={['admin', 'se']}><Reporting /></AuthRoute>} />
+            <Route path="/settings" element={<AuthRoute allowedRoles={['admin', 'se', 'client']}><Settings /></AuthRoute>} />
+            <Route path="/subscriptions" element={<AuthRoute allowedRoles={['admin', 'se']}><Subscriptions /></AuthRoute>} />
+            <Route path="/users" element={<AuthRoute allowedRoles={['admin', 'se']}><Users /></AuthRoute>} />
+            <Route path="/workflows" element={<AuthRoute allowedRoles={['admin', 'se']}><Workflows /></AuthRoute>} />
 
-            {/* Client routes */}
-            <Route path="/client/billing" element={<ClientBilling />} />
-            <Route path="/client/credentials" element={<ClientCredentials />} />
-            <Route path="/client/dashboard" element={<ClientDashboard />} />
-            <Route path="/client/exceptions" element={<ClientExceptions />} />
-            <Route path="/client/messaging" element={<ClientMessaging />} />
-            <Route path="/client/roi" element={<ClientROI />} />
-            <Route path="/client/reporting" element={<ClientReporting />} />
-            <Route path="/client/support" element={<ClientSupport />} />
-            <Route path="/client/users" element={<ClientUsers />} />
+            {/* Protected client routes */}
+            <Route path="/client/billing" element={<AuthRoute allowedRoles={['client']}><ClientBilling /></AuthRoute>} />
+            <Route path="/client/credentials" element={<AuthRoute allowedRoles={['client']}><ClientCredentials /></AuthRoute>} />
+            <Route path="/client/dashboard" element={<AuthRoute allowedRoles={['client']}><ClientDashboard /></AuthRoute>} />
+            <Route path="/client/exceptions" element={<AuthRoute allowedRoles={['client']}><ClientExceptions /></AuthRoute>} />
+            <Route path="/client/messaging" element={<AuthRoute allowedRoles={['client']}><ClientMessaging /></AuthRoute>} />
+            <Route path="/client/roi" element={<AuthRoute allowedRoles={['client']}><ClientROI /></AuthRoute>} />
+            <Route path="/client/reporting" element={<AuthRoute allowedRoles={['client']}><ClientReporting /></AuthRoute>} />
+            <Route path="/client/support" element={<AuthRoute allowedRoles={['client']}><ClientSupport /></AuthRoute>} />
+            <Route path="/client/users" element={<AuthRoute allowedRoles={['client']}><ClientUsers /></AuthRoute>} />
 
             {/* Redirect to Dashboard for the admin path */}
             <Route path="/admin" element={<Navigate to="/dashboard" />} />

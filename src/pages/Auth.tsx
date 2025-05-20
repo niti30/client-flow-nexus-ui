@@ -29,7 +29,7 @@ const cleanupAuthState = () => {
 };
 
 // Function to redirect based on user role
-const redirectBasedOnRole = (role) => {
+const redirectBasedOnRole = (role: string) => {
   if (role === 'client') {
     window.location.href = '/client/dashboard';
   } else if (role === 'admin' || role === 'se') {
@@ -49,7 +49,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<'admin' | 'client'>('client'); // Default to client
+  const [userRole, setUserRole] = useState<'admin' | 'se' | 'client'>('client'); // Default to client
   const [creatingAdmin, setCreatingAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -147,9 +147,6 @@ const Auth = () => {
           setError(adminSignInError.message);
           
           if (adminSignInError.message.includes('not confirmed')) {
-            // In real projects, this should be removed - this is only for testing
-            // Admin email needs confirmation - try to auto-confirm by updating auth.users
-            // But we'll show a toast about this instead since we can't modify the auth schema directly
             toast({
               title: "Email confirmation required",
               description: "Please check your inbox to confirm your email. For testing, you can disable email confirmation in the Supabase dashboard.",
@@ -179,6 +176,122 @@ const Auth = () => {
       });
     } finally {
       setCreatingAdmin(false);
+    }
+  };
+
+  // Create test SE user
+  const createSEUser = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Clean up existing auth state
+      cleanupAuthState();
+      
+      const SE_EMAIL = "se1@example-domain.com";
+      const SE_PASSWORD = "Support123!";
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: SE_EMAIL,
+        password: SE_PASSWORD,
+        options: {
+          data: {
+            role: 'se'
+          }
+        }
+      });
+      
+      if (error) {
+        if (error.message.includes('already')) {
+          toast({
+            title: "SE exists",
+            description: "SE user already exists. Credentials filled in for you.",
+          });
+          
+          setEmail(SE_EMAIL);
+          setPassword(SE_PASSWORD);
+          setUserRole('se');
+          return;
+        }
+        
+        setError(error.message);
+      } else {
+        toast({
+          title: "SE user created",
+          description: "Support Engineer test user created. Credentials filled in for you."
+        });
+        
+        setEmail(SE_EMAIL);
+        setPassword(SE_PASSWORD);
+        setUserRole('se');
+      }
+    } catch (error) {
+      console.error('Error creating SE user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create SE test user.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Create test Client user
+  const createClientUser = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Clean up existing auth state
+      cleanupAuthState();
+      
+      const CLIENT_EMAIL = "client1@example-domain.com";
+      const CLIENT_PASSWORD = "Client123!";
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: CLIENT_EMAIL,
+        password: CLIENT_PASSWORD,
+        options: {
+          data: {
+            role: 'client'
+          }
+        }
+      });
+      
+      if (error) {
+        if (error.message.includes('already')) {
+          toast({
+            title: "Client exists",
+            description: "Client user already exists. Credentials filled in for you.",
+          });
+          
+          setEmail(CLIENT_EMAIL);
+          setPassword(CLIENT_PASSWORD);
+          setUserRole('client');
+          return;
+        }
+        
+        setError(error.message);
+      } else {
+        toast({
+          title: "Client user created",
+          description: "Client test user created. Credentials filled in for you."
+        });
+        
+        setEmail(CLIENT_EMAIL);
+        setPassword(CLIENT_PASSWORD);
+        setUserRole('client');
+      }
+    } catch (error) {
+      console.error('Error creating Client user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create Client test user.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -344,7 +457,7 @@ const Auth = () => {
           description: "Check your email for a password reset link.",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Forgot password error:', error);
       toast({
         title: "Unexpected error",
@@ -424,18 +537,43 @@ const Auth = () => {
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
                 
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
-                  disabled={creatingAdmin} 
-                  onClick={createAdminUser}
-                >
-                  {creatingAdmin ? "Creating Admin..." : "Create Test Admin"}
-                </Button>
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    disabled={creatingAdmin} 
+                    onClick={createAdminUser}
+                    className="w-full"
+                  >
+                    Admin User
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    disabled={loading} 
+                    onClick={createSEUser}
+                    className="w-full"
+                  >
+                    SE User
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    disabled={loading} 
+                    onClick={createClientUser}
+                    className="w-full"
+                  >
+                    Client User
+                  </Button>
+                </div>
                 
                 <div className="text-sm text-center text-gray-500">
-                  Admin: {ADMIN_EMAIL} / {ADMIN_PASSWORD}
+                  Default credentials:<br/>
+                  Admin: admin1@example-domain.com / Admin123!<br/>
+                  SE: se1@example-domain.com / Support123!<br/>
+                  Client: client1@example-domain.com / Client123!
                 </div>
               </CardFooter>
             </form>
@@ -492,6 +630,17 @@ const Auth = () => {
                         className="rounded-full"
                       />
                       <span>Admin</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="user-role"
+                        value="se"
+                        checked={userRole === 'se'}
+                        onChange={() => setUserRole('se')}
+                        className="rounded-full"
+                      />
+                      <span>Support Engineer</span>
                     </label>
                   </div>
                 </div>
