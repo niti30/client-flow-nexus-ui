@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { User, Plus, Loader2 } from "lucide-react";
+import { User, Plus, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,6 +73,7 @@ export function AddUserDialog({
 }: AddUserDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [clientsLoading, setClientsLoading] = useState(false);
   const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -98,6 +99,7 @@ export function AddUserDialog({
     if (userRole === "se" && open) {
       const fetchClients = async () => {
         try {
+          setClientsLoading(true);
           const { data, error } = await supabase
             .from("clients")
             .select("id, name")
@@ -122,6 +124,8 @@ export function AddUserDialog({
             description: "Failed to load clients. Please try again.",
             variant: "destructive",
           });
+        } finally {
+          setClientsLoading(false);
         }
       };
 
@@ -329,41 +333,59 @@ export function AddUserDialog({
                     <FormItem>
                       <FormLabel>Assigned Clients</FormLabel>
                       <FormControl>
-                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                        <Popover 
+                          open={popoverOpen} 
+                          onOpenChange={setPopoverOpen}
+                        >
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               className="w-full justify-start text-left"
-                              disabled={clients.length === 0}
+                              disabled={clientsLoading}
                             >
-                              {selectedClients.length > 0
-                                ? `${selectedClients.length} client${selectedClients.length > 1 ? "s" : ""} selected`
-                                : "Select clients..."}
+                              {clientsLoading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : selectedClients.length > 0 ? (
+                                `${selectedClients.length} client${selectedClients.length > 1 ? "s" : ""} selected`
+                              ) : (
+                                "Select clients..."
+                              )}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-[300px] p-0" align="start">
-                            {clients.length > 0 ? (
+                            {clientsLoading ? (
+                              <div className="p-4 text-center">
+                                <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
+                                <p className="mt-2 text-sm text-muted-foreground">Loading clients...</p>
+                              </div>
+                            ) : clients.length > 0 ? (
                               <Command>
                                 <CommandInput placeholder="Search clients..." />
                                 <CommandEmpty>No clients found.</CommandEmpty>
-                                <ScrollArea className="h-52">
-                                  <CommandGroup>
+                                <CommandGroup>
+                                  <ScrollArea className="h-52">
                                     {clients.map((client) => (
                                       <CommandItem
                                         key={client.id}
                                         onSelect={() => handleClientSelection(client.id)}
+                                        className="flex items-center px-2 py-1"
                                       >
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 flex-1">
                                           <Checkbox
                                             checked={selectedClients.includes(client.id)}
                                             onCheckedChange={() => handleClientSelection(client.id)}
+                                            className="mr-2"
+                                            aria-label={`Select ${client.name}`}
                                           />
                                           <span>{client.name}</span>
                                         </div>
+                                        {selectedClients.includes(client.id) && (
+                                          <Check className="h-4 w-4 text-primary" />
+                                        )}
                                       </CommandItem>
                                     ))}
-                                  </CommandGroup>
-                                </ScrollArea>
+                                  </ScrollArea>
+                                </CommandGroup>
                               </Command>
                             ) : (
                               <div className="p-4 text-center text-sm">
