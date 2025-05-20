@@ -48,7 +48,7 @@ const ClientsTableEnhanced: React.FC<ClientsTableEnhancedProps> = ({
           <TableHead className="font-medium">Revenue</TableHead>
           <TableHead className="font-medium">Time Saved</TableHead>
           <TableHead className="font-medium">Money Saved</TableHead>
-          <TableHead className="w-[50px]"></TableHead>
+          
         </TableRow>
       </TableHeader>
       <TableBody>
