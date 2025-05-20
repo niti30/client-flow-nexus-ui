@@ -5,12 +5,10 @@ import { Plus } from "lucide-react";
 import ClientSidebar from "@/components/layout/ClientSidebar";
 import ClientHeader from "@/components/layout/ClientHeader";
 import { Button } from "@/components/ui/button";
-import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
+import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Workflow } from "@/types/workflow";
-import WorkflowStatusToggle from "@/components/workflows/WorkflowStatusToggle";
 
 interface WorkflowROI {
   id: string;
@@ -23,7 +21,7 @@ interface WorkflowROI {
   exceptions: number;
   time_saved: number;
   cost_saved: number;
-  status: string;
+  status: boolean;
 }
 
 const ClientROI = () => {
@@ -63,7 +61,7 @@ const ClientROI = () => {
               exceptions: workflow.exceptions || 0,
               time_saved: workflow.time_saved || 0,
               cost_saved: workflow.cost_saved || 0,
-              status: workflow.status
+              status: workflow.status === 'active'
             }));
           }
           
@@ -88,7 +86,7 @@ const ClientROI = () => {
           exceptions: 23,
           time_saved: 156.5,
           cost_saved: 15650,
-          status: "active"
+          status: true
         },
         {
           id: "2",
@@ -101,7 +99,7 @@ const ClientROI = () => {
           exceptions: 5,
           time_saved: 89.2,
           cost_saved: 8920,
-          status: "active"
+          status: true
         }
       ] as WorkflowROI[];
     }
@@ -114,22 +112,20 @@ const ClientROI = () => {
     }
   }, [workflowsData]);
   
-  const handleAddWorkflow = (newWorkflow?: Workflow) => {
-    if (!newWorkflow) return;
-    
+  const handleAddWorkflow = (newWorkflow: Workflow) => {
     // Convert the Workflow format to WorkflowROI format
     const newWorkflowROI: WorkflowROI = {
       id: newWorkflow.id,
       created_at: newWorkflow.created_at,
-      department: newWorkflow.department || '',
+      department: newWorkflow.department,
       workflow_name: newWorkflow.name,
       description: newWorkflow.description || '',
       nodes: newWorkflow.nodes,
       executions: newWorkflow.executions,
       exceptions: newWorkflow.exceptions,
-      time_saved: newWorkflow.time_saved || 0,
-      cost_saved: newWorkflow.cost_saved || 0,
-      status: newWorkflow.status
+      time_saved: parseFloat(newWorkflow.timeSaved) || 0,
+      cost_saved: parseFloat(newWorkflow.moneySaved) || 0,
+      status: newWorkflow.status === 'active'
     };
     
     // Add the new workflow to the state
@@ -138,17 +134,6 @@ const ClientROI = () => {
     
     // Refetch the data to ensure we have the latest
     refetch();
-  };
-  
-  const handleStatusChange = (workflowId: string, newStatus: string) => {
-    // Update the workflow status in the state
-    setWorkflows(prev => 
-      prev.map(workflow => 
-        workflow.id === workflowId 
-          ? { ...workflow, status: newStatus } 
-          : workflow
-      )
-    );
   };
   
   const handleSort = (column: string) => {
@@ -176,17 +161,15 @@ const ClientROI = () => {
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Workflow ROI</h1>
-              {clientId && (
-                <AddWorkflowDialog
-                  clientId={clientId}
-                  onWorkflowAdded={handleAddWorkflow}
-                >
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Workflow
-                  </Button>
-                </AddWorkflowDialog>
-              )}
+              <AddWorkflowDialog
+                onWorkflowAdded={handleAddWorkflow}
+                clientId={clientId}
+              >
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Workflow
+                </Button>
+              </AddWorkflowDialog>
             </div>
             
             {isLoading ? (
@@ -297,11 +280,9 @@ const ClientROI = () => {
                               <td className="px-4 py-3 text-sm">{workflow.time_saved} hrs</td>
                               <td className="px-4 py-3 text-sm">${workflow.cost_saved.toLocaleString()}</td>
                               <td className="px-4 py-3 text-sm">
-                                <WorkflowStatusToggle 
-                                  workflowId={workflow.id} 
-                                  initialStatus={workflow.status} 
-                                  onStatusChange={(newStatus) => handleStatusChange(workflow.id, newStatus)}
-                                />
+                                <div className="w-10 h-6 rounded-full bg-muted flex items-center">
+                                  <div className={`w-5 h-5 rounded-full transform transition-transform duration-200 ${workflow.status ? "translate-x-4 bg-green-500" : "translate-x-1 bg-gray-400"}`}></div>
+                                </div>
                               </td>
                             </tr>
                           );

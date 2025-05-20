@@ -10,7 +10,6 @@ interface AuthContextType {
   userRole: string;
   loading: boolean;
   signOut: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -274,48 +273,8 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     }
   };
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      console.log("Signing in user:", email);
-      
-      // Clean up auth state before signing in
-      cleanupAuthState();
-      
-      // Attempt to sign in
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      console.log("Sign in successful, user:", data.user);
-      setUser(data.user);
-      setSession(data.session);
-      
-      // Get role from user metadata as a fallback
-      const metadataRole = data.user?.user_metadata?.role;
-      if (metadataRole) {
-        console.log("Role from metadata after signin:", metadataRole);
-        setUserRole(metadataRole);
-      }
-      
-      // Then try to get from database
-      if (data.user) {
-        setTimeout(() => {
-          fetchUserRole(data.user.id);
-        }, 0);
-      }
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      throw error;
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ session, user, userRole, loading, signOut, signIn }}>
+    <AuthContext.Provider value={{ session, user, userRole, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

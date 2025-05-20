@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AddWorkflowDialog } from "@/components/dialogs/AddWorkflowDialog";
+import { AddWorkflowDialog, Workflow } from "@/components/dialogs/AddWorkflowDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Workflow } from "@/types/workflow";
-import WorkflowStatusToggle from '@/components/workflows/WorkflowStatusToggle';
 
 interface ClientDetailWorkflowsProps {
   clientId: string;
@@ -19,70 +17,49 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const fetchWorkflows = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('workflows')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        console.error("Error fetching workflows:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load workflows. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Convert database data to Workflow format
-      const formattedWorkflows: Workflow[] = data.map(workflow => ({
-        id: workflow.id,
-        name: workflow.name,
-        department: workflow.department,
-        description: workflow.description,
-        created_at: workflow.created_at,
-        nodes: workflow.nodes || 0,
-        executions: workflow.executions || 0,
-        exceptions: workflow.exceptions || 0,
-        timeSaved: workflow.time_saved ? workflow.time_saved.toString() : '0',
-        moneySaved: workflow.cost_saved ? workflow.cost_saved.toString() : '0',
-        status: workflow.status || 'active',
-        progress: workflow.progress || 0,
-        client_id: workflow.client_id,
-        time_saved: workflow.time_saved,
-        cost_saved: workflow.cost_saved,
-        completed_at: workflow.completed_at
-      }));
-      
-      setWorkflows(formattedWorkflows);
-    } catch (err) {
-      console.error("Unexpected error fetching workflows:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
   useEffect(() => {
-    if (clientId) {
-      fetchWorkflows();
-    }
+    // In a real app, we would fetch this data from the database
+    // For now, let's use mock data matching the image
+    const mockWorkflows: Workflow[] = [
+      {
+        id: '1',
+        name: 'Lead Processing',
+        department: 'Sales',
+        created_at: '2025-01-15T12:00:00Z',
+        nodes: 12,
+        executions: 234,
+        exceptions: 2,
+        timeSaved: '30',
+        moneySaved: '75',
+        status: 'active'
+      },
+      {
+        id: '2',
+        name: 'Onboarding',
+        department: 'HR',
+        created_at: '2025-01-10T12:00:00Z',
+        nodes: 8,
+        executions: 45,
+        exceptions: 0,
+        timeSaved: '120',
+        moneySaved: '180',
+        status: 'active'
+      }
+    ];
+    
+    setWorkflows(mockWorkflows);
+    setLoading(false);
   }, [clientId]);
 
   // Function to handle workflow added
-  const handleWorkflowAdded = (workflow?: Workflow) => {
-    if (workflow) {
-      // Add the new workflow to the beginning of the array
-      setWorkflows(prevWorkflows => [workflow, ...prevWorkflows]);
-      
-      toast({
-        title: "Workflow Added",
-        description: `${workflow.name} workflow has been added.`,
-      });
-    }
+  const handleWorkflowAdded = (workflow: Workflow) => {
+    // Add the new workflow to the beginning of the array
+    setWorkflows(prevWorkflows => [workflow, ...prevWorkflows]);
+    
+    toast({
+      title: "Workflow Added",
+      description: `${workflow.name} workflow has been added.`,
+    });
   };
 
   // Handle ROI Report download
@@ -116,7 +93,7 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">Workflows</h2>
         <AddWorkflowDialog 
-          className="bg-black text-white" 
+          buttonClassName="bg-black text-white" 
           onWorkflowAdded={handleWorkflowAdded}
           clientId={clientId}
         />
@@ -177,10 +154,7 @@ export function ClientDetailWorkflows({ clientId }: ClientDetailWorkflowsProps) 
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <WorkflowStatusToggle 
-                          workflowId={workflow.id} 
-                          initialStatus={workflow.status} 
-                        />
+                        <div className="w-4 h-4 rounded-full bg-black"></div>
                         <Button 
                           variant="link" 
                           className="p-0 h-auto text-blue-500"
