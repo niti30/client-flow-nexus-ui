@@ -39,6 +39,7 @@ This project uses Supabase for backend functionality. You'll need to set up a lo
 
 #### Option A: Using Supabase CLI (Recommended for Local Development)
 
+
 1. Install the Supabase CLI:
    ```bash
    npm install -g supabase
