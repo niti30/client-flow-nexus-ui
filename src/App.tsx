@@ -33,6 +33,7 @@ import ClientUsers from './pages/client/ClientUsers';
 
 // Auth Context Provider
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -40,46 +41,48 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
 
-          {/* Admin routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/client-detail/:id" element={<ClientDetail />} />
-          <Route path="/exceptions" element={<Exceptions />} />
-          <Route path="/messaging" element={<Messaging />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/reporting" element={<Reporting />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/subscriptions" element={<Subscriptions />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/workflows" element={<Workflows />} />
+            {/* Admin routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/client-detail/:id" element={<ClientDetail />} />
+            <Route path="/exceptions" element={<Exceptions />} />
+            <Route path="/messaging" element={<Messaging />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/reporting" element={<Reporting />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/workflows" element={<Workflows />} />
 
-          {/* Client routes */}
-          <Route path="/client/billing" element={<ClientBilling />} />
-          <Route path="/client/credentials" element={<ClientCredentials />} />
-          <Route path="/client/dashboard" element={<ClientDashboard />} />
-          <Route path="/client/exceptions" element={<ClientExceptions />} />
-          <Route path="/client/messaging" element={<ClientMessaging />} />
-          <Route path="/client/roi" element={<ClientROI />} />
-          <Route path="/client/reporting" element={<ClientReporting />} />
-          <Route path="/client/support" element={<ClientSupport />} />
-          <Route path="/client/users" element={<ClientUsers />} />
+            {/* Client routes */}
+            <Route path="/client/billing" element={<ClientBilling />} />
+            <Route path="/client/credentials" element={<ClientCredentials />} />
+            <Route path="/client/dashboard" element={<ClientDashboard />} />
+            <Route path="/client/exceptions" element={<ClientExceptions />} />
+            <Route path="/client/messaging" element={<ClientMessaging />} />
+            <Route path="/client/roi" element={<ClientROI />} />
+            <Route path="/client/reporting" element={<ClientReporting />} />
+            <Route path="/client/support" element={<ClientSupport />} />
+            <Route path="/client/users" element={<ClientUsers />} />
 
-          {/* Redirect to Dashboard for the admin path */}
-          <Route path="/admin" element={<Navigate to="/dashboard" />} />
-          <Route path="/admin/dashboard" element={<Navigate to="/dashboard" />} />
+            {/* Redirect to Dashboard for the admin path */}
+            <Route path="/admin" element={<Navigate to="/dashboard" />} />
+            <Route path="/admin/dashboard" element={<Navigate to="/dashboard" />} />
 
-          {/* 404 route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster position="top-right" />
-      </AuthProvider>
+            {/* 404 route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
