@@ -124,7 +124,7 @@ export const useWorkflows = (options?: UseWorkflowsOptions) => {
       const { data: workflowStats, error: workflowError } = await supabase
         .from('workflows')
         .select('client_id, count')
-        .groupby('client_id')
+        .group('client_id')
         .count();
       
       if (workflowError) {
@@ -136,7 +136,7 @@ export const useWorkflows = (options?: UseWorkflowsOptions) => {
       const { data: exceptionStats, error: exceptionError } = await supabase
         .from('exceptions')
         .select('client_id, count')
-        .groupby('client_id')
+        .group('client_id')
         .count();
       
       if (exceptionError) {
