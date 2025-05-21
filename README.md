@@ -14,7 +14,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc) and start prompting.
+Simply visit the [Project](https://lovable.dev/projects/a2e768c5-2ddd-419b-aa90-63360d43e0dc) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
