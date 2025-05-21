@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: [https://client-flow-nexus-ui.lovable.app/auth]
+**URL**: [Link](https://client-flow-nexus-ui.lovable.app/auth)
 
 Client
 Email : nkp0044@gmail.com
