@@ -20,9 +20,9 @@ const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   department: z.string().min(2, { message: "Department is required." }),
   description: z.string().optional(),
-  nodes: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
-  executions: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
-  exceptions: z.string().regex(/^\d*$/, { message: "Must be a number" }).optional().transform(val => val ? parseInt(val) : 0),
+  nodes: z.number().int().nonnegative().default(0),
+  executions: z.number().int().nonnegative().default(0),
+  exceptions: z.number().int().nonnegative().default(0),
 });
 
 export type WorkflowFormValues = z.infer<typeof formSchema>;
@@ -40,9 +40,9 @@ export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: Ad
       name: "",
       department: "",
       description: "",
-      nodes: "0",
-      executions: "0",
-      exceptions: "0",
+      nodes: 0,
+      executions: 0,
+      exceptions: 0,
     },
   });
 
@@ -108,7 +108,14 @@ export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: Ad
               <FormItem>
                 <FormLabel>Nodes</FormLabel>
                 <FormControl>
-                  <Input placeholder="0" type="number" min="0" {...field} />
+                  <Input 
+                    placeholder="0" 
+                    type="number" 
+                    min="0"
+                    {...field}
+                    onChange={e => field.onChange(e.target.valueAsNumber || 0)}
+                    value={field.value || 0}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -122,7 +129,14 @@ export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: Ad
               <FormItem>
                 <FormLabel>Executions</FormLabel>
                 <FormControl>
-                  <Input placeholder="0" type="number" min="0" {...field} />
+                  <Input 
+                    placeholder="0" 
+                    type="number" 
+                    min="0"
+                    {...field}
+                    onChange={e => field.onChange(e.target.valueAsNumber || 0)}
+                    value={field.value || 0}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,7 +150,14 @@ export function AddWorkflowForm({ onSubmit, onCancel, isSubmitting = false }: Ad
               <FormItem>
                 <FormLabel>Exceptions</FormLabel>
                 <FormControl>
-                  <Input placeholder="0" type="number" min="0" {...field} />
+                  <Input 
+                    placeholder="0" 
+                    type="number" 
+                    min="0"
+                    {...field}
+                    onChange={e => field.onChange(e.target.valueAsNumber || 0)}
+                    value={field.value || 0}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
