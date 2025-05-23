@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to your BrainTrust Nexus project
 
 ## Project info
 
