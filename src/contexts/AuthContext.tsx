@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from '@supabase/supabase-js';
@@ -95,6 +94,18 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
           setTimeout(() => {
             fetchUserRole(session.user.id);
           }, 0);
+          
+          // Redirect user based on role if at auth or root page
+          if (location.pathname === '/auth' || location.pathname === '/') {
+            console.log("Redirecting after sign in based on role:", metadataRole || 'client');
+            
+            // Direct the user to the appropriate landing page based on role
+            if (metadataRole === 'client') {
+              navigate('/client/dashboard');
+            } else if (metadataRole === 'admin' || metadataRole === 'se') {
+              navigate('/clients'); // Direct admins to clients page
+            }
+          }
         } else if (event === 'SIGNED_OUT') {
           setUserRole('client'); // Reset to default on sign out
           console.log("User signed out, reset role to client");
@@ -119,6 +130,16 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
         
         // Then try to get from database
         fetchUserRole(session.user.id);
+        
+        // Redirect if user is at auth or root page
+        if (location.pathname === '/auth' || location.pathname === '/') {
+          // Direct the user to the appropriate landing page based on role
+          if (metadataRole === 'client') {
+            navigate('/client/dashboard');
+          } else if (metadataRole === 'admin' || metadataRole === 'se') {
+            navigate('/clients'); // Direct admins to clients page
+          }
+        }
       } else {
         console.log("No existing session found");
         setLoading(false);
@@ -126,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, location.pathname]);
 
   // Effect to check route permissions
   useEffect(() => {
